@@ -51,6 +51,70 @@ pub fn luma_tie_colours(tol: f64, limit: usize) -> Vec<[u8; 3]> {
     out
 }
 
+/// Colours whose rounded luma changes if the sum is re-associated as
+/// `R*r + (G*g + B*b)`: the evaluation order of `ip-1.js` is observable for exactly these.
+pub fn luma_order_sensitive_colours() -> Vec<[u8; 3]> {
+    let mut out = Vec::new();
+    for r in 0..=255u32 {
+        for g in 0..=255u32 {
+            for b in 0..=255u32 {
+                let (rf, gf, bf) = (r as f64, g as f64, b as f64);
+                let canonical = cdch_core::js::round(rf * R_COEF + gf * G_COEF + bf * B_COEF);
+                let reassociated = cdch_core::js::round(rf * R_COEF + (gf * G_COEF + bf * B_COEF));
+                if canonical != reassociated {
+                    out.push([r as u8, g as u8, b as u8]);
+                }
+            }
+        }
+    }
+    out
+}
+
+/// Centres at which V8's and the host libm's direction for some angle round to different
+/// pixels at radius 1 (found by search: `x` within a few ulps of `h - cos` for small
+/// half-integers `h`, kept only if `round(x + cos_v8) != round(x + cos_libm)`; likewise for
+/// sine and `y`). Returns `(angle, x, y)`; the other coordinate is a safe interior value.
+pub fn libm_adversarial_centres(limit: usize) -> Vec<(u32, f64, f64)> {
+    use cdch_core::js::{direction, direction_libm, round};
+    let interior = 8.0;
+    let search = |a: f64, b: f64| -> Option<f64> {
+        for h in [0.5f64, 1.5, 2.5, -0.5] {
+            for base in [h - a, h - b] {
+                let mut x = base;
+                for _ in 0..4 {
+                    x = f64::from_bits(x.to_bits() - 1);
+                }
+                for _ in 0..9 {
+                    if round(x) >= 0.0 && round(x + a) != round(x + b) {
+                        return Some(x);
+                    }
+                    x = f64::from_bits(x.to_bits() + 1);
+                }
+            }
+        }
+        None
+    };
+    let mut out = Vec::new();
+    for angle in 0..360u32 {
+        let (c8, s8) = direction(angle);
+        let (cl, sl) = direction_libm(angle);
+        if c8 != cl {
+            if let Some(x) = search(c8, cl) {
+                out.push((angle, x, interior));
+            }
+        }
+        if s8 != sl {
+            if let Some(y) = search(s8, sl) {
+                out.push((angle, interior, y));
+            }
+        }
+        if out.len() >= limit {
+            break;
+        }
+    }
+    out
+}
+
 pub fn cases() -> Vec<Case> {
     let mut v = Vec::new();
     let mut push = |id: String, category: &'static str, img: OwnedRgb, center: Option<(f64, f64)>, step: u32| {
@@ -92,6 +156,17 @@ pub fn cases() -> Vec<Case> {
         image(128, 128, move |x, y| picks[y * 128 + x])
     };
     push(format!("luma_ties_{}colours_128", ties.len()), "fp_luma", tie_img, archived(128, 128), 1);
+
+    // The 42 colours for which the luma evaluation order is observable.
+    let sensitive = luma_order_sensitive_colours();
+    let order_img = image(64, 64, move |x, y| sensitive[(y * 64 + x) % sensitive.len()]);
+    push("luma_order_sensitive_64".into(), "fp_luma", order_img, archived(64, 64), 1);
+
+    // Centres on which V8 and libm directions round differently (V8 table necessity).
+    let adv_img = random(32, 32, 2024);
+    for (angle, x, y) in libm_adversarial_centres(8) {
+        push(format!("libm_adversarial_angle{angle}_x{x:e}_y{y:e}"), "fp_trig", adv_img.clone(), Some((x, y)), 1);
+    }
 
     // Small and degenerate sizes.
     for (w, h) in [(1, 1), (1, 2), (2, 1), (2, 2), (3, 3), (3, 5), (5, 3), (7, 1), (1, 7), (4, 4)] {

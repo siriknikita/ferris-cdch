@@ -6,6 +6,7 @@ use std::process::{Child, ChildStdin, ChildStdout, Command, Stdio};
 
 use serde_json::{json, Value};
 
+pub mod mutants;
 pub mod synth;
 
 /// Deterministic SplitMix64 generator (no external RNG dependency).
@@ -30,54 +31,7 @@ impl SplitMix {
     }
 }
 
-/// A decoded, owned, tightly packed RGB image.
-#[derive(Clone, Debug)]
-pub struct OwnedRgb {
-    pub width: usize,
-    pub height: usize,
-    pub data: Vec<u8>,
-}
-
-impl OwnedRgb {
-    pub fn view(&self) -> cdch_core::RgbImage<'_> {
-        cdch_core::RgbImage::new(self.width, self.height, &self.data).expect("valid owned image")
-    }
-    /// Copy of the rectangle `[x0, x0+w) x [y0, y0+h)`.
-    pub fn crop(&self, x0: usize, y0: usize, w: usize, h: usize) -> OwnedRgb {
-        let mut data = Vec::with_capacity(w * h * 3);
-        for y in y0..y0 + h {
-            let s = (y * self.width + x0) * 3;
-            data.extend_from_slice(&self.data[s..s + 3 * w]);
-        }
-        OwnedRgb { width: w, height: h, data }
-    }
-}
-
-/// Decode an 8-bit PNG to packed RGB (alpha dropped, grey replicated), matching
-/// Pillow's `Image.convert("RGB")` for these colour types. PNG is lossless, so the
-/// decoded pixels equal Pillow's.
-pub fn read_png(path: &Path) -> Result<OwnedRgb, String> {
-    let file = std::fs::File::open(path).map_err(|e| format!("{}: {e}", path.display()))?;
-    let mut decoder = png::Decoder::new(BufReader::new(file));
-    decoder.set_transformations(png::Transformations::EXPAND | png::Transformations::STRIP_16);
-    let mut reader = decoder.read_info().map_err(|e| format!("{}: {e}", path.display()))?;
-    let size = reader.output_buffer_size().ok_or("png too large")?;
-    let mut buf = vec![0u8; size];
-    let info = reader.next_frame(&mut buf).map_err(|e| format!("{}: {e}", path.display()))?;
-    buf.truncate(info.buffer_size());
-    let (w, h) = (info.width as usize, info.height as usize);
-    let data = match info.color_type {
-        png::ColorType::Rgb => buf,
-        png::ColorType::Rgba => buf.chunks_exact(4).flat_map(|p| [p[0], p[1], p[2]]).collect(),
-        png::ColorType::Grayscale => buf.iter().flat_map(|&g| [g, g, g]).collect(),
-        png::ColorType::GrayscaleAlpha => buf.chunks_exact(2).flat_map(|p| [p[0], p[0], p[0]]).collect(),
-        other => return Err(format!("{}: unsupported colour type {other:?}", path.display())),
-    };
-    if data.len() != w * h * 3 {
-        return Err(format!("{}: unexpected decoded size", path.display()));
-    }
-    Ok(OwnedRgb { width: w, height: h, data })
-}
+pub use cdch_cli::{read_png, OwnedRgb};
 
 /// All `*.png` files below `dir`, sorted for determinism.
 pub fn png_files(dir: &Path) -> Vec<PathBuf> {
