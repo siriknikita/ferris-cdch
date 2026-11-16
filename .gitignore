@@ -1,0 +1,14 @@
+# Rust build output
+/target/
+# Python environment and caches
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+# Locally built extension modules (rebuilt by `uv sync` / maturin)
+*.so
+*.pyd
+*.dylib
+# External, re-downloadable inputs (DIV2K, SR weights, regenerated pairs) live outside this repo
+/external/
+.DS_Store

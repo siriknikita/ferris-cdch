@@ -1,0 +1,22 @@
+[package]
+name = "cdch-python"
+description = "PyO3/NumPy bindings for the validated Rust CDCH implementation"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+name = "_native"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+cdch-core.workspace = true
+cdch-features.workspace = true
+# Python bindings (abi3 keeps one wheel per platform for CPython >= 3.10).
+pyo3 = { version = "0.30", features = ["abi3-py310"] }
+# Zero-copy NumPy array interop.
+numpy = "0.30"
+# Parallel batch extraction (GIL released).
+rayon.workspace = true

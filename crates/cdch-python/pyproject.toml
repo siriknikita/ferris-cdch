@@ -1,0 +1,17 @@
+[build-system]
+requires = ["maturin>=1.7,<2"]
+build-backend = "maturin"
+
+[project]
+name = "cdch-ferris"
+version = "0.1.0"
+description = "Rust-native canonical CDCH (validated against Muzyka's ip-1.js) with NumPy bindings"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24"]
+classifiers = ["Programming Language :: Rust", "Programming Language :: Python :: Implementation :: CPython"]
+
+[tool.maturin]
+python-source = "python"
+module-name = "cdch_ferris._native"
+features = ["pyo3/extension-module"]
+profile = "release"

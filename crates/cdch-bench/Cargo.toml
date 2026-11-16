@@ -1,0 +1,26 @@
+[package]
+name = "cdch-bench"
+description = "Differential testing, profiling and benchmarking utilities for Project Ferris"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+cdch-core.workspace = true
+cdch-features.workspace = true
+# JSON reports and the oracle wire protocol.
+serde_json.workspace = true
+# Lossless PNG decoding for natural-image fixtures (pure Rust).
+png.workspace = true
+# Batch-throughput measurements.
+rayon.workspace = true
+
+[[bin]]
+name = "ferris-diff"
+path = "src/bin/ferris_diff.rs"
+
+[[bin]]
+name = "ferris-bench"
+path = "src/bin/ferris_bench.rs"

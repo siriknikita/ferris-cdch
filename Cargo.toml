@@ -1,0 +1,39 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/cdch-core",
+    "crates/cdch-features",
+    "crates/cdch-python",
+    "crates/cdch-bench",
+    "crates/cdch-cli",
+]
+default-members = [
+    "crates/cdch-core",
+    "crates/cdch-features",
+    "crates/cdch-bench",
+    "crates/cdch-cli",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[workspace.dependencies]
+cdch-core = { path = "crates/cdch-core" }
+cdch-features = { path = "crates/cdch-features" }
+rayon = "1.12"
+png = "0.18"
+serde_json = "1.0"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "unwind"
+debug = "line-tables-only"
+
+[profile.bench]
+inherits = "release"
