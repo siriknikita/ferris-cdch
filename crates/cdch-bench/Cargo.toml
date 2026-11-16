@@ -10,8 +10,12 @@ publish.workspace = true
 [dependencies]
 cdch-core.workspace = true
 cdch-features.workspace = true
-# JSON reports and the oracle wire protocol.
-serde_json.workspace = true
+# Shared PNG decoding (cdch_cli::read_png).
+cdch-cli = { path = "../cdch-cli" }
+# JSON reports and the oracle wire protocol. `float_roundtrip` makes number parsing
+# correctly rounded (the default fast path can be off by one ulp, which the harness's
+# exact centre-echo check detected).
+serde_json = { workspace = true, features = ["float_roundtrip"] }
 # Lossless PNG decoding for natural-image fixtures (pure Rust).
 png.workspace = true
 # Batch-throughput measurements.

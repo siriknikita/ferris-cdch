@@ -1,7 +1,26 @@
 [package]
 name = "cdch-cli"
+description = "Standalone CDCH feature extraction and linear-model scoring (no Python, no Node)"
 version.workspace = true
 edition.workspace = true
-publish = false
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+name = "cdch_cli"
+path = "src/lib.rs"
+
+[[bin]]
+name = "cdch"
+path = "src/main.rs"
 
 [dependencies]
+cdch-core.workspace = true
+cdch-features.workspace = true
+# Lossless PNG decoding (pure Rust).
+png.workspace = true
+# Parallel batch processing.
+rayon.workspace = true
+# Model files and JSON output; float_roundtrip for exact weight parsing.
+serde_json = { workspace = true, features = ["float_roundtrip"] }

@@ -3,13 +3,16 @@
 //!
 //! ```text
 //! ferris-diff --oracle-dir oracle --out reports/differential \
-//!     [--div2k DIR] [--png-dir LABEL=DIR]... [--png-limit N]
+//!     [--div2k DIR] [--png-dir LABEL=DIR]... [--png-limit N] [--mutants]
 //! ```
+//! `--mutants` also evaluates deliberately wrong variants (see `cdch_bench::mutants`) and
+//! records which fixtures expose each one, measuring the harness's sensitivity.
 
 use std::collections::HashSet;
 use std::path::PathBuf;
 use std::time::Instant;
 
+use cdch_bench::mutants;
 use cdch_bench::synth::{self, Case};
 use cdch_bench::{host_info, png_files, read_png, Oracle, OwnedRgb};
 use cdch_core::engine::{checkpoint_bin, CHECKPOINTS};
@@ -28,6 +31,7 @@ struct Args {
     png_dirs: Vec<(String, PathBuf)>,
     png_limit: usize,
     skip_synthetic: bool,
+    mutants: bool,
 }
 
 fn parse_args() -> Args {
@@ -38,6 +42,7 @@ fn parse_args() -> Args {
         png_dirs: vec![],
         png_limit: usize::MAX,
         skip_synthetic: false,
+        mutants: false,
     };
     let mut it = std::env::args().skip(1);
     while let Some(k) = it.next() {
@@ -52,6 +57,7 @@ fn parse_args() -> Args {
             }
             "--png-limit" => a.png_limit = it.next().unwrap().parse().unwrap(),
             "--skip-synthetic" => a.skip_synthetic = true,
+            "--mutants" => a.mutants = true,
             other => panic!("unknown argument {other}"),
         }
     }
@@ -90,7 +96,7 @@ fn natural_cases(args: &Args) -> Vec<Case> {
     out
 }
 
-fn run_case(oracle: &mut Oracle, case: &Case) -> Value {
+fn run_case(oracle: &mut Oracle, case: &Case, with_mutants: bool) -> Value {
     let img: &OwnedRgb = &case.img;
     let view = img.view();
     let (w, h) = (img.width, img.height);
@@ -215,6 +221,18 @@ fn run_case(oracle: &mut Oracle, case: &Case) -> Value {
     }
     let libm_coord_rays = ref_traces.iter().zip(&libm_traces).filter(|(a, b)| a.coords != b.coords).count();
     let nan_rows = (0..rows).filter(|&i| js.matrix.get(i * BINS).is_some_and(|v| v.is_nan())).count();
+    let detected: Vec<String> = if with_mutants && shape_ok {
+        mutants::ALL
+            .iter()
+            .filter(|&&m| {
+                let mm = mutants::cdch(&view, &params, m);
+                mm.len() != js.matrix.len() || mm.iter().zip(&js.matrix).any(|(a, b)| !same(*a, *b))
+            })
+            .map(|m| format!("{m:?}"))
+            .collect()
+    } else {
+        Vec::new()
+    };
 
     json!({
         "id": case.id, "category": case.category, "width": w, "height": h,
@@ -232,6 +250,7 @@ fn run_case(oracle: &mut Oracle, case: &Case) -> Value {
         "pass": mismatches.is_empty(),
         "mismatches": mismatches,
         "diagnostic_libm": {"rays_with_different_coordinates": libm_coord_rays, "matrix_values_different": libm_diff},
+        "mutants_detected": detected,
         "timing_ms": {"js_oracle": js.js_ns as f64 / 1e6, "rust_reference_traced": ref_ms, "rust_plan_build": plan_ms, "rust_engine_matrix": eng_ms},
     })
 }
@@ -244,7 +263,7 @@ fn main() {
     let mut oracle = Oracle::spawn(&args.oracle_dir).expect("spawn node oracle");
     let mut results = Vec::with_capacity(cases.len());
     for (i, case) in cases.iter().enumerate() {
-        let r = run_case(&mut oracle, case);
+        let r = run_case(&mut oracle, case, args.mutants);
         if !r["pass"].as_bool().unwrap() {
             eprintln!("MISMATCH {}: {}", case.id, r["mismatches"]);
         }
@@ -267,7 +286,21 @@ fn main() {
         libm_rays += lr;
         libm_cases += (lr > 0) as usize;
     }
+    let mutant_summary: serde_json::Map<String, Value> = mutants::ALL
+        .iter()
+        .map(|m| {
+            let name = format!("{m:?}");
+            let hits: Vec<&str> = results
+                .iter()
+                .filter(|r| r["mutants_detected"].as_array().is_some_and(|a| a.iter().any(|x| x == name.as_str())))
+                .map(|r| r["id"].as_str().unwrap())
+                .collect();
+            (name, json!({"cases_detecting": hits.len(), "examples": hits.iter().take(5).collect::<Vec<_>>()}))
+        })
+        .collect();
     let summary = json!({
+        "mutants_evaluated": args.mutants,
+        "mutant_detection": mutant_summary,
         "cases": results.len(), "passed": passed, "failed": results.len() - passed,
         "total_samples": results.iter().map(|r| r["samples"].as_u64().unwrap()).sum::<u64>(),
         "total_matrix_values": results.iter().map(|r| r["rays"].as_u64().unwrap() * BINS as u64).sum::<u64>(),

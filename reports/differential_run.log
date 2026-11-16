@@ -1,18 +1,18 @@
-ferris-diff: 704 cases
-  50/704
-  100/704
-  150/704
-  200/704
-  250/704
-  300/704
-  350/704
-  400/704
-  450/704
-  500/704
-  550/704
-  600/704
-  650/704
-  700/704
+ferris-diff: 713 cases
+  50/713
+  100/713
+  150/713
+  200/713
+  250/713
+  300/713
+  350/713
+  400/713
+  450/713
+  500/713
+  550/713
+  600/713
+  650/713
+  700/713
 {
   "by_category": {
     "angle_step": {
@@ -28,10 +28,16 @@ ferris-diff: 704 cases
       "within_ray_duplicate_samples": 2595
     },
     "fp_luma": {
-      "cases": 1,
-      "passed": 1,
-      "samples": 26024,
-      "within_ray_duplicate_samples": 1358
+      "cases": 2,
+      "passed": 2,
+      "samples": 39123,
+      "within_ray_duplicate_samples": 2018
+    },
+    "fp_trig": {
+      "cases": 8,
+      "passed": 8,
+      "samples": 38363,
+      "within_ray_duplicate_samples": 1487
     },
     "gradient": {
       "cases": 5,
@@ -94,12 +100,165 @@ ferris-diff: 704 cases
       "within_ray_duplicate_samples": 9506
     }
   },
-  "cases": 704,
+  "cases": 713,
   "failed": 0,
-  "libm_variant_cases_with_coordinate_differences": 0,
-  "libm_variant_rays_with_coordinate_differences": 0,
-  "passed": 704,
-  "total_matrix_values": 64002560,
-  "total_samples": 17952238
+  "libm_variant_cases_with_coordinate_differences": 8,
+  "libm_variant_rays_with_coordinate_differences": 12,
+  "mutant_detection": {
+    "DedupCoordinates": {
+      "cases_detecting": 686,
+      "examples": [
+        "hgrad_128",
+        "vgrad_128",
+        "hgrad_rgb_256",
+        "diag_grad_128",
+        "radial_128"
+      ]
+    },
+    "LibmTrig": {
+      "cases_detecting": 8,
+      "examples": [
+        "libm_adversarial_angle24_x9.326335692419979e-2_y8e0",
+        "libm_adversarial_angle26_x8e0_y2.398794046299167e0",
+        "libm_adversarial_angle27_x8e0_y1.3910065241883678e0",
+        "libm_adversarial_angle32_x8e0_y2.348048096156426e0",
+        "libm_adversarial_angle37_x-1.0181502315204832e-1_y8e0"
+      ]
+    },
+    "LumaInteger": {
+      "cases_detecting": 16,
+      "examples": [
+        "random_s6_128",
+        "luma_ties_1688colours_128",
+        "luma_order_sensitive_64",
+        "rect_1024x768",
+        "div2k_0890_crop128"
+      ]
+    },
+    "LumaReassociated": {
+      "cases_detecting": 15,
+      "examples": [
+        "random_s6_128",
+        "luma_ties_1688colours_128",
+        "luma_order_sensitive_64",
+        "div2k_0890_crop128",
+        "pairs:test/0836_swinir.png"
+      ]
+    },
+    "LumaRec601": {
+      "cases_detecting": 699,
+      "examples": [
+        "const_255_0_0_128",
+        "const_0_255_0_128",
+        "const_0_0_255_128",
+        "const_128_64_200_128",
+        "const_17_230_99_128"
+      ]
+    },
+    "MirroredAngles": {
+      "cases_detecting": 694,
+      "examples": [
+        "hgrad_128",
+        "vgrad_128",
+        "hgrad_rgb_256",
+        "diag_grad_128",
+        "radial_128"
+      ]
+    },
+    "NormReciprocal": {
+      "cases_detecting": 679,
+      "examples": [
+        "hgrad_128",
+        "vgrad_128",
+        "hgrad_rgb_256",
+        "diag_grad_128",
+        "radial_128"
+      ]
+    },
+    "RadiusMaxDim": {
+      "cases_detecting": 6,
+      "examples": [
+        "small_1x2",
+        "small_3x5_midpoint",
+        "small_1x7",
+        "rect_50x200",
+        "rect_64x128"
+      ]
+    },
+    "RadiusMinDim": {
+      "cases_detecting": 9,
+      "examples": [
+        "hgrad_rgb_256",
+        "small_2x1",
+        "small_5x3_midpoint",
+        "small_7x1",
+        "rect_200x50"
+      ]
+    },
+    "RoundFloorHalf": {
+      "cases_detecting": 6,
+      "examples": [
+        "libm_adversarial_angle24_x9.326335692419979e-2_y8e0",
+        "libm_adversarial_angle56_x-3.290375725550417e-1_y8e0",
+        "small_2x1",
+        "small_7x1",
+        "centre_near_half_0.49999999999999994"
+      ]
+    },
+    "RoundHalfAway": {
+      "cases_detecting": 21,
+      "examples": [
+        "small_3x3_midpoint",
+        "small_3x5_midpoint",
+        "small_5x3_midpoint",
+        "rect_127x127_midpoint",
+        "oracle_default_center_129x65"
+      ]
+    },
+    "RoundHalfEven": {
+      "cases_detecting": 685,
+      "examples": [
+        "hgrad_128",
+        "vgrad_128",
+        "hgrad_rgb_256",
+        "diag_grad_128",
+        "radial_128"
+      ]
+    },
+    "SkipCentre": {
+      "cases_detecting": 701,
+      "examples": [
+        "hgrad_128",
+        "vgrad_128",
+        "hgrad_rgb_256",
+        "diag_grad_128",
+        "radial_128"
+      ]
+    },
+    "Truncate": {
+      "cases_detecting": 699,
+      "examples": [
+        "hgrad_128",
+        "vgrad_128",
+        "hgrad_rgb_256",
+        "diag_grad_128",
+        "radial_128"
+      ]
+    },
+    "ZeroDegreesRight": {
+      "cases_detecting": 694,
+      "examples": [
+        "hgrad_128",
+        "vgrad_128",
+        "hgrad_rgb_256",
+        "diag_grad_128",
+        "radial_128"
+      ]
+    }
+  },
+  "mutants_evaluated": true,
+  "passed": 713,
+  "total_matrix_values": 64832000,
+  "total_samples": 18003700
 }
 exit 0
