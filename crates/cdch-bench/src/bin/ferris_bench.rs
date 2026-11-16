@@ -2,6 +2,7 @@
 //!
 //! ```text
 //! ferris-bench --images DIR [--warmup 50] [--trials 2000] [--out reports/perf/rust_microbench.json]
+//!              [--only SUBSTRING]   # run matching single-image benchmarks only (for profiling)
 //! ```
 //! Times single-image operations on decoded 8-bit RGB buffers already in memory
 //! (no decoding, no Python), cycling through the supplied images, then measures
@@ -25,10 +26,13 @@ struct Args {
     trials: usize,
     out: PathBuf,
     batch_images: usize,
+    only: Option<String>,
 }
 
+static ONLY: std::sync::OnceLock<Option<String>> = std::sync::OnceLock::new();
+
 fn parse() -> Args {
-    let mut a = Args { images: PathBuf::new(), warmup: 50, trials: 2000, out: PathBuf::from("reports/perf/rust_microbench.json"), batch_images: 4000 };
+    let mut a = Args { images: PathBuf::new(), warmup: 50, trials: 2000, out: PathBuf::from("reports/perf/rust_microbench.json"), batch_images: 4000, only: None };
     let mut it = std::env::args().skip(1);
     while let Some(k) = it.next() {
         match k.as_str() {
@@ -37,6 +41,7 @@ fn parse() -> Args {
             "--trials" => a.trials = it.next().unwrap().parse().unwrap(),
             "--out" => a.out = it.next().unwrap().into(),
             "--batch-images" => a.batch_images = it.next().unwrap().parse().unwrap(),
+            "--only" => a.only = Some(it.next().unwrap()),
             o => panic!("unknown argument {o}"),
         }
     }
@@ -45,6 +50,11 @@ fn parse() -> Args {
 
 /// Time `f(image_index)` per call; returns summary in microseconds.
 fn bench(name: &str, n_images: usize, warmup: usize, trials: usize, mut f: impl FnMut(usize)) -> Value {
+    if let Some(Some(only)) = ONLY.get() {
+        if !name.contains(only.as_str()) {
+            return json!({"name": name, "skipped": true});
+        }
+    }
     for i in 0..warmup {
         f(i % n_images);
     }
@@ -67,6 +77,7 @@ fn bench(name: &str, n_images: usize, warmup: usize, trials: usize, mut f: impl 
 
 fn main() {
     let args = parse();
+    ONLY.set(args.only.clone()).unwrap();
     let images: Vec<OwnedRgb> = png_files(&args.images).iter().map(|p| read_png(p).unwrap()).collect();
     assert!(!images.is_empty(), "no PNG images in {}", args.images.display());
     let (w, h) = (images[0].width, images[0].height);
@@ -165,6 +176,9 @@ fn main() {
     counts.push(max_threads);
     counts.retain(|&t| t <= max_threads);
     counts.dedup();
+    if args.only.is_some() {
+        counts.clear();
+    }
     for &threads in &counts {
         let pool = rayon::ThreadPoolBuilder::new().num_threads(threads).build().unwrap();
         for rep in [Representation::A, Representation::B, Representation::C] {

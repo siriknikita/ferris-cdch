@@ -5,7 +5,7 @@ use std::sync::Arc;
 use cdch_core::engine::CHECKPOINTS;
 use cdch_core::{CdchError, Engine, MatrixView, Params, Result, RgbImage, SamplingPlan, Workspace, BINS, RAYS_ARCHIVED};
 
-use crate::{compact_from_checkpoints, enriched, from_matrix, sector_from_checkpoints, Representation};
+use crate::{compact_from_checkpoints, compact_prevalidated, from_matrix, rich, sector_from_checkpoints, Representation, A_DIM};
 
 /// Per-thread extractor. Holds reusable buffers and shares a plan cache.
 ///
@@ -59,6 +59,19 @@ impl FeatureExtractor {
         plan.matrix_into(img, &mut self.ws, out)
     }
 
+    /// The plan-level equivalent of `descriptor()`'s matrix checks. The engine's matrix is
+    /// non-finite, non-terminal or non-monotone only if some ray is empty, so checking the
+    /// geometry replaces the O(360 x 256) scan, exactly.
+    fn require_valid_archived(plan: &SamplingPlan) -> Result<()> {
+        if plan.n_rays() != RAYS_ARCHIVED {
+            return Err(CdchError::RayCount { expected: RAYS_ARCHIVED, actual: plan.n_rays() });
+        }
+        if !plan.all_rays_nonempty() {
+            return Err(CdchError::InvalidMatrix("non-finite values (empty ray?)".into()));
+        }
+        Ok(())
+    }
+
     /// Checkpoint matrix into the internal buffer; returns the plan used.
     fn checkpoints(&mut self, img: &RgbImage<'_>, params: &Params) -> Result<Arc<SamplingPlan>> {
         let plan = self.plan(img, params)?;
@@ -78,11 +91,7 @@ impl FeatureExtractor {
         match rep {
             Representation::A => {
                 let plan = self.checkpoints(img, params)?;
-                // Equivalent to descriptor()'s matrix checks: an empty ray is the only way the
-                // canonical matrix can be non-finite, non-terminal or non-monotone.
-                if !plan.all_rays_nonempty() {
-                    return Err(CdchError::InvalidMatrix("non-finite values (empty ray?)".into()));
-                }
+                Self::require_valid_archived(&plan)?;
                 compact_from_checkpoints(&self.cp, &mut self.sampled, &mut self.scratch, out)
             }
             Representation::C | Representation::D => {
@@ -91,9 +100,13 @@ impl FeatureExtractor {
             }
             Representation::B => {
                 let plan = self.plan(img, params)?;
+                Self::require_valid_archived(&plan)?;
                 self.matrix.resize(plan.n_rays() * BINS, 0.0);
                 plan.matrix_into(img, &mut self.ws, &mut self.matrix)?;
-                enriched(&MatrixView::new(plan.n_rays(), &self.matrix)?, out)
+                let m = MatrixView::new(plan.n_rays(), &self.matrix)?;
+                compact_prevalidated(&m, &mut out[..A_DIM]);
+                rich(&m, &mut out[A_DIM..]);
+                Ok(())
             }
         }
     }

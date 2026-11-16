@@ -54,9 +54,35 @@ fn pairwise_rec(start: usize, n: usize, f: &impl Fn(usize) -> f64) -> f64 {
     }
 }
 
-#[inline]
+/// [`pairwise_sum_by`] over a slice. Same order, but without closure recursion, so the
+/// 8-accumulator block loop vectorizes.
 pub fn pairwise_sum(xs: &[f64]) -> f64 {
-    pairwise_sum_by(xs.len(), &|i| xs[i])
+    let n = xs.len();
+    if n < 8 {
+        let mut res = -0.0;
+        for &x in xs {
+            res += x;
+        }
+        res
+    } else if n <= PW_BLOCKSIZE {
+        let mut r = [0f64; 8];
+        r.copy_from_slice(&xs[..8]);
+        let full = n - (n % 8);
+        for chunk in xs[8..full].chunks_exact(8) {
+            for k in 0..8 {
+                r[k] += chunk[k];
+            }
+        }
+        let mut res = ((r[0] + r[1]) + (r[2] + r[3])) + ((r[4] + r[5]) + (r[6] + r[7]));
+        for &x in &xs[full..] {
+            res += x;
+        }
+        res
+    } else {
+        let mut n2 = n / 2;
+        n2 -= n2 % 8;
+        pairwise_sum(&xs[..n2]) + pairwise_sum(&xs[n2..])
+    }
 }
 
 /// `np.mean(x)` for a contiguous 1-D array.
@@ -97,6 +123,24 @@ mod tests {
     fn small_sums_are_sequential() {
         let x = [1e16, 1.0, -1e16, 1.0];
         assert_eq!(pairwise_sum(&x), ((1e16 + 1.0) + -1e16) + 1.0);
+    }
+
+    #[test]
+    fn slice_and_closure_forms_agree_bitwise() {
+        let mut s = 0x9E37_79B9_7F4A_7C15u64;
+        for n in [0usize, 1, 5, 7, 8, 9, 15, 16, 17, 127, 128, 129, 255, 256, 257, 360, 1000] {
+            let xs: Vec<f64> = (0..n)
+                .map(|_| {
+                    s ^= s << 13;
+                    s ^= s >> 7;
+                    s ^= s << 17;
+                    ((s >> 11) as f64 / (1u64 << 53) as f64 - 0.3) * 10f64.powi((s % 9) as i32 - 4)
+                })
+                .collect();
+            let a = pairwise_sum(&xs);
+            let b = pairwise_sum_by(n, &|i| xs[i]);
+            assert_eq!(a.to_bits(), b.to_bits(), "n = {n}");
+        }
     }
 
     #[test]
