@@ -60,14 +60,14 @@ impl SamplingPlan {
         if img.is_packed() {
             ws.lum.extend(unique.iter().map(|&p| {
                 let i = 3 * p as usize;
-                js::luma(data[i], data[i + 1], data[i + 2])
+                js::luma_fast(data[i], data[i + 1], data[i + 2])
             }));
         } else {
             let (w, stride) = (self.width(), img.row_stride());
             ws.lum.extend(unique.iter().map(|&p| {
                 let p = p as usize;
                 let i = (p / w) * stride + 3 * (p % w);
-                js::luma(data[i], data[i + 1], data[i + 2])
+                js::luma_fast(data[i], data[i + 1], data[i + 2])
             }));
         }
     }

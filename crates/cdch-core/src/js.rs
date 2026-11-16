@@ -38,6 +38,32 @@ pub fn luma(r: u8, g: u8, b: u8) -> u8 {
     round(v) as u8
 }
 
+const fn product_table(coef: f64) -> [f64; 256] {
+    let mut t = [0f64; 256];
+    let mut i = 0;
+    while i < 256 {
+        t[i] = i as f64 * coef;
+        i += 1;
+    }
+    t
+}
+
+/// `v * R_COEF` for every 8-bit `v` (IEEE products are exact-rounded identically at
+/// compile time and run time).
+pub const LUMA_R: [f64; 256] = product_table(R_COEF);
+pub const LUMA_G: [f64; 256] = product_table(G_COEF);
+pub const LUMA_B: [f64; 256] = product_table(B_COEF);
+
+/// Table-driven [`luma`]: the same three products, added in the same order, then
+/// `floor(v + 0.5)` via truncation. `luma_fast_matches_luma_exhaustively` proves this
+/// equals [`luma`] for all 2^24 colours (for these reachable `v`, adding 0.5 never
+/// rounds across an integer and `v >= 0`).
+#[inline]
+pub fn luma_fast(r: u8, g: u8, b: u8) -> u8 {
+    let v = (LUMA_R[r as usize] + LUMA_G[g as usize]) + LUMA_B[b as usize];
+    (v + 0.5) as u8
+}
+
 /// `(Math.cos(radians), Math.sin(radians))` with
 /// `radians = (angle - 90) * (Math.PI / 180)`, reproduced from the V8 bit patterns
 /// recorded by `oracle/direction_table.js`.
@@ -127,6 +153,17 @@ mod tests {
                 for b in 0..=255u32 {
                     let v = r as f64 * R_COEF + g as f64 * G_COEF + b as f64 * B_COEF;
                     assert!(round(v) <= 255.0);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn luma_fast_matches_luma_exhaustively() {
+        for r in 0..=255u8 {
+            for g in 0..=255u8 {
+                for b in 0..=255u8 {
+                    assert_eq!(luma_fast(r, g, b), luma(r, g, b), "colour ({r}, {g}, {b})");
                 }
             }
         }

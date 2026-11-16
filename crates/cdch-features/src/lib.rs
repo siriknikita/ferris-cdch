@@ -81,21 +81,37 @@ pub fn validate_matrix(m: &MatrixView<'_>) -> Result<()> {
     if m.rows() != RAYS_ARCHIVED {
         return Err(CdchError::RayCount { expected: RAYS_ARCHIVED, actual: m.rows() });
     }
-    let d = m.as_slice();
-    if !d.iter().all(|v| v.is_finite()) {
-        return Err(CdchError::InvalidMatrix("non-finite values (empty ray?)".into()));
-    }
-    if d.iter().any(|&v| v < 0.0) {
-        return Err(CdchError::InvalidMatrix("negative values".into()));
-    }
+    // One branch-light pass; errors are reported in the order descriptor() checks them.
+    let (mut non_finite, mut negative) = (false, false);
+    let (mut unterminated, mut non_monotone) = (None, None);
     for i in 0..m.rows() {
         let row = m.row(i);
-        if (row[BINS - 1] - 1.0).abs() > 1e-8 + 1e-5 {
-            return Err(CdchError::InvalidMatrix(format!("row {i} does not end at 1")));
+        let mut bad_step = false;
+        for (b, &v) in row.iter().enumerate() {
+            non_finite |= !v.is_finite();
+            negative |= v < 0.0;
+            if b > 0 {
+                bad_step |= v - row[b - 1] < -1e-12;
+            }
         }
-        if row.windows(2).any(|w| w[1] - w[0] < -1e-12) {
-            return Err(CdchError::InvalidMatrix(format!("row {i} is not monotone")));
+        if unterminated.is_none() && (row[BINS - 1] - 1.0).abs() > 1e-8 + 1e-5 {
+            unterminated = Some(i);
         }
+        if non_monotone.is_none() && bad_step {
+            non_monotone = Some(i);
+        }
+    }
+    if non_finite {
+        return Err(CdchError::InvalidMatrix("non-finite values (empty ray?)".into()));
+    }
+    if negative {
+        return Err(CdchError::InvalidMatrix("negative values".into()));
+    }
+    if let Some(i) = unterminated {
+        return Err(CdchError::InvalidMatrix(format!("row {i} does not end at 1")));
+    }
+    if let Some(i) = non_monotone {
+        return Err(CdchError::InvalidMatrix(format!("row {i} is not monotone")));
     }
     Ok(())
 }
@@ -133,8 +149,9 @@ fn twiddles() -> &'static [(f64, f64); RAYS_ARCHIVED] {
 }
 
 /// `|rfft(x, axis=0)[k]|` for the 16 columns of a demeaned `360 x 16` array,
-/// using compensated (Neumaier) summation. NumPy uses pocketfft; agreement is
-/// within a few ulps (quantified in the validation report), not bitwise.
+/// using compensated summation (branchless TwoSum, so the 16 lanes vectorize).
+/// NumPy uses pocketfft; agreement is within a few ulps (quantified in the
+/// validation report), not bitwise.
 fn harmonic_magnitudes(centered: &[f64], k: usize, out: &mut [f64; A_COLUMNS]) {
     let tw = twiddles();
     let mut re = [0f64; A_COLUMNS];
@@ -145,19 +162,25 @@ fn harmonic_magnitudes(centered: &[f64], k: usize, out: &mut [f64; A_COLUMNS]) {
         let (c, s) = tw[(k * n) % RAYS_ARCHIVED];
         let row = &centered[n * A_COLUMNS..(n + 1) * A_COLUMNS];
         for j in 0..A_COLUMNS {
-            let a = row[j] * c;
-            let t = re[j] + a;
-            cre[j] += if re[j].abs() >= a.abs() { (re[j] - t) + a } else { (a - t) + re[j] };
+            let (t, e) = two_sum(re[j], row[j] * c);
             re[j] = t;
-            let b = -(row[j] * s);
-            let t = im[j] + b;
-            cim[j] += if im[j].abs() >= b.abs() { (im[j] - t) + b } else { (b - t) + im[j] };
+            cre[j] += e;
+            let (t, e) = two_sum(im[j], -(row[j] * s));
             im[j] = t;
+            cim[j] += e;
         }
     }
     for j in 0..A_COLUMNS {
         out[j] = (re[j] + cre[j]).hypot(im[j] + cim[j]);
     }
+}
+
+/// Knuth's TwoSum: `a + b = s + e` exactly.
+#[inline(always)]
+fn two_sum(a: f64, b: f64) -> (f64, f64) {
+    let s = a + b;
+    let bb = s - a;
+    (s, (a - (s - bb)) + (b - bb))
 }
 
 /// Representation A from the sampled `360 x 16` array `sampled[i * 16 + m] = F(θ_i, 16m + 7)`.
@@ -213,13 +236,19 @@ pub fn compact_from_sampled(sampled: &[f64], scratch: &mut Vec<f64>, out: &mut [
 /// Representation A from the full matrix (validates first, like `descriptor`).
 pub fn compact(m: &MatrixView<'_>, out: &mut [f64]) -> Result<()> {
     validate_matrix(m)?;
+    compact_prevalidated(m, out);
+    Ok(())
+}
+
+/// Representation A from a matrix already known to satisfy [`validate_matrix`]
+/// (e.g. produced by the engine from a plan whose rays are all non-empty).
+pub(crate) fn compact_prevalidated(m: &MatrixView<'_>, out: &mut [f64]) {
     let mut sampled = Vec::with_capacity(RAYS_ARCHIVED * A_COLUMNS);
     for i in 0..RAYS_ARCHIVED {
         let row = m.row(i);
         sampled.extend((0..A_COLUMNS).map(|c| row[16 * c + 7]));
     }
     compact_from_sampled(&sampled, &mut Vec::new(), out);
-    Ok(())
 }
 
 /// Representation A from the `360 x 32` checkpoint matrix (fused path). The caller
@@ -295,14 +324,20 @@ pub fn rich(m: &MatrixView<'_>, out: &mut [f64]) {
             centered[b] = bins[b] - mean;
         }
         let variance = pairwise_sum_by(BINS, &|b| pmf[b] * (centered[b] * centered[b]));
-        let c3 = pairwise_sum_by(BINS, &|b| pmf[b] * centered[b].powf(3.0));
-        let c4 = pairwise_sum_by(BINS, &|b| pmf[b] * centered[b].powf(4.0));
+        // Most PMF bins are ±0 (a ray has ~70 samples over 256 bins). For those, the
+        // products are signed zeros and libm is skipped with bit-identical results:
+        // ±0·pow(c,3) = ±0·c (pow keeps c's sign), ±0·pow(c,4) = ±0·1, and
+        // ±0·log2(max(±0, 1e-300)) = ∓0 because log2(1e-300) < 0.
+        let c3 = pairwise_sum_by(BINS, &|b| {
+            if pmf[b] == 0.0 { pmf[b] * centered[b] } else { pmf[b] * centered[b].powf(3.0) }
+        });
+        let c4 = pairwise_sum_by(BINS, &|b| if pmf[b] == 0.0 { pmf[b] } else { pmf[b] * centered[b].powf(4.0) });
         let (skew, kurt) = if variance > 1e-10 {
             (c3 / variance.powf(1.5), c4 / (variance * variance))
         } else {
             (0.0, 0.0)
         };
-        let entropy = -pairwise_sum_by(BINS, &|b| pmf[b] * pmf[b].max(1e-300).log2()) / 8.0;
+        let entropy = -pairwise_sum_by(BINS, &|b| if pmf[b] == 0.0 { -pmf[b] } else { pmf[b] * pmf[b].max(1e-300).log2() }) / 8.0;
         let concentration = pairwise_sum_by(BINS, &|b| pmf[b] * pmf[b]);
         let max_mass = pmf.iter().copied().fold(f64::NEG_INFINITY, f64::max);
         let mad = pairwise_sum_by(BINS - 1, &|b| (pmf[b + 1] - pmf[b]).abs()) / (BINS - 1) as f64;
@@ -363,5 +398,76 @@ pub fn from_matrix(m: &MatrixView<'_>, rep: Representation, out: &mut [f64]) -> 
         Representation::A => compact(m, out),
         Representation::B => enriched(m, out),
         Representation::C | Representation::D => sector(m, out),
+    }
+}
+
+#[cfg(test)]
+mod rich_shortcut_tests {
+    use super::*;
+
+    /// The pre-optimization formulas: libm on every bin, no zero shortcut.
+    fn per_ray_reference(cdf: &[f64]) -> [f64; 3] {
+        let bins = linspace_0_1_256();
+        let mut pmf = [0f64; BINS];
+        pmf[0] = cdf[0] - 0.0;
+        for b in 1..BINS {
+            pmf[b] = cdf[b] - cdf[b - 1];
+        }
+        let mean = pairwise_sum_by(BINS, &|b| pmf[b] * bins[b]);
+        let c: Vec<f64> = bins.iter().map(|x| x - mean).collect();
+        [
+            pairwise_sum_by(BINS, &|b| pmf[b] * c[b].powf(3.0)),
+            pairwise_sum_by(BINS, &|b| pmf[b] * c[b].powf(4.0)),
+            pairwise_sum_by(BINS, &|b| pmf[b] * pmf[b].max(1e-300).log2()),
+        ]
+    }
+
+    fn per_ray_shortcut(cdf: &[f64]) -> [f64; 3] {
+        let bins = linspace_0_1_256();
+        let mut pmf = [0f64; BINS];
+        pmf[0] = cdf[0] - 0.0;
+        for b in 1..BINS {
+            pmf[b] = cdf[b] - cdf[b - 1];
+        }
+        let mean = pairwise_sum_by(BINS, &|b| pmf[b] * bins[b]);
+        let c: Vec<f64> = bins.iter().map(|x| x - mean).collect();
+        [
+            pairwise_sum_by(BINS, &|b| if pmf[b] == 0.0 { pmf[b] * c[b] } else { pmf[b] * c[b].powf(3.0) }),
+            pairwise_sum_by(BINS, &|b| if pmf[b] == 0.0 { pmf[b] } else { pmf[b] * c[b].powf(4.0) }),
+            pairwise_sum_by(BINS, &|b| if pmf[b] == 0.0 { -pmf[b] } else { pmf[b] * pmf[b].max(1e-300).log2() }),
+        ]
+    }
+
+    #[test]
+    fn zero_pmf_shortcut_is_bitwise_identical() {
+        let mut s = 0x1234_5678_9abc_def0u64;
+        let mut next = || {
+            s ^= s << 13;
+            s ^= s >> 7;
+            s ^= s << 17;
+            s
+        };
+        for case in 0..20_000 {
+            let n = 1 + next() % 300;
+            let mut hist = [0u64; BINS];
+            let spread = 1 + next() % 256;
+            let base = next() % 256;
+            for _ in 0..n {
+                hist[((base + next() % spread) % 256) as usize] += 1;
+            }
+            let mut cdf = [0f64; BINS];
+            let mut cum = 0u64;
+            for b in 0..BINS {
+                cum += hist[b];
+                cdf[b] = cum as f64 / n as f64;
+            }
+            if case % 7 == 0 {
+                cdf[0] = -0.0; // arbitrary matrices passed in from Python
+            }
+            let (a, b) = (per_ray_reference(&cdf), per_ray_shortcut(&cdf));
+            for k in 0..3 {
+                assert_eq!(a[k].to_bits(), b[k].to_bits(), "case {case} term {k}: {} vs {}", a[k], b[k]);
+            }
+        }
     }
 }
