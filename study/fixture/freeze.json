@@ -1,0 +1,29 @@
+{
+  "status": "source_only",
+  "sha256": {
+    "rgb.pt": "70c8cb1255ee5251f82594e6ef3142ea37028f220cda08ad734c4a3c076a19e1",
+    "statistical.joblib": "64cf739cc02113b09d2b5066e30c0ab86839fa008463455ae5b9b133574f4f45",
+    "protocol.json": "5467e8bebfe22e56a86ce5ce78acd1bcda3329d7f3a0f7c81c8d9a5c8ed6a9e9",
+    "code/build_pairs.py": "a77a0a959e8f8f1dbdd2c96faa6d05d59c84d42fc20b286e481db0925f5ff2fb",
+    "code/experiment.py": "d3b5492aad380bf0d3902ae8b2221c15cfe8d69ba9c4392e2f9e4b137f93f1a9",
+    "code/zero_shot.py": "23a784f08c5317ee874e6ccc64c489570a46ede2df9695fef8ee5a33617b8ba8",
+    "code/pyproject.toml": "24feb846e21a4d5d0b6e6a9c21dd9d6b647c6a43d3d659072ff6d98a9feeb221",
+    "code/uv.lock": "2d7beac5369c2759381088b64a985d6fef57f24611e77813f72fb20d116eadb2",
+    "code/config/target_protocol.json": "7e4f4b69bd72c1325628f9f572d2befe5aa61ec2c0cd582f17df61da85be555e",
+    "code/cdch_features.py": "c7960dac06840b782c61bb1a3863829f60cf0640373c9d883575a2e1ef3726f4",
+    "code/cdch/ip-1.js": "110732b48bc6e8b2d5167eec30f7277245913bed98b9baaa3c65c0c22aab44d8",
+    "code/cdch/worker.js": "0afd0aee2b124e086d4a9578fde4b4de027a4c0b5b1352498ae5d0844c4912e3",
+    "code/cdch/oracle.js": "0d45b7d68e76970950c9abc3b5e7bff1800cd92f6959ab972f2ec070243edb72",
+    "pair_manifest.json": "a8f23f602d965a4659694b0a28a061fb6b3eb281d50dcf4e1c32038e920d4ea9",
+    "pair_inventory.json": "6f37ef445ef2835bdb55c188345543206d36b8648e527939c15ad05467893512",
+    "target_preprocessing.json": "36b94a689e612100c5962eaeb781a9346df4b6289f171ddc852d319df4937600",
+    "code/native/native_features.py": "96fafaa3a4ba67e78f2c30203b0d588656a39b54e1fc3f771907c5c485848c5c",
+    "code/native/native_models.py": "a68cef28656d6bbe96d8085de4b1a2b277d86eb263b65eab1c35e350c3794a99",
+    "code/native/native_worker.js": "ed0a04bc148cb58d5c62d96295340cebf9313be6266d3323b3704ce69c82229c",
+    "code/native/native_pipeline.py": "a526c67b750053ea317d84ef50d53c718f673ca626b96750ba11d36cf83de370",
+    "code/native/target_native.py": "2db10c8db225aff2cc673d14fd5c3b5917d1528f017539b8cb0dbf47e2355fac",
+    "code/native/config/native.json": "a21d5bba8a78abdf9e088eeffb66efe76950e09959a39d6b7a20b4c084082b46",
+    "source_models.joblib": "8a59021de50153c7661020189281b22dcb2af309bb197c43a46529a3ed0f5fb8",
+    "SOURCE_DECISIONS.json": "6f140ad14d9f22d3bf6383d64a4b5ab3707eb01f4ccf3951b8d2729c997f061b"
+  }
+}

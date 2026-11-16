@@ -1,0 +1,13 @@
+{
+  "dataset_priority": ["FaceForensics++", "Celeb-DF v2", "DFDC"],
+  "cohorts": "Official held-out splits; FF++ c23 first, then c0 and c40 where available. Evaluate each codec independently.",
+  "sampling": "Use up to 16 equally spaced successful decoded frame indices over each video. Attempt crop extraction only at those indices; log every failure.",
+  "preprocessing": "Supply RGB128 PNG face crops from one externally pinned detector/tracker and one fixed ROI/resize policy. Record executable version, weights digest, ROI geometry, resize settings and sampling audit before label release. No restoration, alignment-by-class, per-dataset tuning or label-driven rejection.",
+  "primary_model": "frequency",
+  "primary_score": "higher_is_fake",
+  "primary_endpoint": "Video-level AUROC on FaceForensics++ c23 and Celeb-DF v2 separately.",
+  "secondary_endpoints": "Frame and video average precision, fixed-threshold balanced accuracy, confusion matrix, per-manipulation and codec metrics, and paired model comparisons.",
+  "exploratory": "Report reversed ranking separately. Use ensemble disagreement for description only.",
+  "cluster": "Dependence blocks declared before join. Use shared source lineage where known; record unresolved cross-block donor/identity overlap.",
+  "labels": "Separate custodian or process keeps labels inaccessible until final source-only freeze and label-blind target scores are sealed."
+}

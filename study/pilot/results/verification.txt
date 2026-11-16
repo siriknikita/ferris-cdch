@@ -1,0 +1,22 @@
+Executed verification on November 16, 2026.
+
+PASS  DIV2K validation HR archive matched its recorded SHA-256 and passed ZIP member CRC checks.
+PASS  All 100 source images decoded as RGB; no embedded ICC profiles were observed.
+PASS  Decoded source and reference-crop pixel hashes were unique within their respective sets.
+PASS  All 500 derivative files passed variant coverage, unique source split, PNG encoding, dimensions and manifest SHA-256 checks.
+PASS  Both learned SR checkpoints loaded their state dictionaries strictly.
+PASS  Local Real-ESRGAN x2 inference matched upstream BasicSR RRDBNet exactly on a deterministic rectangular RGB probe.
+PASS  Canonical Muzyka source matched its archived SHA-256 and executed with the archived Node adapters.
+PASS  All 560 inputs (400 PNGs and two sets of 80 re-encodes) produced finite 360 by 256 monotone cumulative matrices.
+PASS  Weighted metric formulas matched scikit-learn on tied-score and group-bootstrap cases.
+PASS  Point metrics and confusion counts for all 252 reported rows matched scikit-learn independently.
+PASS  Both checkpoints, protocol and five evaluation CSVs reproduced byte-for-byte in a second fit under the locked uv environment.
+PASS  Target CLI passed freeze, blind scoring, post-seal label join and score-file tamper rejection on 16 SR-only fixture items.
+PASS  Three published plots regenerated from the final CSVs and were visually checked.
+
+PASS  Rebuilt all 500 PNGs in the locked environment. Inventory, manifest, and every PNG digest matched the first build.
+
+Target scope
+- SR-only fixture inputs were held-out DIV2K originals and SwinIR reconstructions.
+- Real deepfake benchmark media and video-level labels never entered this run.
+- No FF++ or Celeb-DF v2 quantitative results are included.

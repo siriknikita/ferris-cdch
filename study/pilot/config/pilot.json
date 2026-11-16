@@ -1,0 +1,14 @@
+{
+  "seed": 20261116,
+  "split_sources": [60, 20, 20],
+  "context_px": 160,
+  "input_px": 128,
+  "scale": 2,
+  "generator_ids": ["swinir", "realesrgan"],
+  "torch_threads": 4,
+  "cnn_epochs": 12,
+  "batch_size": 16,
+  "learning_rate": 0.001,
+  "bootstrap_replicates": 1000,
+  "jpeg_quality": [90, 75]
+}

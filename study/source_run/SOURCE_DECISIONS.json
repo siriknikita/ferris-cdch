@@ -1,0 +1,60 @@
+{
+  "selected": "cdch_A_logistic",
+  "thresholds": {
+    "cdch_A_logistic": 0.7987539542252771,
+    "cdch_A_linear_svm": 0.3609426282986869,
+    "cdch_A_rbf_svm": 1.0169428450625482,
+    "cdch_A_forest": 0.6109141408005885,
+    "cdch_A_boosting": 1.072482367225495,
+    "cdch_A_mlp": 0.6217490187294169,
+    "cdch_B_logistic": 0.33729889855527395,
+    "cdch_B_linear_svm": 0.16350311433294434,
+    "cdch_B_rbf_svm": 1.0155101074264783,
+    "cdch_B_forest": 0.7275737918314952,
+    "cdch_B_boosting": 0.7626220726067013,
+    "cdch_B_mlp": 0.43616652788341326,
+    "cdch_C_logistic": 0.7890487844718891,
+    "cdch_C_linear_svm": 0.5501832397171376,
+    "cdch_C_rbf_svm": 1.0056916778037444,
+    "cdch_C_forest": 0.6200808352031948,
+    "cdch_C_boosting": 1.6728394551708523,
+    "cdch_C_mlp": 0.8727995703489674,
+    "cdch_D_conv": 0.840196967124939,
+    "cdch_D_permuted_conv": 4.637341499328613,
+    "frequency_plus_selected_features": 0.10989074019279288,
+    "rgb": 0.5283625721931458,
+    "frequency": 0.030480431226332483,
+    "frequency_cdch": 0.10989074019279288,
+    "authentic_anomaly": 0.5513588136607698,
+    "reconstruction_similarity": -0.4029876653955787,
+    "ensemble": 0.5375,
+    "frequency_cdch_score_fusion": 0.3875,
+    "rgb_cdch_score_fusion": 0.39166666666666666,
+    "ensemble_cdch_score_fusion": 0.48125
+  },
+  "fusion_weights": {
+    "ensemble": {
+      "rgb": 0.25,
+      "frequency": 0.25,
+      "authentic_anomaly": 0.25,
+      "reconstruction_similarity": 0.25
+    },
+    "frequency_cdch_score_fusion": {
+      "frequency": 0.75,
+      "cdch_A_logistic": 0.25
+    },
+    "rgb_cdch_score_fusion": {
+      "rgb": 0.25,
+      "cdch_A_logistic": 0.75
+    },
+    "ensemble_cdch_score_fusion": {
+      "rgb": 0.1875,
+      "frequency": 0.1875,
+      "authentic_anomaly": 0.1875,
+      "reconstruction_similarity": 0.1875,
+      "cdch_A_logistic": 0.25
+    }
+  },
+  "manifest_sha256": "a8f23f602d965a4659694b0a28a061fb6b3eb281d50dcf4e1c32038e920d4ea9",
+  "config_sha256": "a21d5bba8a78abdf9e088eeffb66efe76950e09959a39d6b7a20b4c084082b46"
+}

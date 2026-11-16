@@ -1,0 +1,8 @@
+candidate,reference,trials,paired_median_delta_ms,ci_lo_ms,ci_hi_ms
+cdch_A_logistic,frequency,40,79.7671435,77.35755549999999,88.310438
+cdch_B_linear_svm,frequency,40,97.5090285,95.211822,100.7493915
+cdch_B_linear_svm,cdch_A_logistic,40,13.554311999999996,9.326083500000003,19.674318999999997
+frequency_cdch,frequency,40,81.8607625,79.84764849999999,85.333169
+frequency_cdch_score_fusion,frequency,40,79.3059135,77.880708,82.424988
+rgb_cdch_score_fusion,rgb,40,83.521333,80.288176,84.77864600000001
+ensemble_cdch_score_fusion,ensemble,40,78.24345,75.10302999999999,81.630646

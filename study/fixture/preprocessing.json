@@ -1,0 +1,5 @@
+{
+  "scope": "CLI fixture using existing SR holdout crops",
+  "dataset": "DIV2K validation partition",
+  "decoding": "one normalized RGB PNG per pseudo-video"
+}

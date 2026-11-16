@@ -1,0 +1,17 @@
+video_id,dataset,compression,manipulation,label,cluster_id
+fixture-001,SR-only CLI fixture,png,real,0,0805
+fixture-002,SR-only CLI fixture,png,swinir-treatment,1,0805
+fixture-003,SR-only CLI fixture,png,real,0,0809
+fixture-004,SR-only CLI fixture,png,swinir-treatment,1,0809
+fixture-005,SR-only CLI fixture,png,real,0,0822
+fixture-006,SR-only CLI fixture,png,swinir-treatment,1,0822
+fixture-007,SR-only CLI fixture,png,real,0,0827
+fixture-008,SR-only CLI fixture,png,swinir-treatment,1,0827
+fixture-009,SR-only CLI fixture,png,real,0,0828
+fixture-010,SR-only CLI fixture,png,swinir-treatment,1,0828
+fixture-011,SR-only CLI fixture,png,real,0,0830
+fixture-012,SR-only CLI fixture,png,swinir-treatment,1,0830
+fixture-013,SR-only CLI fixture,png,real,0,0836
+fixture-014,SR-only CLI fixture,png,swinir-treatment,1,0836
+fixture-015,SR-only CLI fixture,png,real,0,0837
+fixture-016,SR-only CLI fixture,png,swinir-treatment,1,0837

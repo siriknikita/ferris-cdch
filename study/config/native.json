@@ -1,0 +1,17 @@
+{
+  "seed": 20261116,
+  "bootstrap_replicates": 4000,
+  "training_repeat_seeds": [13, 42, 87],
+  "development_split_seeds": [17, 73, 101],
+  "generators": ["swinir", "realesrgan"],
+  "holdout_encodings": ["png", "jpeg90", "jpeg75", "resize96"],
+  "primary_comparisons": [
+    ["native_selected", "cdch_A_logistic"],
+    ["native_selected", "frequency"]
+  ],
+  "fusion_cdch_weights": [0, 0.25, 0.5, 0.75, 1],
+  "bootstrap_unit": "original photograph, preserving all reconstruction variants",
+  "validation_selection": "highest pooled original versus AI validation AUROC, ties resolved in fixed candidate order",
+  "benchmark": {"warmup": 8, "trials": 60, "cold_trials": 3, "batch_size": 1, "threads": 1},
+  "scope": "Exploratory extension on the already reported pilot holdout. No confirmatory hypothesis testing."
+}
