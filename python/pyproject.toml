@@ -1,0 +1,31 @@
+[project]
+name = "ferris-research"
+version = "0.1.0"
+description = "Python research environment for Project Ferris (Rust CDCH) — same pins as the archived pilot"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  # Identical pins to study/pilot/pyproject.toml so archived joblib/torch checkpoints load unchanged.
+  "torch==2.7.1", "torchvision==0.22.1", "timm==1.0.15",
+  "numpy==2.3.5", "scipy==1.17.0", "scikit-learn==1.8.0",
+  "pillow==13.0.0", "matplotlib==3.10.8", "joblib==1.5.3",
+  # Rust extension, built from source by maturin (crates/cdch-python).
+  "cdch-ferris",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+cdch-ferris = { path = "../crates/cdch-python" }
+torch = [{index = "pytorch-cpu", marker = "sys_platform == 'linux'"}]
+torchvision = [{index = "pytorch-cpu", marker = "sys_platform == 'linux'"}]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+]

@@ -1,0 +1,105 @@
+ferris-diff: 704 cases
+  50/704
+  100/704
+  150/704
+  200/704
+  250/704
+  300/704
+  350/704
+  400/704
+  450/704
+  500/704
+  550/704
+  600/704
+  650/704
+  700/704
+{
+  "by_category": {
+    "angle_step": {
+      "cases": 11,
+      "passed": 11,
+      "samples": 16612,
+      "within_ray_duplicate_samples": 878
+    },
+    "border": {
+      "cases": 8,
+      "passed": 8,
+      "samples": 54004,
+      "within_ray_duplicate_samples": 2595
+    },
+    "fp_luma": {
+      "cases": 1,
+      "passed": 1,
+      "samples": 26024,
+      "within_ray_duplicate_samples": 1358
+    },
+    "gradient": {
+      "cases": 5,
+      "passed": 5,
+      "samples": 126892,
+      "within_ray_duplicate_samples": 6353
+    },
+    "natural": {
+      "cases": 120,
+      "passed": 120,
+      "samples": 3935550,
+      "within_ray_duplicate_samples": 202350
+    },
+    "natural_full": {
+      "cases": 2,
+      "passed": 2,
+      "samples": 662296,
+      "within_ray_duplicate_samples": 32357
+    },
+    "pattern": {
+      "cases": 3,
+      "passed": 3,
+      "samples": 78072,
+      "within_ray_duplicate_samples": 4074
+    },
+    "pilot_pairs": {
+      "cases": 500,
+      "passed": 500,
+      "samples": 12043200,
+      "within_ray_duplicate_samples": 624300
+    },
+    "random": {
+      "cases": 8,
+      "passed": 8,
+      "samples": 208192,
+      "within_ray_duplicate_samples": 10864
+    },
+    "rectangular": {
+      "cases": 10,
+      "passed": 10,
+      "samples": 403832,
+      "within_ray_duplicate_samples": 19596
+    },
+    "rounding": {
+      "cases": 9,
+      "passed": 9,
+      "samples": 205009,
+      "within_ray_duplicate_samples": 9907
+    },
+    "small": {
+      "cases": 20,
+      "passed": 20,
+      "samples": 10387,
+      "within_ray_duplicate_samples": 407
+    },
+    "uniform": {
+      "cases": 7,
+      "passed": 7,
+      "samples": 182168,
+      "within_ray_duplicate_samples": 9506
+    }
+  },
+  "cases": 704,
+  "failed": 0,
+  "libm_variant_cases_with_coordinate_differences": 0,
+  "libm_variant_rays_with_coordinate_differences": 0,
+  "passed": 704,
+  "total_matrix_values": 64002560,
+  "total_samples": 17952238
+}
+exit 0
