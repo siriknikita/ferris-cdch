@@ -8,6 +8,8 @@
 //! (no decoding, no Python), cycling through the supplied images, then measures
 //! batch throughput with 1..N rayon threads.
 
+#![forbid(unsafe_code)]
+
 use std::hint::black_box;
 use std::path::PathBuf;
 use std::sync::Arc;

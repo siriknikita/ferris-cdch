@@ -8,6 +8,8 @@
 //! `--mutants` also evaluates deliberately wrong variants (see `cdch_bench::mutants`) and
 //! records which fixtures expose each one, measuring the harness's sensitivity.
 
+#![forbid(unsafe_code)]
+
 use std::collections::HashSet;
 use std::path::PathBuf;
 use std::time::Instant;

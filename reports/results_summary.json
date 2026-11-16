@@ -2060,5 +2060,259 @@
       "seconds": "0.010",
       "img_per_s": "40298"
     }
+  ],
+  "speedups": [
+    {
+      "scope": "core",
+      "comparison": "CDCH matrix, 128^2 (ms)",
+      "baseline": "ip-1.js in Node (js stage)",
+      "baseline_value": 10.925458,
+      "rust": "engine matrix_into",
+      "rust_value": 0.057334,
+      "speedup": 190.5580981616493
+    },
+    {
+      "scope": "core",
+      "comparison": "CDCH reduced output, 128^2 (ms)",
+      "baseline": "ip-1.js in Node (js stage)",
+      "baseline_value": 10.925458,
+      "rust": "engine checkpoints_into",
+      "rust_value": 0.028082999999999997,
+      "speedup": 389.0416978243066
+    },
+    {
+      "scope": "core",
+      "comparison": "CDCH matrix, 128^2 (ms)",
+      "baseline": "ip-1.js in Node (js stage)",
+      "baseline_value": 10.925458,
+      "rust": "literal reference port",
+      "rust_value": 0.326188,
+      "speedup": 33.494359081266026
+    },
+    {
+      "scope": "features",
+      "comparison": "representation A from CDCH data (ms)",
+      "baseline": "NumPy (feature stage)",
+      "baseline_value": 0.2937705,
+      "rust": "features_A_from_checkpoints",
+      "rust_value": 0.028,
+      "speedup": 10.491803571428571
+    },
+    {
+      "scope": "features",
+      "comparison": "representation B from CDCH data (ms)",
+      "baseline": "NumPy (feature stage)",
+      "baseline_value": 2.230937,
+      "rust": "features_B_from_matrix",
+      "rust_value": 1.1664169999999998,
+      "speedup": 1.9126410194638799
+    },
+    {
+      "scope": "features",
+      "comparison": "representation C from CDCH data (ms)",
+      "baseline": "NumPy (feature stage)",
+      "baseline_value": 0.043125,
+      "rust": "features_C_from_checkpoints",
+      "rust_value": 0.001083,
+      "speedup": 39.81994459833795
+    },
+    {
+      "scope": "cdch_stage",
+      "comparison": "cdch_A_logistic: pixels -> representation in Python (ms)",
+      "baseline": "canonical_js roundtrip+NumPy",
+      "baseline_value": 20.7814375,
+      "rust": "rust fused call",
+      "rust_value": 0.05475,
+      "speedup": 379.56963470319636
+    },
+    {
+      "scope": "cdch_stage",
+      "comparison": "cdch_B_linear_svm: pixels -> representation in Python (ms)",
+      "baseline": "canonical_js roundtrip+NumPy",
+      "baseline_value": 22.9225625,
+      "rust": "rust fused call",
+      "rust_value": 1.1668125,
+      "speedup": 19.645455032406666
+    },
+    {
+      "scope": "cdch_stage",
+      "comparison": "cdch_C_logistic: pixels -> representation in Python (ms)",
+      "baseline": "canonical_js roundtrip+NumPy",
+      "baseline_value": 20.820104,
+      "rust": "rust fused call",
+      "rust_value": 0.03125,
+      "speedup": 666.243328
+    },
+    {
+      "scope": "cdch_stage",
+      "comparison": "cdch_D_conv: pixels -> representation in Python (ms)",
+      "baseline": "canonical_js roundtrip+NumPy",
+      "baseline_value": 21.048521,
+      "rust": "rust fused call",
+      "rust_value": 0.0307705,
+      "speedup": 684.0487154904861
+    },
+    {
+      "scope": "cdch_stage",
+      "comparison": "frequency_cdch: pixels -> representation in Python (ms)",
+      "baseline": "canonical_js roundtrip+NumPy",
+      "baseline_value": 21.1053545,
+      "rust": "rust fused call",
+      "rust_value": 0.058333,
+      "speedup": 361.8081446179692
+    },
+    {
+      "scope": "cdch_stage",
+      "comparison": "frequency_cdch_score_fusion: pixels -> representation in Python (ms)",
+      "baseline": "canonical_js roundtrip+NumPy",
+      "baseline_value": 21.2508335,
+      "rust": "rust fused call",
+      "rust_value": 0.0585415,
+      "speedup": 363.00459503087546
+    },
+    {
+      "scope": "pipeline",
+      "comparison": "cdch_A_logistic: end-to-end median (ms)",
+      "baseline": "canonical_js",
+      "baseline_value": 21.3859795,
+      "rust": "rust",
+      "rust_value": 0.430479,
+      "speedup": 49.679495399311
+    },
+    {
+      "scope": "pipeline",
+      "comparison": "cdch_B_linear_svm: end-to-end median (ms)",
+      "baseline": "canonical_js",
+      "baseline_value": 23.5184585,
+      "rust": "rust",
+      "rust_value": 1.5905205,
+      "speedup": 14.7866428002657
+    },
+    {
+      "scope": "pipeline",
+      "comparison": "cdch_C_logistic: end-to-end median (ms)",
+      "baseline": "canonical_js",
+      "baseline_value": 21.4357085,
+      "rust": "rust",
+      "rust_value": 0.4155,
+      "speedup": 51.590152827918175
+    },
+    {
+      "scope": "pipeline",
+      "comparison": "cdch_D_conv: end-to-end median (ms)",
+      "baseline": "canonical_js",
+      "baseline_value": 21.7095,
+      "rust": "rust",
+      "rust_value": 0.374188,
+      "speedup": 58.01762750275262
+    },
+    {
+      "scope": "pipeline",
+      "comparison": "frequency_cdch: end-to-end median (ms)",
+      "baseline": "canonical_js",
+      "baseline_value": 22.368583,
+      "rust": "rust",
+      "rust_value": 1.075833,
+      "speedup": 20.79187290220694
+    },
+    {
+      "scope": "pipeline",
+      "comparison": "frequency_cdch_score_fusion: end-to-end median (ms)",
+      "baseline": "canonical_js",
+      "baseline_value": 22.6353125,
+      "rust": "rust",
+      "rust_value": 1.1654165,
+      "speedup": 19.42250903432378
+    },
+    {
+      "scope": "batch",
+      "comparison": "A features from decoded arrays, 1 threads (img/s)",
+      "baseline": "JS worker, 1 process",
+      "baseline_value": 0.021785871669999998,
+      "rust": "batch_features threads=1",
+      "rust_value": 5.840396000000001e-05,
+      "speedup": 373.02045392127513
+    },
+    {
+      "scope": "batch",
+      "comparison": "A features from decoded arrays, 2 threads (img/s)",
+      "baseline": "JS worker, 1 process",
+      "baseline_value": 0.021785871669999998,
+      "rust": "batch_features threads=2",
+      "rust_value": 3.0007082499999998e-05,
+      "speedup": 726.0243200917649
+    },
+    {
+      "scope": "batch",
+      "comparison": "A features from decoded arrays, 4 threads (img/s)",
+      "baseline": "JS worker, 1 process",
+      "baseline_value": 0.021785871669999998,
+      "rust": "batch_features threads=4",
+      "rust_value": 1.5770105e-05,
+      "speedup": 1381.4664943575199
+    },
+    {
+      "scope": "batch",
+      "comparison": "A features from decoded arrays, 8 threads (img/s)",
+      "baseline": "JS worker, 1 process",
+      "baseline_value": 0.021785871669999998,
+      "rust": "batch_features threads=8",
+      "rust_value": 8.81125e-06,
+      "speedup": 2472.506360618527
+    },
+    {
+      "scope": "batch",
+      "comparison": "A features from decoded arrays, 14 threads (img/s)",
+      "baseline": "JS worker, 1 process",
+      "baseline_value": 0.021785871669999998,
+      "rust": "batch_features threads=14",
+      "rust_value": 7.1852075e-06,
+      "speedup": 3032.0448880564686
+    },
+    {
+      "scope": "batch",
+      "comparison": "decode + A + logistic, CLI 1 threads (img/s)",
+      "baseline": "canonical_js pipeline (img/s)",
+      "baseline_value": 0.021471349710000004,
+      "rust": "cdch score --threads 1",
+      "rust_value": 0.00018772292096865028,
+      "speedup": 114.37787990517002
+    },
+    {
+      "scope": "batch",
+      "comparison": "decode + A + logistic, CLI 2 threads (img/s)",
+      "baseline": "canonical_js pipeline (img/s)",
+      "baseline_value": 0.021471349710000004,
+      "rust": "cdch score --threads 2",
+      "rust_value": 9.458053532582995e-05,
+      "speedup": 227.01658048383004
+    },
+    {
+      "scope": "batch",
+      "comparison": "decode + A + logistic, CLI 4 threads (img/s)",
+      "baseline": "canonical_js pipeline (img/s)",
+      "baseline_value": 0.021471349710000004,
+      "rust": "cdch score --threads 4",
+      "rust_value": 5.241639584862145e-05,
+      "speedup": 409.6304097673801
+    },
+    {
+      "scope": "batch",
+      "comparison": "decode + A + logistic, CLI 8 threads (img/s)",
+      "baseline": "canonical_js pipeline (img/s)",
+      "baseline_value": 0.021471349710000004,
+      "rust": "cdch score --threads 8",
+      "rust_value": 2.961471258921432e-05,
+      "speedup": 725.0230656575701
+    },
+    {
+      "scope": "batch",
+      "comparison": "decode + A + logistic, CLI 14 threads (img/s)",
+      "baseline": "canonical_js pipeline (img/s)",
+      "baseline_value": 0.021471349710000004,
+      "rust": "cdch score --threads 14",
+      "rust_value": 2.407955886248164e-05,
+      "speedup": 891.6836821065901
+    }
   ]
 }
