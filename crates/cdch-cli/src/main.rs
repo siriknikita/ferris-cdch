@@ -8,6 +8,8 @@
 //! ```
 //! Defaults follow the archived protocol: centre `(width // 2, height // 2)`, 360 rays.
 
+#![forbid(unsafe_code)]
+
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use std::sync::Arc;

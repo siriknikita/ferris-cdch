@@ -11,6 +11,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 REP = ROOT / "reports"
+MODELS_CDCH = ["cdch_A_logistic", "cdch_B_linear_svm", "cdch_C_logistic", "cdch_D_conv",
+               "frequency_cdch", "frequency_cdch_score_fusion"]
 
 
 def rows(path):
@@ -64,7 +66,53 @@ def main():
     out["rust_batch_img_s"] = {f'{b["representation"]}|{b["threads"]}': b["median_img_s"] for b in micro["batch"]}
     out["components"] = json.loads((REP / "perf/components.json").read_text())
     out["cli_throughput"] = rows(REP / "perf/cli_throughput.csv")
+    # ---- Speedups S = T_baseline / T_rust (same machine, same session) ----
+    mb = out["rust_microbench_us"]
+    comp = out["components"]
+    def stage(m, b, s):
+        return float(pipe[(m, b)][f"{s}_median_ms"])
+    sp = []
+    def add(scope, what, base_label, base, rust_label, rust):
+        sp.append(dict(scope=scope, comparison=what, baseline=base_label, baseline_value=base,
+                       rust=rust_label, rust_value=rust, speedup=base / rust))
+    js_core_ms = stage("cdch_A_logistic", "canonical_js", "js")
+    add("core", "CDCH matrix, 128^2 (ms)", "ip-1.js in Node (js stage)", js_core_ms, "engine matrix_into", mb["core_engine_matrix_into"] / 1e3)
+    add("core", "CDCH reduced output, 128^2 (ms)", "ip-1.js in Node (js stage)", js_core_ms, "engine checkpoints_into", mb["core_engine_checkpoints_into"] / 1e3)
+    add("core", "CDCH matrix, 128^2 (ms)", "ip-1.js in Node (js stage)", js_core_ms, "literal reference port", mb["core_reference_matrix"] / 1e3)
+    for kind, np_model, rust_bench in (("A", "cdch_A_logistic", "features_A_from_checkpoints"),
+                                       ("B", "cdch_B_linear_svm", "features_B_from_matrix"),
+                                       ("C", "cdch_C_logistic", "features_C_from_checkpoints")):
+        add("features", f"representation {kind} from CDCH data (ms)", "NumPy (feature stage)",
+            stage(np_model, "canonical_js", "feature"), rust_bench, mb[rust_bench] / 1e3)
+    for m in MODELS_CDCH:
+        add("cdch_stage", f"{m}: pixels -> representation in Python (ms)", "canonical_js roundtrip+NumPy",
+            stage(m, "canonical_js", "cdch_total"), "rust fused call", stage(m, "rust", "cdch_total"))
+    for m in MODELS_CDCH:
+        add("pipeline", f"{m}: end-to-end median (ms)", "canonical_js", stage(m, "canonical_js", "total"),
+            "rust", stage(m, "rust", "total"))
+    js_tp = comp["js_worker_matrix_throughput_img_s"]
+    for b in comp["batch_from_arrays"]:
+        if b["kind"] == "A":
+            add("batch", f"A features from decoded arrays, {b['threads']} threads (img/s)", "JS worker, 1 process",
+                1 / js_tp, f"batch_features threads={b['threads']}", 1 / b["median_img_s"])
+    cli = {}
+    for r in out["cli_throughput"]:
+        cli.setdefault(int(r["threads"]), []).append(float(r["img_per_s"]))
+    for t, v in sorted(cli.items()):
+        add("batch", f"decode + A + logistic, CLI {t} threads (img/s)", "canonical_js pipeline (img/s)",
+            1 / float(pipe[("cdch_A_logistic", "canonical_js")]["throughput_img_s"]), f"cdch score --threads {t}",
+            1 / (sorted(v)[len(v) // 2]))
+    with (REP / "perf/speedups.csv").open("w", newline="") as s:
+        w = csv.DictWriter(s, fieldnames=list(sp[0]))
+        w.writeheader()
+        w.writerows(sp)
+    out["speedups"] = sp
     (REP / "results_summary.json").write_text(json.dumps(out, indent=2) + "\n")
+    print("\n### Speedups\n")
+    print("| Scope | Comparison | Baseline | Rust | S |")
+    print("|---|---|---:|---:|---:|")
+    for r in sp:
+        print(f"| {r['scope']} | {r['comparison']} | {r['baseline_value']:.4g} | {r['rust_value']:.4g} | {r['speedup']:.1f}× |")
 
     # ---- Markdown tables ----
     print("\n### Pipelines (median / p95 ms, cold ms, img/s, peak RSS MiB, CPU %)\n")

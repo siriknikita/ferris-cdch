@@ -9,6 +9,8 @@ __pycache__/
 *.so
 *.pyd
 *.dylib
+# Built wheels / binaries (shipped in the release archive, not in git)
+/dist/
 # External, re-downloadable inputs (DIV2K, SR weights, regenerated pairs) live outside this repo
 /external/
 .DS_Store

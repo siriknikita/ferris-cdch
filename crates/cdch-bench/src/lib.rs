@@ -1,5 +1,7 @@
 //! Shared utilities for the Ferris differential harness and benchmarks.
 
+#![forbid(unsafe_code)]
+
 use std::io::{BufRead, BufReader, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Child, ChildStdin, ChildStdout, Command, Stdio};
