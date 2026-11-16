@@ -50,7 +50,7 @@ enum PixelData<'py> {
 impl Pixels<'_> {
     fn slice(&self) -> &[u8] {
         match &self.data {
-            PixelData::Borrowed(a) => a.as_slice().expect("checked contiguous"),
+            PixelData::Borrowed(a) => a.as_slice().expect("checked C-contiguous"),
             PixelData::Owned(v) => v,
         }
     }
@@ -88,7 +88,8 @@ fn image_from<'py>(obj: &Bound<'py, PyAny>) -> PyResult<Pixels<'py>> {
         )));
     }
     let typed = arr.cast::<PyArray3<u8>>()?.readonly();
-    let data = if typed.as_slice().is_ok() {
+    // `as_slice` also succeeds for Fortran-ordered arrays, so require C order explicitly.
+    let data = if typed.is_c_contiguous() {
         PixelData::Borrowed(typed)
     } else {
         PixelData::Owned(typed.as_array().iter().copied().collect())
@@ -247,12 +248,11 @@ fn features_from_matrix<'py>(py: Python<'py>, cdf: &Bound<'py, PyAny>, kind: &st
     }
     let typed = arr.cast::<PyArray2<f64>>()?.readonly();
     let owned: Vec<f64>;
-    let data: &[f64] = match typed.as_slice() {
-        Ok(s) => s,
-        Err(_) => {
-            owned = typed.as_array().iter().copied().collect();
-            &owned
-        }
+    let data: &[f64] = if typed.is_c_contiguous() {
+        typed.as_slice().expect("checked C-contiguous")
+    } else {
+        owned = typed.as_array().iter().copied().collect();
+        &owned
     };
     let mut out = vec![0.0; rep.dim()];
     cdch_features::from_matrix(&MatrixView::new(shape[0], data).map_err(err)?, rep, &mut out).map_err(err)?;
@@ -267,21 +267,49 @@ fn stack_from(obj: &Bound<'_, PyAny>) -> PyResult<(usize, usize, usize, Vec<u8>)
         return Err(PyValueError::new_err(format!("images must have shape (n, height, width, 3), got {shape:?}")));
     }
     let typed = arr.cast::<PyArray4<u8>>()?.readonly();
-    let data = match typed.as_slice() {
-        Ok(s) => s.to_vec(),
-        Err(_) => typed.as_array().iter().copied().collect(),
+    let data = if typed.is_c_contiguous() {
+        typed.as_slice().expect("checked C-contiguous").to_vec()
+    } else {
+        typed.as_array().iter().copied().collect()
     };
     Ok((shape[0], shape[1], shape[2], data))
 }
 
-fn pool(threads: Option<usize>) -> PyResult<Option<rayon::ThreadPool>> {
-    match threads {
-        None | Some(0) => Ok(None),
-        Some(n) => rayon::ThreadPoolBuilder::new()
-            .num_threads(n)
-            .build()
-            .map(Some)
-            .map_err(|e| PyValueError::new_err(e.to_string())),
+/// Rayon pool for an explicit thread count, built once per count and reused across
+/// calls (building a pool costs far more than a typical batch item). `None`/`0` means
+/// the global pool.
+fn pool(threads: Option<usize>) -> PyResult<Option<Arc<rayon::ThreadPool>>> {
+    static POOLS: OnceLock<std::sync::Mutex<std::collections::HashMap<usize, Arc<rayon::ThreadPool>>>> = OnceLock::new();
+    let n = match threads {
+        None | Some(0) => return Ok(None),
+        Some(n) => n,
+    };
+    let mut pools = POOLS.get_or_init(Default::default).lock().expect("pool cache poisoned");
+    if let Some(p) = pools.get(&n) {
+        return Ok(Some(Arc::clone(p)));
+    }
+    let p = Arc::new(
+        rayon::ThreadPoolBuilder::new().num_threads(n).build().map_err(|e| PyValueError::new_err(e.to_string()))?,
+    );
+    pools.insert(n, Arc::clone(&p));
+    Ok(Some(p))
+}
+
+/// Run `work(i, chunk_i)` over the `chunk`-sized slices of `out`: serially on the calling
+/// thread for `threads == Some(1)` or a single item, otherwise on `pool` (or the global pool).
+fn for_each_item(
+    out: &mut [f64],
+    chunk: usize,
+    threads: Option<usize>,
+    pool: Option<&rayon::ThreadPool>,
+    work: impl Fn((usize, &mut [f64])) -> Result<(), CdchError> + Send + Sync,
+) -> Result<(), CdchError> {
+    if threads == Some(1) || out.len() <= chunk {
+        out.chunks_mut(chunk).enumerate().try_for_each(work)
+    } else if let Some(p) = pool {
+        p.install(|| out.par_chunks_mut(chunk).enumerate().try_for_each(work))
+    } else {
+        out.par_chunks_mut(chunk).enumerate().try_for_each(work)
     }
 }
 
@@ -299,17 +327,10 @@ fn batch_features<'py>(py: Python<'py>, images: &Bound<'py, PyAny>, kind: &str, 
         .detach(|| {
             let mut out = vec![0.0; n * dim];
             let stride = h * w * 3;
-            let work = |(i, dst): (usize, &mut [f64])| -> Result<(), CdchError> {
+            for_each_item(&mut out, dim, threads, pool.as_deref(), |(i, dst)| {
                 let img = RgbImage::new(w, h, &data[i * stride..(i + 1) * stride])?;
                 EXTRACTOR.with(|fx| fx.borrow_mut().extract(&img, &params, rep, dst))
-            };
-            if threads == Some(1) || n <= 1 {
-                out.chunks_mut(dim.max(1)).enumerate().try_for_each(work)?;
-            } else if let Some(p) = &pool {
-                p.install(|| out.par_chunks_mut(dim).enumerate().try_for_each(work))?;
-            } else {
-                out.par_chunks_mut(dim).enumerate().try_for_each(work)?;
-            }
+            })?;
             Ok::<_, CdchError>(out)
         })
         .map_err(err)?;
@@ -330,18 +351,11 @@ fn batch_cdch<'py>(py: Python<'py>, images: &Bound<'py, PyAny>, center: Option<(
             let plan = engine().plan(w, h, params)?;
             let mut out = vec![0.0; n * per];
             let stride = h * w * 3;
-            let work = |(i, dst): (usize, &mut [f64])| -> Result<(), CdchError> {
+            for_each_item(&mut out, per, threads, pool.as_deref(), |(i, dst)| {
                 let img = RgbImage::new(w, h, &data[i * stride..(i + 1) * stride])?;
                 let mut ws = cdch_core::Workspace::new();
                 plan.matrix_into(&img, &mut ws, dst)
-            };
-            if threads == Some(1) || n <= 1 {
-                out.chunks_mut(per.max(1)).enumerate().try_for_each(work)?;
-            } else if let Some(p) = &pool {
-                p.install(|| out.par_chunks_mut(per).enumerate().try_for_each(work))?;
-            } else {
-                out.par_chunks_mut(per).enumerate().try_for_each(work)?;
-            }
+            })?;
             Ok::<_, CdchError>(out)
         })
         .map_err(err)?;

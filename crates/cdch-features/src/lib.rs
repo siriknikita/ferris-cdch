@@ -28,7 +28,7 @@ pub use extractor::FeatureExtractor;
 
 use cdch_core::engine::CHECKPOINTS;
 use cdch_core::{CdchError, MatrixView, Result, BINS, RAYS_ARCHIVED};
-use numpy_compat::{linspace_0_1_256, pairwise_sum, pairwise_sum_by};
+use numpy_compat::{linspace_0_1_256, pairwise_sum};
 
 pub const A_DIM: usize = 56;
 pub const RICH_DIM: usize = 42;
@@ -311,6 +311,14 @@ pub fn rich(m: &MatrixView<'_>, out: &mut [f64]) {
     let mut q = vec![0f64; 21 * rows];
     let mut pmf = [0f64; BINS];
     let mut centered = [0f64; BINS];
+    // Per-bin terms are materialized here, then reduced in NumPy's pairwise order.
+    let mut t = [0f64; BINS];
+    let mut sum = |f: &dyn Fn(usize) -> f64, len: usize| -> f64 {
+        for (b, v) in t[..len].iter_mut().enumerate() {
+            *v = f(b);
+        }
+        pairwise_sum(&t[..len])
+    };
     for i in 0..rows {
         let cdf = m.row(i);
         // pmf = np.diff(cdf, axis=1, prepend=0)
@@ -319,28 +327,26 @@ pub fn rich(m: &MatrixView<'_>, out: &mut [f64]) {
             pmf[b] = cdf[b] - cdf[b - 1];
         }
         // mean = pmf @ bins (BLAS in NumPy; pairwise here).
-        let mean = pairwise_sum_by(BINS, &|b| pmf[b] * bins[b]);
+        let mean = sum(&|b| pmf[b] * bins[b], BINS);
         for b in 0..BINS {
             centered[b] = bins[b] - mean;
         }
-        let variance = pairwise_sum_by(BINS, &|b| pmf[b] * (centered[b] * centered[b]));
+        let variance = sum(&|b| pmf[b] * (centered[b] * centered[b]), BINS);
         // Most PMF bins are ±0 (a ray has ~70 samples over 256 bins). For those, the
         // products are signed zeros and libm is skipped with bit-identical results:
         // ±0·pow(c,3) = ±0·c (pow keeps c's sign), ±0·pow(c,4) = ±0·1, and
         // ±0·log2(max(±0, 1e-300)) = ∓0 because log2(1e-300) < 0.
-        let c3 = pairwise_sum_by(BINS, &|b| {
-            if pmf[b] == 0.0 { pmf[b] * centered[b] } else { pmf[b] * centered[b].powf(3.0) }
-        });
-        let c4 = pairwise_sum_by(BINS, &|b| if pmf[b] == 0.0 { pmf[b] } else { pmf[b] * centered[b].powf(4.0) });
+        let c3 = sum(&|b| if pmf[b] == 0.0 { pmf[b] * centered[b] } else { pmf[b] * centered[b].powf(3.0) }, BINS);
+        let c4 = sum(&|b| if pmf[b] == 0.0 { pmf[b] } else { pmf[b] * centered[b].powf(4.0) }, BINS);
         let (skew, kurt) = if variance > 1e-10 {
             (c3 / variance.powf(1.5), c4 / (variance * variance))
         } else {
             (0.0, 0.0)
         };
-        let entropy = -pairwise_sum_by(BINS, &|b| if pmf[b] == 0.0 { -pmf[b] } else { pmf[b] * pmf[b].max(1e-300).log2() }) / 8.0;
-        let concentration = pairwise_sum_by(BINS, &|b| pmf[b] * pmf[b]);
+        let entropy = -sum(&|b| if pmf[b] == 0.0 { -pmf[b] } else { pmf[b] * pmf[b].max(1e-300).log2() }, BINS) / 8.0;
+        let concentration = sum(&|b| pmf[b] * pmf[b], BINS);
         let max_mass = pmf.iter().copied().fold(f64::NEG_INFINITY, f64::max);
-        let mad = pairwise_sum_by(BINS - 1, &|b| (pmf[b + 1] - pmf[b]).abs()) / (BINS - 1) as f64;
+        let mad = sum(&|b| (pmf[b + 1] - pmf[b]).abs(), BINS - 1) / (BINS - 1) as f64;
         let quantile = |p: f64| -> f64 {
             // (cdf >= p).argmax() / 255 — 0 when no bin qualifies.
             cdf.iter().position(|&v| v >= p).unwrap_or(0) as f64 / 255.0
@@ -371,7 +377,7 @@ pub fn rich(m: &MatrixView<'_>, out: &mut [f64]) {
         // Angular lags: mean |cdf[i] - cdf[(i - lag) mod rows]| over intensity.
         for (n, &lag) in [1usize, 15, 90, 180].iter().enumerate() {
             let other = m.row((i + rows - lag % rows) % rows);
-            q[(17 + n) * rows + i] = pairwise_sum_by(BINS, &|b| (cdf[b] - other[b]).abs()) / BINS as f64;
+            q[(17 + n) * rows + i] = sum(&|b| (cdf[b] - other[b]).abs(), BINS) / BINS as f64;
         }
     }
     for k in 0..21 {
@@ -404,6 +410,7 @@ pub fn from_matrix(m: &MatrixView<'_>, rep: Representation, out: &mut [f64]) -> 
 #[cfg(test)]
 mod rich_shortcut_tests {
     use super::*;
+    use crate::numpy_compat::pairwise_sum_by;
 
     /// The pre-optimization formulas: libm on every bin, no zero shortcut.
     fn per_ray_reference(cdf: &[f64]) -> [f64; 3] {

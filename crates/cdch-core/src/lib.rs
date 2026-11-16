@@ -57,6 +57,8 @@ pub enum CdchError {
     RayCount { expected: usize, actual: usize },
     /// The canonical matrix failed the archived validity checks (empty ray, NaN, ...).
     InvalidMatrix(String),
+    /// An image was evaluated with a sampling plan built for another size.
+    Dimensions { plan: (usize, usize), image: (usize, usize) },
 }
 
 impl fmt::Display for CdchError {
@@ -77,6 +79,11 @@ impl fmt::Display for CdchError {
                 write!(f, "representation requires {expected} rays, got {actual}")
             }
             CdchError::InvalidMatrix(why) => write!(f, "invalid canonical CDCH matrix: {why}"),
+            CdchError::Dimensions { plan, image } => write!(
+                f,
+                "image is {}x{} but the sampling plan was built for {}x{}",
+                image.0, image.1, plan.0, plan.1
+            ),
         }
     }
 }

@@ -42,9 +42,9 @@ pub struct CheckpointMatrix {
 
 fn check_dims(plan: &SamplingPlan, img: &RgbImage<'_>) -> Result<()> {
     if img.width() != plan.width() || img.height() != plan.height() {
-        return Err(CdchError::BufferSize {
-            expected: plan.width() * plan.height() * 3,
-            actual: img.width() * img.height() * 3,
+        return Err(CdchError::Dimensions {
+            plan: (plan.width(), plan.height()),
+            image: (img.width(), img.height()),
         });
     }
     Ok(())
@@ -82,11 +82,14 @@ impl SamplingPlan {
         self.fill_luma(img, ws);
         let lum = &ws.lum[..];
         for (ray, row) in out.chunks_exact_mut(BINS).enumerate() {
+            let samples = self.ray_samples(ray);
             let mut hist = [0u32; BINS];
-            for &k in self.ray_samples(ray) {
+            for &k in samples {
                 hist[lum[k as usize] as usize] += 1;
             }
-            let max = self.ray_len(ray) as f64;
+            // Direct division vectorizes better here than the quotient-table lookup used
+            // by the 32-checkpoint path (measured in RUST_PERFORMANCE_REPORT.md).
+            let max = samples.len() as f64;
             let mut cum = 0u32;
             for (dst, &h) in row.iter_mut().zip(hist.iter()) {
                 cum += h;
@@ -133,15 +136,25 @@ impl SamplingPlan {
         }
         let bucket = &ws.lum[..];
         for (ray, row) in out.chunks_exact_mut(CHECKPOINTS).enumerate() {
-            let mut counts = [0u32; CHECKPOINTS];
-            for &k in self.ray_samples(ray) {
-                counts[bucket[k as usize] as usize] += 1;
+            // Four interleaved count tables break the store-to-load dependency chain when
+            // consecutive samples fall in the same bucket (common in smooth regions).
+            let mut counts = [[0u32; CHECKPOINTS]; 4];
+            let samples = self.ray_samples(ray);
+            let mut quads = samples.chunks_exact(4);
+            for q in &mut quads {
+                counts[0][bucket[q[0] as usize] as usize] += 1;
+                counts[1][bucket[q[1] as usize] as usize] += 1;
+                counts[2][bucket[q[2] as usize] as usize] += 1;
+                counts[3][bucket[q[3] as usize] as usize] += 1;
             }
-            let max = self.ray_len(ray) as f64;
+            for &k in quads.remainder() {
+                counts[0][bucket[k as usize] as usize] += 1;
+            }
+            let quotient = self.ray_quotients(ray);
             let mut cum = 0u32;
-            for (dst, &c) in row.iter_mut().zip(counts.iter()) {
-                cum += c;
-                *dst = cum as f64 / max;
+            for (j, dst) in row.iter_mut().enumerate() {
+                cum += counts[0][j] + counts[1][j] + counts[2][j] + counts[3][j];
+                *dst = quotient[cum as usize];
             }
         }
         Ok(())

@@ -10,7 +10,13 @@
 //! * `samples`: for every sample in emission order, its index into `unique`
 //!   (duplicate coordinates produced by rounding appear as repeated indices and
 //!   keep their canonical multiplicity);
-//! * `ray_starts`: CSR offsets of each ray within `samples`.
+//! * `ray_starts`: CSR offsets of each ray within `samples`;
+//! * `quotients`: for every distinct ray length `n`, the binary64 values `c / n` for
+//!   `c = 0..=n`, computed once with the same IEEE division the JavaScript performs
+//!   per bin (`cumulative[b] / max`). Rays index their table via `quotient_starts`.
+//!   An empty ray (`n = 0`) maps to `[0 / 0] = [NaN]`, as in JavaScript.
+
+use std::collections::HashMap;
 
 use crate::{js, CdchError, Params, Result};
 
@@ -22,6 +28,8 @@ pub struct SamplingPlan {
     ray_starts: Vec<u32>,
     samples: Vec<u32>,
     unique: Vec<u32>,
+    quotients: Vec<f64>,
+    quotient_starts: Vec<u32>,
 }
 
 impl SamplingPlan {
@@ -59,7 +67,20 @@ impl SamplingPlan {
             .iter()
             .map(|p| unique.binary_search(p).expect("pixel present") as u32)
             .collect();
-        Ok(Self { width, height, params, ray_starts, samples, unique })
+        let mut quotients = Vec::new();
+        let mut table_of: HashMap<u32, u32> = HashMap::new();
+        let quotient_starts = ray_starts
+            .windows(2)
+            .map(|w| {
+                let n = w[1] - w[0];
+                *table_of.entry(n).or_insert_with(|| {
+                    let start = quotients.len() as u32;
+                    quotients.extend((0..=n).map(|c| c as f64 / n as f64));
+                    start
+                })
+            })
+            .collect();
+        Ok(Self { width, height, params, ray_starts, samples, unique, quotients, quotient_starts })
     }
 
     pub fn width(&self) -> usize {
@@ -92,6 +113,12 @@ impl SamplingPlan {
     pub fn ray_len(&self, i: usize) -> usize {
         (self.ray_starts[i + 1] - self.ray_starts[i]) as usize
     }
+    /// `c / n` for `c = 0..=n`, where `n` is the length of ray `i`.
+    #[inline]
+    pub fn ray_quotients(&self, i: usize) -> &[f64] {
+        let start = self.quotient_starts[i] as usize;
+        &self.quotients[start..start + self.ray_len(i) + 1]
+    }
     /// Coordinates `(px, py)` of ray `i`, in emission order.
     pub fn ray_coords(&self, i: usize) -> impl Iterator<Item = (usize, usize)> + '_ {
         let w = self.width;
@@ -107,6 +134,7 @@ impl SamplingPlan {
     }
     /// Heap bytes held by the plan.
     pub fn heap_bytes(&self) -> usize {
-        4 * (self.ray_starts.capacity() + self.samples.capacity() + self.unique.capacity())
+        4 * (self.ray_starts.capacity() + self.samples.capacity() + self.unique.capacity() + self.quotient_starts.capacity())
+            + 8 * self.quotients.capacity()
     }
 }
