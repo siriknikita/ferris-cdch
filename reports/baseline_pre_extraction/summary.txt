@@ -1,0 +1,10 @@
+== git
+553ff8c35864ae1c7efc1a3484a6f84aa29e5747
+== fmt
+fmt exit 1
+== clippy
+clippy exit 101
+== test
+test exit 0
+== diff
+diff exit 0

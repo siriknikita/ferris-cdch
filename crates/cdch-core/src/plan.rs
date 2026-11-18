@@ -35,7 +35,10 @@ pub struct SamplingPlan {
 impl SamplingPlan {
     pub fn new(width: usize, height: usize, params: Params) -> Result<Self> {
         params.validate()?;
-        if width.checked_mul(height).map_or(true, |n| n > u32::MAX as usize) {
+        if width
+            .checked_mul(height)
+            .is_none_or(|n| n > u32::MAX as usize)
+        {
             return Err(CdchError::TooLarge { width, height });
         }
         let (x, y) = (params.center.x, params.center.y);
@@ -80,7 +83,16 @@ impl SamplingPlan {
                 })
             })
             .collect();
-        Ok(Self { width, height, params, ray_starts, samples, unique, quotients, quotient_starts })
+        Ok(Self {
+            width,
+            height,
+            params,
+            ray_starts,
+            samples,
+            unique,
+            quotients,
+            quotient_starts,
+        })
     }
 
     pub fn width(&self) -> usize {
@@ -134,7 +146,10 @@ impl SamplingPlan {
     }
     /// Heap bytes held by the plan.
     pub fn heap_bytes(&self) -> usize {
-        4 * (self.ray_starts.capacity() + self.samples.capacity() + self.unique.capacity() + self.quotient_starts.capacity())
+        4 * (self.ray_starts.capacity()
+            + self.samples.capacity()
+            + self.unique.capacity()
+            + self.quotient_starts.capacity())
             + 8 * self.quotients.capacity()
     }
 }

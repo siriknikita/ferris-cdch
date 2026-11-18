@@ -73,11 +73,19 @@ impl SamplingPlan {
     }
 
     /// Full canonical matrix into `out` (`n_rays * 256` values).
-    pub fn matrix_into(&self, img: &RgbImage<'_>, ws: &mut Workspace, out: &mut [f64]) -> Result<()> {
+    pub fn matrix_into(
+        &self,
+        img: &RgbImage<'_>,
+        ws: &mut Workspace,
+        out: &mut [f64],
+    ) -> Result<()> {
         check_dims(self, img)?;
         let rows = self.n_rays();
         if out.len() != rows * BINS {
-            return Err(CdchError::BufferSize { expected: rows * BINS, actual: out.len() });
+            return Err(CdchError::BufferSize {
+                expected: rows * BINS,
+                actual: out.len(),
+            });
         }
         self.fill_luma(img, ws);
         let lum = &ws.lum[..];
@@ -119,15 +127,68 @@ impl SamplingPlan {
         Ok(out)
     }
 
+    /// Integer histograms and the canonical matrix from one pass over the image.
+    ///
+    /// `counts` receives `n_rays * 256` raw counts and `matrix` the `n_rays * 256`
+    /// canonical values. Each matrix value is produced exactly as in
+    /// [`Self::matrix_into`]: an integer cumulative count divided once (IEEE binary64)
+    /// by the ray length, so both outputs are bit-identical to the separate calls.
+    pub fn histograms_and_matrix_into(
+        &self,
+        img: &RgbImage<'_>,
+        ws: &mut Workspace,
+        counts: &mut [u32],
+        matrix: &mut [f64],
+    ) -> Result<()> {
+        check_dims(self, img)?;
+        let n = self.n_rays() * BINS;
+        for len in [counts.len(), matrix.len()] {
+            if len != n {
+                return Err(CdchError::BufferSize {
+                    expected: n,
+                    actual: len,
+                });
+            }
+        }
+        self.fill_luma(img, ws);
+        let lum = &ws.lum[..];
+        for (ray, (hist, row)) in counts
+            .chunks_exact_mut(BINS)
+            .zip(matrix.chunks_exact_mut(BINS))
+            .enumerate()
+        {
+            hist.fill(0);
+            let samples = self.ray_samples(ray);
+            for &k in samples {
+                hist[lum[k as usize] as usize] += 1;
+            }
+            let max = samples.len() as f64;
+            let mut cum = 0u32;
+            for (dst, &h) in row.iter_mut().zip(hist.iter()) {
+                cum += h;
+                *dst = cum as f64 / max;
+            }
+        }
+        Ok(())
+    }
+
     /// The canonical CDF at the 32 checkpoint bins only (`n_rays * 32` values),
     /// without materializing the 256-bin matrix. Each value is computed as
     /// `cumulative[8j+7] / cumulative[255]` with the same integer cumulative count
     /// and the same single division as the full path, so it is bit-identical.
-    pub fn checkpoints_into(&self, img: &RgbImage<'_>, ws: &mut Workspace, out: &mut [f64]) -> Result<()> {
+    pub fn checkpoints_into(
+        &self,
+        img: &RgbImage<'_>,
+        ws: &mut Workspace,
+        out: &mut [f64],
+    ) -> Result<()> {
         check_dims(self, img)?;
         let rows = self.n_rays();
         if out.len() != rows * CHECKPOINTS {
-            return Err(CdchError::BufferSize { expected: rows * CHECKPOINTS, actual: out.len() });
+            return Err(CdchError::BufferSize {
+                expected: rows * CHECKPOINTS,
+                actual: out.len(),
+            });
         }
         self.fill_luma(img, ws);
         // Bucket j collects intensities in (8j - 1, 8j + 7]; i.e. bucket = luma >> 3.
@@ -163,7 +224,10 @@ impl SamplingPlan {
     pub fn checkpoints(&self, img: &RgbImage<'_>, ws: &mut Workspace) -> Result<CheckpointMatrix> {
         let mut values = vec![0.0; self.n_rays() * CHECKPOINTS];
         self.checkpoints_into(img, ws, &mut values)?;
-        Ok(CheckpointMatrix { rows: self.n_rays(), values })
+        Ok(CheckpointMatrix {
+            rows: self.n_rays(),
+            values,
+        })
     }
 }
 

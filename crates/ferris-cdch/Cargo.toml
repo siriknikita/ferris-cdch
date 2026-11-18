@@ -1,0 +1,30 @@
+[package]
+name = "ferris-cdch"
+description = "Ferris: the stable public Rust API for canonical CDCH (cumulative directional colour histogram) computation"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+readme = "README.md"
+keywords = ["cdch", "histogram", "image-analysis", "research"]
+categories = ["science", "multimedia::images"]
+
+[features]
+default = []
+# Re-export the validated statistical representations A/B/C/D (`cdch-features`).
+representations = ["dep:cdch-features"]
+
+[dependencies]
+# The verified canonical implementation. No other runtime dependencies.
+cdch-core.workspace = true
+cdch-features = { workspace = true, optional = true }
+
+[[example]]
+name = "basic"
+
+[[example]]
+name = "rgba"
+
+[package.metadata.docs.rs]
+all-features = true

@@ -1,0 +1,4759 @@
+{
+  "canonical_sha256": "110732b48bc6e8b2d5167eec30f7277245913bed98b9baaa3c65c0c22aab44d8",
+  "cases": [
+    {
+      "angle_step": 1,
+      "category": "uniform",
+      "center": [
+        64.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1358,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "black_128",
+      "mismatches": [],
+      "mutants_detected": [],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26024,
+      "timing_ms": {
+        "js_oracle": 15.120541,
+        "rust_engine_matrix": 0.08333299999999999,
+        "rust_plan_build": 0.432,
+        "rust_reference_traced": 0.530708
+      },
+      "unique_pixels": 14758,
+      "width": 128,
+      "within_ray_duplicate_samples": 1358
+    },
+    {
+      "angle_step": 1,
+      "category": "uniform",
+      "center": [
+        64.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1358,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "white_128",
+      "mismatches": [],
+      "mutants_detected": [],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26024,
+      "timing_ms": {
+        "js_oracle": 10.645792,
+        "rust_engine_matrix": 0.063916,
+        "rust_plan_build": 0.423083,
+        "rust_reference_traced": 0.499042
+      },
+      "unique_pixels": 14758,
+      "width": 128,
+      "within_ray_duplicate_samples": 1358
+    },
+    {
+      "angle_step": 1,
+      "category": "uniform",
+      "center": [
+        64.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1358,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "const_255_0_0_128",
+      "mismatches": [],
+      "mutants_detected": [
+        "LumaRec601"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26024,
+      "timing_ms": {
+        "js_oracle": 10.436875,
+        "rust_engine_matrix": 0.06595899999999999,
+        "rust_plan_build": 0.454458,
+        "rust_reference_traced": 0.429875
+      },
+      "unique_pixels": 14758,
+      "width": 128,
+      "within_ray_duplicate_samples": 1358
+    },
+    {
+      "angle_step": 1,
+      "category": "uniform",
+      "center": [
+        64.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1358,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "const_0_255_0_128",
+      "mismatches": [],
+      "mutants_detected": [
+        "LumaRec601"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26024,
+      "timing_ms": {
+        "js_oracle": 10.585917,
+        "rust_engine_matrix": 0.058832999999999996,
+        "rust_plan_build": 0.440125,
+        "rust_reference_traced": 0.426
+      },
+      "unique_pixels": 14758,
+      "width": 128,
+      "within_ray_duplicate_samples": 1358
+    },
+    {
+      "angle_step": 1,
+      "category": "uniform",
+      "center": [
+        64.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1358,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "const_0_0_255_128",
+      "mismatches": [],
+      "mutants_detected": [
+        "LumaRec601"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26024,
+      "timing_ms": {
+        "js_oracle": 10.233541,
+        "rust_engine_matrix": 0.063291,
+        "rust_plan_build": 0.42941700000000005,
+        "rust_reference_traced": 0.431041
+      },
+      "unique_pixels": 14758,
+      "width": 128,
+      "within_ray_duplicate_samples": 1358
+    },
+    {
+      "angle_step": 1,
+      "category": "uniform",
+      "center": [
+        64.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1358,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "const_128_64_200_128",
+      "mismatches": [],
+      "mutants_detected": [
+        "LumaRec601"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26024,
+      "timing_ms": {
+        "js_oracle": 10.380125,
+        "rust_engine_matrix": 0.059334,
+        "rust_plan_build": 0.463459,
+        "rust_reference_traced": 0.45933399999999996
+      },
+      "unique_pixels": 14758,
+      "width": 128,
+      "within_ray_duplicate_samples": 1358
+    },
+    {
+      "angle_step": 1,
+      "category": "uniform",
+      "center": [
+        64.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1358,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "const_17_230_99_128",
+      "mismatches": [],
+      "mutants_detected": [
+        "LumaRec601"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26024,
+      "timing_ms": {
+        "js_oracle": 9.921792,
+        "rust_engine_matrix": 0.058542000000000004,
+        "rust_plan_build": 0.439792,
+        "rust_reference_traced": 0.436208
+      },
+      "unique_pixels": 14758,
+      "width": 128,
+      "within_ray_duplicate_samples": 1358
+    },
+    {
+      "angle_step": 1,
+      "category": "gradient",
+      "center": [
+        64.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1358,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "hgrad_128",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26024,
+      "timing_ms": {
+        "js_oracle": 10.349875,
+        "rust_engine_matrix": 0.062875,
+        "rust_plan_build": 0.42283400000000004,
+        "rust_reference_traced": 0.430166
+      },
+      "unique_pixels": 14758,
+      "width": 128,
+      "within_ray_duplicate_samples": 1358
+    },
+    {
+      "angle_step": 1,
+      "category": "gradient",
+      "center": [
+        64.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1358,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "vgrad_128",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26024,
+      "timing_ms": {
+        "js_oracle": 11.21,
+        "rust_engine_matrix": 0.06691699999999999,
+        "rust_plan_build": 0.442875,
+        "rust_reference_traced": 0.441833
+      },
+      "unique_pixels": 14758,
+      "width": 128,
+      "within_ray_duplicate_samples": 1358
+    },
+    {
+      "angle_step": 1,
+      "category": "gradient",
+      "center": [
+        128.0,
+        32.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 921,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 64,
+      "id": "hgrad_rgb_256",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "RadiusMinDim",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 22796,
+      "timing_ms": {
+        "js_oracle": 9.352291,
+        "rust_engine_matrix": 0.06516699999999999,
+        "rust_plan_build": 0.36925,
+        "rust_reference_traced": 0.463333
+      },
+      "unique_pixels": 12781,
+      "width": 256,
+      "within_ray_duplicate_samples": 921
+    },
+    {
+      "angle_step": 1,
+      "category": "gradient",
+      "center": [
+        64.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1358,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "diag_grad_128",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26024,
+      "timing_ms": {
+        "js_oracle": 11.074791,
+        "rust_engine_matrix": 0.06325,
+        "rust_plan_build": 0.42450000000000004,
+        "rust_reference_traced": 0.43962500000000004
+      },
+      "unique_pixels": 14758,
+      "width": 128,
+      "within_ray_duplicate_samples": 1358
+    },
+    {
+      "angle_step": 1,
+      "category": "gradient",
+      "center": [
+        64.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1358,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "radial_128",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26024,
+      "timing_ms": {
+        "js_oracle": 10.56875,
+        "rust_engine_matrix": 0.062875,
+        "rust_plan_build": 0.426292,
+        "rust_reference_traced": 0.425834
+      },
+      "unique_pixels": 14758,
+      "width": 128,
+      "within_ray_duplicate_samples": 1358
+    },
+    {
+      "angle_step": 1,
+      "category": "pattern",
+      "center": [
+        64.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1358,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "checker1_128",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26024,
+      "timing_ms": {
+        "js_oracle": 10.795375,
+        "rust_engine_matrix": 0.09883299999999999,
+        "rust_plan_build": 0.485375,
+        "rust_reference_traced": 0.475541
+      },
+      "unique_pixels": 14758,
+      "width": 128,
+      "within_ray_duplicate_samples": 1358
+    },
+    {
+      "angle_step": 1,
+      "category": "pattern",
+      "center": [
+        64.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1358,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "checker8_128",
+      "mismatches": [],
+      "mutants_detected": [
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26024,
+      "timing_ms": {
+        "js_oracle": 11.336208,
+        "rust_engine_matrix": 0.08545799999999999,
+        "rust_plan_build": 0.466166,
+        "rust_reference_traced": 0.465791
+      },
+      "unique_pixels": 14758,
+      "width": 128,
+      "within_ray_duplicate_samples": 1358
+    },
+    {
+      "angle_step": 1,
+      "category": "pattern",
+      "center": [
+        64.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1358,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "stripes_v_128",
+      "mismatches": [],
+      "mutants_detected": [
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26024,
+      "timing_ms": {
+        "js_oracle": 10.96525,
+        "rust_engine_matrix": 0.086708,
+        "rust_plan_build": 0.42620800000000003,
+        "rust_reference_traced": 0.44675
+      },
+      "unique_pixels": 14758,
+      "width": 128,
+      "within_ray_duplicate_samples": 1358
+    },
+    {
+      "angle_step": 1,
+      "category": "random",
+      "center": [
+        64.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1358,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "random_s0_128",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26024,
+      "timing_ms": {
+        "js_oracle": 11.561833,
+        "rust_engine_matrix": 0.05875,
+        "rust_plan_build": 0.430917,
+        "rust_reference_traced": 0.439834
+      },
+      "unique_pixels": 14758,
+      "width": 128,
+      "within_ray_duplicate_samples": 1358
+    },
+    {
+      "angle_step": 1,
+      "category": "random",
+      "center": [
+        64.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1358,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "random_s1_128",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26024,
+      "timing_ms": {
+        "js_oracle": 10.739,
+        "rust_engine_matrix": 0.055583,
+        "rust_plan_build": 0.42220799999999997,
+        "rust_reference_traced": 0.424916
+      },
+      "unique_pixels": 14758,
+      "width": 128,
+      "within_ray_duplicate_samples": 1358
+    },
+    {
+      "angle_step": 1,
+      "category": "random",
+      "center": [
+        64.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1358,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "random_s2_128",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26024,
+      "timing_ms": {
+        "js_oracle": 11.691625,
+        "rust_engine_matrix": 0.058542000000000004,
+        "rust_plan_build": 0.42666600000000005,
+        "rust_reference_traced": 0.42975
+      },
+      "unique_pixels": 14758,
+      "width": 128,
+      "within_ray_duplicate_samples": 1358
+    },
+    {
+      "angle_step": 1,
+      "category": "random",
+      "center": [
+        64.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1358,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "random_s3_128",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26024,
+      "timing_ms": {
+        "js_oracle": 10.829875,
+        "rust_engine_matrix": 0.055708999999999995,
+        "rust_plan_build": 0.44316700000000003,
+        "rust_reference_traced": 0.424625
+      },
+      "unique_pixels": 14758,
+      "width": 128,
+      "within_ray_duplicate_samples": 1358
+    },
+    {
+      "angle_step": 1,
+      "category": "random",
+      "center": [
+        64.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1358,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "random_s4_128",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26024,
+      "timing_ms": {
+        "js_oracle": 11.617292,
+        "rust_engine_matrix": 0.059958,
+        "rust_plan_build": 0.43262500000000004,
+        "rust_reference_traced": 0.429791
+      },
+      "unique_pixels": 14758,
+      "width": 128,
+      "within_ray_duplicate_samples": 1358
+    },
+    {
+      "angle_step": 1,
+      "category": "random",
+      "center": [
+        64.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1358,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "random_s5_128",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26024,
+      "timing_ms": {
+        "js_oracle": 10.501541,
+        "rust_engine_matrix": 0.075959,
+        "rust_plan_build": 0.4325,
+        "rust_reference_traced": 0.449667
+      },
+      "unique_pixels": 14758,
+      "width": 128,
+      "within_ray_duplicate_samples": 1358
+    },
+    {
+      "angle_step": 1,
+      "category": "random",
+      "center": [
+        64.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1358,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "random_s6_128",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaInteger",
+        "LumaReassociated",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26024,
+      "timing_ms": {
+        "js_oracle": 11.542375,
+        "rust_engine_matrix": 0.055542,
+        "rust_plan_build": 0.423583,
+        "rust_reference_traced": 0.43025
+      },
+      "unique_pixels": 14758,
+      "width": 128,
+      "within_ray_duplicate_samples": 1358
+    },
+    {
+      "angle_step": 1,
+      "category": "random",
+      "center": [
+        64.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1358,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "random_s7_128",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26024,
+      "timing_ms": {
+        "js_oracle": 10.773791,
+        "rust_engine_matrix": 0.055375,
+        "rust_plan_build": 0.423292,
+        "rust_reference_traced": 0.427292
+      },
+      "unique_pixels": 14758,
+      "width": 128,
+      "within_ray_duplicate_samples": 1358
+    },
+    {
+      "angle_step": 1,
+      "category": "fp_luma",
+      "center": [
+        64.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1358,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "luma_ties_1688colours_128",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaInteger",
+        "LumaReassociated",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26024,
+      "timing_ms": {
+        "js_oracle": 11.34675,
+        "rust_engine_matrix": 0.055583,
+        "rust_plan_build": 0.42354200000000003,
+        "rust_reference_traced": 0.430541
+      },
+      "unique_pixels": 14758,
+      "width": 128,
+      "within_ray_duplicate_samples": 1358
+    },
+    {
+      "angle_step": 1,
+      "category": "fp_luma",
+      "center": [
+        32.0,
+        32.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 660,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 64,
+      "id": "luma_order_sensitive_64",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaInteger",
+        "LumaReassociated",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 13099,
+      "timing_ms": {
+        "js_oracle": 5.928583,
+        "rust_engine_matrix": 0.044875,
+        "rust_plan_build": 0.198708,
+        "rust_reference_traced": 0.346458
+      },
+      "unique_pixels": 4074,
+      "width": 64,
+      "within_ray_duplicate_samples": 660
+    },
+    {
+      "angle_step": 1,
+      "category": "fp_trig",
+      "center": [
+        0.09326335692419979,
+        8.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 172,
+      "diagnostic_libm": {
+        "matrix_values_different": 53,
+        "rays_with_different_coordinates": 2
+      },
+      "height": 32,
+      "id": "libm_adversarial_angle24_x9.326335692419979e-2_y8e0",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundFloorHalf",
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "LibmTrig",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 4554,
+      "timing_ms": {
+        "js_oracle": 2.843708,
+        "rust_engine_matrix": 0.038416,
+        "rust_plan_build": 0.071917,
+        "rust_reference_traced": 0.29329099999999997
+      },
+      "unique_pixels": 948,
+      "width": 32,
+      "within_ray_duplicate_samples": 172
+    },
+    {
+      "angle_step": 1,
+      "category": "fp_trig",
+      "center": [
+        8.0,
+        2.398794046299167
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 199,
+      "diagnostic_libm": {
+        "matrix_values_different": 191,
+        "rays_with_different_coordinates": 1
+      },
+      "height": 32,
+      "id": "libm_adversarial_angle26_x8e0_y2.398794046299167e0",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "LibmTrig",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 5258,
+      "timing_ms": {
+        "js_oracle": 4.281959,
+        "rust_engine_matrix": 0.03925,
+        "rust_plan_build": 0.081417,
+        "rust_reference_traced": 0.281208
+      },
+      "unique_pixels": 986,
+      "width": 32,
+      "within_ray_duplicate_samples": 199
+    },
+    {
+      "angle_step": 1,
+      "category": "fp_trig",
+      "center": [
+        8.0,
+        1.3910065241883678
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 182,
+      "diagnostic_libm": {
+        "matrix_values_different": 142,
+        "rays_with_different_coordinates": 1
+      },
+      "height": 32,
+      "id": "libm_adversarial_angle27_x8e0_y1.3910065241883678e0",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "LibmTrig",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 5011,
+      "timing_ms": {
+        "js_oracle": 3.1805,
+        "rust_engine_matrix": 0.039375,
+        "rust_plan_build": 0.080667,
+        "rust_reference_traced": 0.284958
+      },
+      "unique_pixels": 974,
+      "width": 32,
+      "within_ray_duplicate_samples": 182
+    },
+    {
+      "angle_step": 1,
+      "category": "fp_trig",
+      "center": [
+        8.0,
+        2.348048096156426
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 191,
+      "diagnostic_libm": {
+        "matrix_values_different": 8,
+        "rays_with_different_coordinates": 1
+      },
+      "height": 32,
+      "id": "libm_adversarial_angle32_x8e0_y2.348048096156426e0",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "LibmTrig",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 5246,
+      "timing_ms": {
+        "js_oracle": 4.118333,
+        "rust_engine_matrix": 0.039791,
+        "rust_plan_build": 0.075959,
+        "rust_reference_traced": 0.281375
+      },
+      "unique_pixels": 985,
+      "width": 32,
+      "within_ray_duplicate_samples": 191
+    },
+    {
+      "angle_step": 1,
+      "category": "fp_trig",
+      "center": [
+        -0.10181502315204832,
+        8.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 190,
+      "diagnostic_libm": {
+        "matrix_values_different": 53,
+        "rays_with_different_coordinates": 2
+      },
+      "height": 32,
+      "id": "libm_adversarial_angle37_x-1.0181502315204832e-1_y8e0",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "LibmTrig",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 4479,
+      "timing_ms": {
+        "js_oracle": 2.818042,
+        "rust_engine_matrix": 0.058625000000000003,
+        "rust_plan_build": 0.075041,
+        "rust_reference_traced": 0.308709
+      },
+      "unique_pixels": 945,
+      "width": 32,
+      "within_ray_duplicate_samples": 190
+    },
+    {
+      "angle_step": 1,
+      "category": "fp_trig",
+      "center": [
+        -0.12932039104983745,
+        8.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 189,
+      "diagnostic_libm": {
+        "matrix_values_different": 53,
+        "rays_with_different_coordinates": 2
+      },
+      "height": 32,
+      "id": "libm_adversarial_angle39_x-1.2932039104983745e-1_y8e0",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "LibmTrig",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 4471,
+      "timing_ms": {
+        "js_oracle": 2.921917,
+        "rust_engine_matrix": 0.039375,
+        "rust_plan_build": 0.064375,
+        "rust_reference_traced": 0.274875
+      },
+      "unique_pixels": 942,
+      "width": 32,
+      "within_ray_duplicate_samples": 189
+    },
+    {
+      "angle_step": 1,
+      "category": "fp_trig",
+      "center": [
+        8.0,
+        1.219339800338651
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 189,
+      "diagnostic_libm": {
+        "matrix_values_different": 32,
+        "rays_with_different_coordinates": 1
+      },
+      "height": 32,
+      "id": "libm_adversarial_angle44_x8e0_y1.219339800338651e0",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "LibmTrig",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 4953,
+      "timing_ms": {
+        "js_oracle": 4.134,
+        "rust_engine_matrix": 0.040917,
+        "rust_plan_build": 0.07241600000000001,
+        "rust_reference_traced": 0.284167
+      },
+      "unique_pixels": 972,
+      "width": 32,
+      "within_ray_duplicate_samples": 189
+    },
+    {
+      "angle_step": 1,
+      "category": "fp_trig",
+      "center": [
+        -0.3290375725550417,
+        8.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 175,
+      "diagnostic_libm": {
+        "matrix_values_different": 53,
+        "rays_with_different_coordinates": 2
+      },
+      "height": 32,
+      "id": "libm_adversarial_angle56_x-3.290375725550417e-1_y8e0",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundFloorHalf",
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "LibmTrig",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 4391,
+      "timing_ms": {
+        "js_oracle": 3.123833,
+        "rust_engine_matrix": 0.04575,
+        "rust_plan_build": 0.074417,
+        "rust_reference_traced": 0.31608400000000003
+      },
+      "unique_pixels": 938,
+      "width": 32,
+      "within_ray_duplicate_samples": 175
+    },
+    {
+      "angle_step": 1,
+      "category": "small",
+      "center": [
+        0.0,
+        0.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 0,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 1,
+      "id": "small_1x1",
+      "mismatches": [],
+      "mutants_detected": [
+        "LumaRec601",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 360,
+      "timing_ms": {
+        "js_oracle": 1.841208,
+        "rust_engine_matrix": 0.0395,
+        "rust_plan_build": 0.00575,
+        "rust_reference_traced": 0.2745
+      },
+      "unique_pixels": 1,
+      "width": 1,
+      "within_ray_duplicate_samples": 0
+    },
+    {
+      "angle_step": 1,
+      "category": "small",
+      "center": [
+        0.5,
+        0.5
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 0,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 1,
+      "id": "small_1x1_midpoint",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate"
+      ],
+      "nan_rows": 360,
+      "pass": true,
+      "rays": 360,
+      "samples": 0,
+      "timing_ms": {
+        "js_oracle": 1.713084,
+        "rust_engine_matrix": 0.034999999999999996,
+        "rust_plan_build": 0.00325,
+        "rust_reference_traced": 0.233042
+      },
+      "unique_pixels": 0,
+      "width": 1,
+      "within_ray_duplicate_samples": 0
+    },
+    {
+      "angle_step": 1,
+      "category": "small",
+      "center": [
+        0.0,
+        1.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 0,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 2,
+      "id": "small_1x2",
+      "mismatches": [],
+      "mutants_detected": [
+        "LumaRec601",
+        "RadiusMaxDim",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 360,
+      "timing_ms": {
+        "js_oracle": 1.723,
+        "rust_engine_matrix": 0.037959,
+        "rust_plan_build": 0.004625,
+        "rust_reference_traced": 0.238958
+      },
+      "unique_pixels": 1,
+      "width": 1,
+      "within_ray_duplicate_samples": 0
+    },
+    {
+      "angle_step": 1,
+      "category": "small",
+      "center": [
+        0.5,
+        1.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 0,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 2,
+      "id": "small_1x2_midpoint",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate"
+      ],
+      "nan_rows": 360,
+      "pass": true,
+      "rays": 360,
+      "samples": 0,
+      "timing_ms": {
+        "js_oracle": 1.801875,
+        "rust_engine_matrix": 0.035667000000000004,
+        "rust_plan_build": 0.003208,
+        "rust_reference_traced": 0.241917
+      },
+      "unique_pixels": 0,
+      "width": 1,
+      "within_ray_duplicate_samples": 0
+    },
+    {
+      "angle_step": 1,
+      "category": "small",
+      "center": [
+        1.0,
+        0.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 0,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 1,
+      "id": "small_2x1",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundFloorHalf",
+        "Truncate",
+        "LumaRec601",
+        "RadiusMinDim",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 420,
+      "timing_ms": {
+        "js_oracle": 2.286125,
+        "rust_engine_matrix": 0.0475,
+        "rust_plan_build": 0.006291000000000001,
+        "rust_reference_traced": 0.24570899999999998
+      },
+      "unique_pixels": 2,
+      "width": 2,
+      "within_ray_duplicate_samples": 0
+    },
+    {
+      "angle_step": 1,
+      "category": "small",
+      "center": [
+        1.0,
+        0.5
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 0,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 1,
+      "id": "small_2x1_midpoint",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "SkipCentre"
+      ],
+      "nan_rows": 360,
+      "pass": true,
+      "rays": 360,
+      "samples": 0,
+      "timing_ms": {
+        "js_oracle": 1.625583,
+        "rust_engine_matrix": 0.037708,
+        "rust_plan_build": 0.00325,
+        "rust_reference_traced": 0.241833
+      },
+      "unique_pixels": 0,
+      "width": 2,
+      "within_ray_duplicate_samples": 0
+    },
+    {
+      "angle_step": 1,
+      "category": "small",
+      "center": [
+        1.0,
+        1.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 0,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 2,
+      "id": "small_2x2",
+      "mismatches": [],
+      "mutants_detected": [
+        "Truncate",
+        "LumaRec601",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 509,
+      "timing_ms": {
+        "js_oracle": 1.868333,
+        "rust_engine_matrix": 0.038417,
+        "rust_plan_build": 0.006791,
+        "rust_reference_traced": 0.241
+      },
+      "unique_pixels": 4,
+      "width": 2,
+      "within_ray_duplicate_samples": 0
+    },
+    {
+      "angle_step": 1,
+      "category": "small",
+      "center": [
+        1.0,
+        1.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 0,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 2,
+      "id": "small_2x2_midpoint",
+      "mismatches": [],
+      "mutants_detected": [
+        "Truncate",
+        "LumaRec601",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 509,
+      "timing_ms": {
+        "js_oracle": 1.763417,
+        "rust_engine_matrix": 0.037333000000000005,
+        "rust_plan_build": 0.009333000000000001,
+        "rust_reference_traced": 0.241583
+      },
+      "unique_pixels": 4,
+      "width": 2,
+      "within_ray_duplicate_samples": 0
+    },
+    {
+      "angle_step": 1,
+      "category": "small",
+      "center": [
+        1.0,
+        1.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 28,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 3,
+      "id": "small_3x3",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 748,
+      "timing_ms": {
+        "js_oracle": 1.733959,
+        "rust_engine_matrix": 0.037083,
+        "rust_plan_build": 0.010792,
+        "rust_reference_traced": 0.243334
+      },
+      "unique_pixels": 9,
+      "width": 3,
+      "within_ray_duplicate_samples": 28
+    },
+    {
+      "angle_step": 1,
+      "category": "small",
+      "center": [
+        1.5,
+        1.5
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 89,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 3,
+      "id": "small_3x3_midpoint",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "RoundHalfAway",
+        "Truncate",
+        "LumaRec601",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 867,
+      "timing_ms": {
+        "js_oracle": 2.403458,
+        "rust_engine_matrix": 0.036708000000000005,
+        "rust_plan_build": 0.010375,
+        "rust_reference_traced": 0.242583
+      },
+      "unique_pixels": 9,
+      "width": 3,
+      "within_ray_duplicate_samples": 89
+    },
+    {
+      "angle_step": 1,
+      "category": "small",
+      "center": [
+        1.0,
+        2.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 28,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 5,
+      "id": "small_3x5",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 914,
+      "timing_ms": {
+        "js_oracle": 1.894792,
+        "rust_engine_matrix": 0.038042,
+        "rust_plan_build": 0.013667,
+        "rust_reference_traced": 0.250292
+      },
+      "unique_pixels": 15,
+      "width": 3,
+      "within_ray_duplicate_samples": 28
+    },
+    {
+      "angle_step": 1,
+      "category": "small",
+      "center": [
+        1.5,
+        2.5
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 89,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 5,
+      "id": "small_3x5_midpoint",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "RoundHalfAway",
+        "Truncate",
+        "LumaRec601",
+        "RadiusMaxDim",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 957,
+      "timing_ms": {
+        "js_oracle": 1.845917,
+        "rust_engine_matrix": 0.043584000000000005,
+        "rust_plan_build": 0.00975,
+        "rust_reference_traced": 0.247625
+      },
+      "unique_pixels": 12,
+      "width": 3,
+      "within_ray_duplicate_samples": 89
+    },
+    {
+      "angle_step": 1,
+      "category": "small",
+      "center": [
+        2.0,
+        1.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 28,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 3,
+      "id": "small_5x3",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 914,
+      "timing_ms": {
+        "js_oracle": 1.9345,
+        "rust_engine_matrix": 0.040458,
+        "rust_plan_build": 0.010708,
+        "rust_reference_traced": 0.249542
+      },
+      "unique_pixels": 15,
+      "width": 5,
+      "within_ray_duplicate_samples": 28
+    },
+    {
+      "angle_step": 1,
+      "category": "small",
+      "center": [
+        2.5,
+        1.5
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 89,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 3,
+      "id": "small_5x3_midpoint",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "RoundHalfAway",
+        "Truncate",
+        "LumaRec601",
+        "RadiusMinDim",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 1018,
+      "timing_ms": {
+        "js_oracle": 1.862041,
+        "rust_engine_matrix": 0.036833,
+        "rust_plan_build": 0.0115,
+        "rust_reference_traced": 0.244
+      },
+      "unique_pixels": 15,
+      "width": 5,
+      "within_ray_duplicate_samples": 89
+    },
+    {
+      "angle_step": 1,
+      "category": "small",
+      "center": [
+        3.0,
+        0.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 0,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 1,
+      "id": "small_7x1",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundFloorHalf",
+        "Truncate",
+        "LumaRec601",
+        "RadiusMinDim",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 577,
+      "timing_ms": {
+        "js_oracle": 2.341875,
+        "rust_engine_matrix": 0.037709,
+        "rust_plan_build": 0.008917,
+        "rust_reference_traced": 0.240625
+      },
+      "unique_pixels": 7,
+      "width": 7,
+      "within_ray_duplicate_samples": 0
+    },
+    {
+      "angle_step": 1,
+      "category": "small",
+      "center": [
+        3.5,
+        0.5
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 0,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 1,
+      "id": "small_7x1_midpoint",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "SkipCentre"
+      ],
+      "nan_rows": 360,
+      "pass": true,
+      "rays": 360,
+      "samples": 0,
+      "timing_ms": {
+        "js_oracle": 1.547917,
+        "rust_engine_matrix": 0.034959000000000004,
+        "rust_plan_build": 0.0035,
+        "rust_reference_traced": 0.233083
+      },
+      "unique_pixels": 0,
+      "width": 7,
+      "within_ray_duplicate_samples": 0
+    },
+    {
+      "angle_step": 1,
+      "category": "small",
+      "center": [
+        0.0,
+        3.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 0,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 7,
+      "id": "small_1x7",
+      "mismatches": [],
+      "mutants_detected": [
+        "LumaRec601",
+        "RadiusMaxDim",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 360,
+      "timing_ms": {
+        "js_oracle": 1.672125,
+        "rust_engine_matrix": 0.037833,
+        "rust_plan_build": 0.00475,
+        "rust_reference_traced": 0.23800000000000002
+      },
+      "unique_pixels": 1,
+      "width": 1,
+      "within_ray_duplicate_samples": 0
+    },
+    {
+      "angle_step": 1,
+      "category": "small",
+      "center": [
+        0.5,
+        3.5
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 0,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 7,
+      "id": "small_1x7_midpoint",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate"
+      ],
+      "nan_rows": 360,
+      "pass": true,
+      "rays": 360,
+      "samples": 0,
+      "timing_ms": {
+        "js_oracle": 1.585792,
+        "rust_engine_matrix": 0.035666,
+        "rust_plan_build": 0.003583,
+        "rust_reference_traced": 0.266667
+      },
+      "unique_pixels": 0,
+      "width": 1,
+      "within_ray_duplicate_samples": 0
+    },
+    {
+      "angle_step": 1,
+      "category": "small",
+      "center": [
+        2.0,
+        2.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 28,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 4,
+      "id": "small_4x4",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 937,
+      "timing_ms": {
+        "js_oracle": 1.895583,
+        "rust_engine_matrix": 0.037750000000000006,
+        "rust_plan_build": 0.011875,
+        "rust_reference_traced": 0.24954099999999999
+      },
+      "unique_pixels": 16,
+      "width": 4,
+      "within_ray_duplicate_samples": 28
+    },
+    {
+      "angle_step": 1,
+      "category": "small",
+      "center": [
+        2.0,
+        2.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 28,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 4,
+      "id": "small_4x4_midpoint",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 937,
+      "timing_ms": {
+        "js_oracle": 1.756917,
+        "rust_engine_matrix": 0.039916999999999994,
+        "rust_plan_build": 0.010292,
+        "rust_reference_traced": 0.24333300000000002
+      },
+      "unique_pixels": 16,
+      "width": 4,
+      "within_ray_duplicate_samples": 28
+    },
+    {
+      "angle_step": 1,
+      "category": "rectangular",
+      "center": [
+        100.0,
+        25.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 687,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 50,
+      "id": "rect_200x50",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "RadiusMinDim",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 17846,
+      "timing_ms": {
+        "js_oracle": 8.074625,
+        "rust_engine_matrix": 0.057583,
+        "rust_plan_build": 0.31033299999999997,
+        "rust_reference_traced": 0.401333
+      },
+      "unique_pixels": 8713,
+      "width": 200,
+      "within_ray_duplicate_samples": 687
+    },
+    {
+      "angle_step": 1,
+      "category": "rectangular",
+      "center": [
+        25.0,
+        100.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 600,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 200,
+      "id": "rect_50x200",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "RadiusMaxDim",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 13655,
+      "timing_ms": {
+        "js_oracle": 6.246,
+        "rust_engine_matrix": 0.053708,
+        "rust_plan_build": 0.22525,
+        "rust_reference_traced": 0.363958
+      },
+      "unique_pixels": 4700,
+      "width": 50,
+      "within_ray_duplicate_samples": 600
+    },
+    {
+      "angle_step": 1,
+      "category": "rectangular",
+      "center": [
+        64.0,
+        32.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 852,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 64,
+      "id": "rect_128x64",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "RadiusMinDim",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 17825,
+      "timing_ms": {
+        "js_oracle": 7.641416,
+        "rust_engine_matrix": 0.050417000000000003,
+        "rust_plan_build": 0.281458,
+        "rust_reference_traced": 0.376666
+      },
+      "unique_pixels": 7880,
+      "width": 128,
+      "within_ray_duplicate_samples": 852
+    },
+    {
+      "angle_step": 1,
+      "category": "rectangular",
+      "center": [
+        32.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 825,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "rect_64x128",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "RadiusMaxDim",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 17457,
+      "timing_ms": {
+        "js_oracle": 7.639625,
+        "rust_engine_matrix": 0.050583,
+        "rust_plan_build": 0.27954199999999996,
+        "rust_reference_traced": 0.371833
+      },
+      "unique_pixels": 7540,
+      "width": 64,
+      "within_ray_duplicate_samples": 825
+    },
+    {
+      "angle_step": 1,
+      "category": "rectangular",
+      "center": [
+        150.0,
+        8.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 255,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 17,
+      "id": "rect_300x17",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "RadiusMinDim",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 9058,
+      "timing_ms": {
+        "js_oracle": 4.549041,
+        "rust_engine_matrix": 0.042375,
+        "rust_plan_build": 0.149375,
+        "rust_reference_traced": 0.375625
+      },
+      "unique_pixels": 3814,
+      "width": 300,
+      "within_ray_duplicate_samples": 255
+    },
+    {
+      "angle_step": 1,
+      "category": "rectangular",
+      "center": [
+        8.0,
+        150.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 208,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 300,
+      "id": "rect_17x300",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "RadiusMaxDim",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 4720,
+      "timing_ms": {
+        "js_oracle": 3.233584,
+        "rust_engine_matrix": 0.039916999999999994,
+        "rust_plan_build": 0.07200000000000001,
+        "rust_reference_traced": 0.30354200000000003
+      },
+      "unique_pixels": 541,
+      "width": 17,
+      "within_ray_duplicate_samples": 208
+    },
+    {
+      "angle_step": 1,
+      "category": "rectangular",
+      "center": [
+        64.0,
+        32.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 870,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 65,
+      "id": "rect_129x65",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "RadiusMinDim",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 18045,
+      "timing_ms": {
+        "js_oracle": 8.455875,
+        "rust_engine_matrix": 0.049375,
+        "rust_plan_build": 0.28370799999999996,
+        "rust_reference_traced": 0.382208
+      },
+      "unique_pixels": 8052,
+      "width": 129,
+      "within_ray_duplicate_samples": 870
+    },
+    {
+      "angle_step": 1,
+      "category": "rectangular",
+      "center": [
+        63.0,
+        63.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1345,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 127,
+      "id": "rect_127x127",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 25824,
+      "timing_ms": {
+        "js_oracle": 10.549042,
+        "rust_engine_matrix": 0.055458,
+        "rust_plan_build": 0.44541600000000003,
+        "rust_reference_traced": 0.432917
+      },
+      "unique_pixels": 14571,
+      "width": 127,
+      "within_ray_duplicate_samples": 1345
+    },
+    {
+      "angle_step": 1,
+      "category": "rectangular",
+      "center": [
+        250.0,
+        250.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 5164,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 500,
+      "id": "rect_500x500",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 101200,
+      "timing_ms": {
+        "js_oracle": 36.36225,
+        "rust_engine_matrix": 0.134625,
+        "rust_plan_build": 2.190542,
+        "rust_reference_traced": 1.354458
+      },
+      "unique_pixels": 86130,
+      "width": 500,
+      "within_ray_duplicate_samples": 5164
+    },
+    {
+      "angle_step": 1,
+      "category": "rectangular",
+      "center": [
+        512.0,
+        384.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 8790,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 768,
+      "id": "rect_1024x768",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaInteger",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 178202,
+      "timing_ms": {
+        "js_oracle": 64.54375,
+        "rust_engine_matrix": 0.216541,
+        "rust_plan_build": 3.8305000000000002,
+        "rust_reference_traced": 1.675541
+      },
+      "unique_pixels": 159505,
+      "width": 1024,
+      "within_ray_duplicate_samples": 8790
+    },
+    {
+      "angle_step": 1,
+      "category": "rounding",
+      "center": [
+        63.5,
+        63.5
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1300,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 127,
+      "id": "rect_127x127_midpoint",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "RoundHalfAway",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 25849,
+      "timing_ms": {
+        "js_oracle": 10.694959,
+        "rust_engine_matrix": 0.062583,
+        "rust_plan_build": 0.430583,
+        "rust_reference_traced": 0.445917
+      },
+      "unique_pixels": 14579,
+      "width": 127,
+      "within_ray_duplicate_samples": 1300
+    },
+    {
+      "angle_step": 1,
+      "category": "rounding",
+      "center": [
+        64.5,
+        32.5
+      ],
+      "center_from_oracle_default": true,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 819,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 65,
+      "id": "oracle_default_center_129x65",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "RoundHalfAway",
+        "Truncate",
+        "LumaRec601",
+        "RadiusMinDim",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 18070,
+      "timing_ms": {
+        "js_oracle": 7.696166,
+        "rust_engine_matrix": 0.051792000000000005,
+        "rust_plan_build": 0.293167,
+        "rust_reference_traced": 0.403042
+      },
+      "unique_pixels": 8089,
+      "width": 129,
+      "within_ray_duplicate_samples": 819
+    },
+    {
+      "angle_step": 1,
+      "category": "rounding",
+      "center": [
+        63.5,
+        63.5
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1316,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "centre_half_63.5_63.5",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "RoundHalfAway",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26062,
+      "timing_ms": {
+        "js_oracle": 11.212125,
+        "rust_engine_matrix": 0.056791,
+        "rust_plan_build": 0.440708,
+        "rust_reference_traced": 0.43558399999999997
+      },
+      "unique_pixels": 14776,
+      "width": 128,
+      "within_ray_duplicate_samples": 1316
+    },
+    {
+      "angle_step": 1,
+      "category": "rounding",
+      "center": [
+        64.5,
+        64.5
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1308,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "centre_half_64.5_64.5",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "RoundHalfAway",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26044,
+      "timing_ms": {
+        "js_oracle": 10.689458,
+        "rust_engine_matrix": 0.057624999999999996,
+        "rust_plan_build": 0.422917,
+        "rust_reference_traced": 0.448917
+      },
+      "unique_pixels": 14766,
+      "width": 128,
+      "within_ray_duplicate_samples": 1308
+    },
+    {
+      "angle_step": 1,
+      "category": "rounding",
+      "center": [
+        64.5,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1193,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "centre_half_64.5_64",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "RoundHalfAway",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26034,
+      "timing_ms": {
+        "js_oracle": 10.854083,
+        "rust_engine_matrix": 0.056958,
+        "rust_plan_build": 0.421916,
+        "rust_reference_traced": 0.42570800000000003
+      },
+      "unique_pixels": 14855,
+      "width": 128,
+      "within_ray_duplicate_samples": 1193
+    },
+    {
+      "angle_step": 1,
+      "category": "rounding",
+      "center": [
+        10.25,
+        99.75
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 846,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "centre_quarter_10.25_99.75",
+      "mismatches": [],
+      "mutants_detected": [
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 19813,
+      "timing_ms": {
+        "js_oracle": 8.246083,
+        "rust_engine_matrix": 0.052625,
+        "rust_plan_build": 0.351333,
+        "rust_reference_traced": 0.37512500000000004
+      },
+      "unique_pixels": 11587,
+      "width": 128,
+      "within_ray_duplicate_samples": 846
+    },
+    {
+      "angle_step": 1,
+      "category": "rounding",
+      "center": [
+        33.3,
+        77.7
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1173,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "centre_third_33.3_77.7",
+      "mismatches": [],
+      "mutants_detected": [
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 24553,
+      "timing_ms": {
+        "js_oracle": 10.247709,
+        "rust_engine_matrix": 0.056541,
+        "rust_plan_build": 0.40549999999999997,
+        "rust_reference_traced": 0.417125
+      },
+      "unique_pixels": 13831,
+      "width": 128,
+      "within_ray_duplicate_samples": 1173
+    },
+    {
+      "angle_step": 1,
+      "category": "rounding",
+      "center": [
+        0.49999999999999994,
+        0.5
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 595,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "centre_near_half_0.49999999999999994",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundFloorHalf",
+        "RoundHalfEven",
+        "RoundHalfAway",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 12560,
+      "timing_ms": {
+        "js_oracle": 6.313458,
+        "rust_engine_matrix": 0.048334,
+        "rust_plan_build": 0.197166,
+        "rust_reference_traced": 0.32066700000000004
+      },
+      "unique_pixels": 8684,
+      "width": 128,
+      "within_ray_duplicate_samples": 595
+    },
+    {
+      "angle_step": 1,
+      "category": "rounding",
+      "center": [
+        64.0000000000001,
+        63.9999999999999
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 1357,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "centre_tiny_offset_64+1e-13",
+      "mismatches": [],
+      "mutants_detected": [
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 26024,
+      "timing_ms": {
+        "js_oracle": 10.499791,
+        "rust_engine_matrix": 0.060292,
+        "rust_plan_build": 0.424041,
+        "rust_reference_traced": 0.500834
+      },
+      "unique_pixels": 14760,
+      "width": 128,
+      "within_ray_duplicate_samples": 1357
+    },
+    {
+      "angle_step": 1,
+      "category": "border",
+      "center": [
+        0.0,
+        0.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 578,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "centre_corner_0_0",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundFloorHalf",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 12123,
+      "timing_ms": {
+        "js_oracle": 7.117792,
+        "rust_engine_matrix": 0.046,
+        "rust_plan_build": 0.192417,
+        "rust_reference_traced": 0.31525
+      },
+      "unique_pixels": 8593,
+      "width": 128,
+      "within_ray_duplicate_samples": 578
+    },
+    {
+      "angle_step": 1,
+      "category": "border",
+      "center": [
+        127.0,
+        127.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 576,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "centre_corner_127_127",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 12121,
+      "timing_ms": {
+        "js_oracle": 6.703125,
+        "rust_engine_matrix": 0.047083,
+        "rust_plan_build": 0.191167,
+        "rust_reference_traced": 0.314042
+      },
+      "unique_pixels": 8593,
+      "width": 128,
+      "within_ray_duplicate_samples": 576
+    },
+    {
+      "angle_step": 1,
+      "category": "border",
+      "center": [
+        127.5,
+        0.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 0,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "centre_edge_127.5_0",
+      "mismatches": [],
+      "mutants_detected": [
+        "Truncate",
+        "SkipCentre"
+      ],
+      "nan_rows": 360,
+      "pass": true,
+      "rays": 360,
+      "samples": 0,
+      "timing_ms": {
+        "js_oracle": 2.5445,
+        "rust_engine_matrix": 0.033917,
+        "rust_plan_build": 0.003208,
+        "rust_reference_traced": 0.253291
+      },
+      "unique_pixels": 0,
+      "width": 128,
+      "within_ray_duplicate_samples": 0
+    },
+    {
+      "angle_step": 1,
+      "category": "border",
+      "center": [
+        0.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 846,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "centre_edge_0_64",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 17843,
+      "timing_ms": {
+        "js_oracle": 7.476583,
+        "rust_engine_matrix": 0.052,
+        "rust_plan_build": 0.290458,
+        "rust_reference_traced": 0.355458
+      },
+      "unique_pixels": 11660,
+      "width": 128,
+      "within_ray_duplicate_samples": 846
+    },
+    {
+      "angle_step": 1,
+      "category": "border",
+      "center": [
+        -0.5,
+        -0.5
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 595,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "centre_negative_half_-0.5_-0.5",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "RoundHalfAway",
+        "Truncate",
+        "LumaRec601",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 360,
+      "samples": 11917,
+      "timing_ms": {
+        "js_oracle": 7.247541,
+        "rust_engine_matrix": 0.045792,
+        "rust_plan_build": 0.18625,
+        "rust_reference_traced": 0.318542
+      },
+      "unique_pixels": 8570,
+      "width": 128,
+      "within_ray_duplicate_samples": 595
+    },
+    {
+      "angle_step": 1,
+      "category": "border",
+      "center": [
+        -0.6,
+        5.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 0,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "centre_outside_-0.6_5",
+      "mismatches": [],
+      "mutants_detected": [
+        "Truncate",
+        "SkipCentre"
+      ],
+      "nan_rows": 360,
+      "pass": true,
+      "rays": 360,
+      "samples": 0,
+      "timing_ms": {
+        "js_oracle": 2.58875,
+        "rust_engine_matrix": 0.034249999999999996,
+        "rust_plan_build": 0.003208,
+        "rust_reference_traced": 0.232208
+      },
+      "unique_pixels": 0,
+      "width": 128,
+      "within_ray_duplicate_samples": 0
+    },
+    {
+      "angle_step": 1,
+      "category": "border",
+      "center": [
+        200.0,
+        64.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 0,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "centre_outside_200_64",
+      "mismatches": [],
+      "mutants_detected": [],
+      "nan_rows": 360,
+      "pass": true,
+      "rays": 360,
+      "samples": 0,
+      "timing_ms": {
+        "js_oracle": 1.662584,
+        "rust_engine_matrix": 0.034416999999999996,
+        "rust_plan_build": 0.0029579999999999997,
+        "rust_reference_traced": 0.231958
+      },
+      "unique_pixels": 0,
+      "width": 128,
+      "within_ray_duplicate_samples": 0
+    },
+    {
+      "angle_step": 1,
+      "category": "border",
+      "center": [
+        64.0,
+        -40.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 0,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 128,
+      "id": "centre_outside_64_-40",
+      "mismatches": [],
+      "mutants_detected": [],
+      "nan_rows": 360,
+      "pass": true,
+      "rays": 360,
+      "samples": 0,
+      "timing_ms": {
+        "js_oracle": 1.728875,
+        "rust_engine_matrix": 0.034125,
+        "rust_plan_build": 0.003333,
+        "rust_reference_traced": 0.23308399999999999
+      },
+      "unique_pixels": 0,
+      "width": 128,
+      "within_ray_duplicate_samples": 0
+    },
+    {
+      "angle_step": 2,
+      "category": "angle_step",
+      "center": [
+        32.0,
+        24.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 256,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 48,
+      "id": "step_2_64x48",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 180,
+      "samples": 5653,
+      "timing_ms": {
+        "js_oracle": 2.953875,
+        "rust_engine_matrix": 0.0235,
+        "rust_plan_build": 0.102375,
+        "rust_reference_traced": 0.16683299999999998
+      },
+      "unique_pixels": 2883,
+      "width": 64,
+      "within_ray_duplicate_samples": 256
+    },
+    {
+      "angle_step": 3,
+      "category": "angle_step",
+      "center": [
+        32.0,
+        24.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 236,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 48,
+      "id": "step_3_64x48",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 120,
+      "samples": 3769,
+      "timing_ms": {
+        "js_oracle": 2.254,
+        "rust_engine_matrix": 0.017625000000000002,
+        "rust_plan_build": 0.07466600000000001,
+        "rust_reference_traced": 0.11325
+      },
+      "unique_pixels": 2436,
+      "width": 64,
+      "within_ray_duplicate_samples": 236
+    },
+    {
+      "angle_step": 5,
+      "category": "angle_step",
+      "center": [
+        32.0,
+        24.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 132,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 48,
+      "id": "step_5_64x48",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 72,
+      "samples": 2258,
+      "timing_ms": {
+        "js_oracle": 1.464375,
+        "rust_engine_matrix": 0.010166000000000001,
+        "rust_plan_build": 0.035167,
+        "rust_reference_traced": 0.067042
+      },
+      "unique_pixels": 1712,
+      "width": 64,
+      "within_ray_duplicate_samples": 132
+    },
+    {
+      "angle_step": 7,
+      "category": "angle_step",
+      "center": [
+        32.0,
+        24.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 79,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 48,
+      "id": "step_7_64x48",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 52,
+      "samples": 1627,
+      "timing_ms": {
+        "js_oracle": 1.136583,
+        "rust_engine_matrix": 0.007500000000000001,
+        "rust_plan_build": 0.028374999999999997,
+        "rust_reference_traced": 0.048667
+      },
+      "unique_pixels": 1318,
+      "width": 64,
+      "within_ray_duplicate_samples": 79
+    },
+    {
+      "angle_step": 10,
+      "category": "angle_step",
+      "center": [
+        32.0,
+        24.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 46,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 48,
+      "id": "step_10_64x48",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 36,
+      "samples": 1130,
+      "timing_ms": {
+        "js_oracle": 0.844958,
+        "rust_engine_matrix": 0.005833,
+        "rust_plan_build": 0.022125,
+        "rust_reference_traced": 0.037167
+      },
+      "unique_pixels": 964,
+      "width": 64,
+      "within_ray_duplicate_samples": 46
+    },
+    {
+      "angle_step": 45,
+      "category": "angle_step",
+      "center": [
+        32.0,
+        24.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 40,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 48,
+      "id": "step_45_64x48",
+      "mismatches": [],
+      "mutants_detected": [
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 8,
+      "samples": 252,
+      "timing_ms": {
+        "js_oracle": 0.334,
+        "rust_engine_matrix": 0.001209,
+        "rust_plan_build": 0.004417,
+        "rust_reference_traced": 0.010499999999999999
+      },
+      "unique_pixels": 205,
+      "width": 64,
+      "within_ray_duplicate_samples": 40
+    },
+    {
+      "angle_step": 90,
+      "category": "angle_step",
+      "center": [
+        32.0,
+        24.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 0,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 48,
+      "id": "step_90_64x48",
+      "mismatches": [],
+      "mutants_detected": [
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 4,
+      "samples": 114,
+      "timing_ms": {
+        "js_oracle": 0.2205,
+        "rust_engine_matrix": 0.000792,
+        "rust_plan_build": 0.0036669999999999997,
+        "rust_reference_traced": 0.003875
+      },
+      "unique_pixels": 111,
+      "width": 64,
+      "within_ray_duplicate_samples": 0
+    },
+    {
+      "angle_step": 120,
+      "category": "angle_step",
+      "center": [
+        32.0,
+        24.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 6,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 48,
+      "id": "step_120_64x48",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 3,
+      "samples": 100,
+      "timing_ms": {
+        "js_oracle": 0.232333,
+        "rust_engine_matrix": 0.00075,
+        "rust_plan_build": 0.001917,
+        "rust_reference_traced": 0.003375
+      },
+      "unique_pixels": 92,
+      "width": 64,
+      "within_ray_duplicate_samples": 6
+    },
+    {
+      "angle_step": 359,
+      "category": "angle_step",
+      "center": [
+        32.0,
+        24.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 0,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 48,
+      "id": "step_359_64x48",
+      "mismatches": [],
+      "mutants_detected": [
+        "Truncate",
+        "LumaRec601",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 2,
+      "samples": 50,
+      "timing_ms": {
+        "js_oracle": 0.178583,
+        "rust_engine_matrix": 0.000292,
+        "rust_plan_build": 0.001041,
+        "rust_reference_traced": 0.002125
+      },
+      "unique_pixels": 25,
+      "width": 64,
+      "within_ray_duplicate_samples": 0
+    },
+    {
+      "angle_step": 360,
+      "category": "angle_step",
+      "center": [
+        32.0,
+        24.0
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 0,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 48,
+      "id": "step_360_64x48",
+      "mismatches": [],
+      "mutants_detected": [
+        "LumaRec601",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 1,
+      "samples": 25,
+      "timing_ms": {
+        "js_oracle": 0.16075,
+        "rust_engine_matrix": 0.000209,
+        "rust_plan_build": 0.000625,
+        "rust_reference_traced": 0.001084
+      },
+      "unique_pixels": 25,
+      "width": 64,
+      "within_ray_duplicate_samples": 0
+    },
+    {
+      "angle_step": 7,
+      "category": "angle_step",
+      "center": [
+        31.5,
+        23.5
+      ],
+      "center_from_oracle_default": false,
+      "checks": {
+        "centre": true,
+        "checkpoints_bitwise": true,
+        "coordinates": true,
+        "counts": true,
+        "engine_matrix_bitwise": true,
+        "ray_lengths": true,
+        "reference_matrix_bitwise": true,
+        "shape": true,
+        "tracing_harness_equals_oracle": true
+      },
+      "consecutive_duplicate_samples": 83,
+      "diagnostic_libm": {
+        "matrix_values_different": 0,
+        "rays_with_different_coordinates": 0
+      },
+      "height": 48,
+      "id": "step_7_half_centre",
+      "mismatches": [],
+      "mutants_detected": [
+        "RoundHalfEven",
+        "RoundHalfAway",
+        "Truncate",
+        "LumaRec601",
+        "NormReciprocal",
+        "ZeroDegreesRight",
+        "MirroredAngles",
+        "DedupCoordinates",
+        "SkipCentre"
+      ],
+      "nan_rows": 0,
+      "pass": true,
+      "rays": 52,
+      "samples": 1634,
+      "timing_ms": {
+        "js_oracle": 1.095292,
+        "rust_engine_matrix": 0.008041,
+        "rust_plan_build": 0.029708000000000002,
+        "rust_reference_traced": 0.049042
+      },
+      "unique_pixels": 1318,
+      "width": 64,
+      "within_ray_duplicate_samples": 83
+    }
+  ],
+  "host": {
+    "arch": "aarch64",
+    "cpu": "Apple M4 Pro",
+    "logical_cpus": 14,
+    "memory_bytes": "25769803776",
+    "node": "v22.23.4",
+    "os": "macos",
+    "os_version": "27.2.1",
+    "rustc": "rustc 1.91.1 (ed61e7d7e 2025-11-07)"
+  },
+  "summary": {
+    "by_category": {
+      "angle_step": {
+        "cases": 11,
+        "passed": 11,
+        "samples": 16612,
+        "within_ray_duplicate_samples": 878
+      },
+      "border": {
+        "cases": 8,
+        "passed": 8,
+        "samples": 54004,
+        "within_ray_duplicate_samples": 2595
+      },
+      "fp_luma": {
+        "cases": 2,
+        "passed": 2,
+        "samples": 39123,
+        "within_ray_duplicate_samples": 2018
+      },
+      "fp_trig": {
+        "cases": 8,
+        "passed": 8,
+        "samples": 38363,
+        "within_ray_duplicate_samples": 1487
+      },
+      "gradient": {
+        "cases": 5,
+        "passed": 5,
+        "samples": 126892,
+        "within_ray_duplicate_samples": 6353
+      },
+      "pattern": {
+        "cases": 3,
+        "passed": 3,
+        "samples": 78072,
+        "within_ray_duplicate_samples": 4074
+      },
+      "random": {
+        "cases": 8,
+        "passed": 8,
+        "samples": 208192,
+        "within_ray_duplicate_samples": 10864
+      },
+      "rectangular": {
+        "cases": 10,
+        "passed": 10,
+        "samples": 403832,
+        "within_ray_duplicate_samples": 19596
+      },
+      "rounding": {
+        "cases": 9,
+        "passed": 9,
+        "samples": 205009,
+        "within_ray_duplicate_samples": 9907
+      },
+      "small": {
+        "cases": 20,
+        "passed": 20,
+        "samples": 10387,
+        "within_ray_duplicate_samples": 407
+      },
+      "uniform": {
+        "cases": 7,
+        "passed": 7,
+        "samples": 182168,
+        "within_ray_duplicate_samples": 9506
+      }
+    },
+    "cases": 91,
+    "failed": 0,
+    "libm_variant_cases_with_coordinate_differences": 8,
+    "libm_variant_rays_with_coordinate_differences": 12,
+    "mutant_detection": {
+      "DedupCoordinates": {
+        "cases_detecting": 64,
+        "examples": [
+          "hgrad_128",
+          "vgrad_128",
+          "hgrad_rgb_256",
+          "diag_grad_128",
+          "radial_128"
+        ]
+      },
+      "LibmTrig": {
+        "cases_detecting": 8,
+        "examples": [
+          "libm_adversarial_angle24_x9.326335692419979e-2_y8e0",
+          "libm_adversarial_angle26_x8e0_y2.398794046299167e0",
+          "libm_adversarial_angle27_x8e0_y1.3910065241883678e0",
+          "libm_adversarial_angle32_x8e0_y2.348048096156426e0",
+          "libm_adversarial_angle37_x-1.0181502315204832e-1_y8e0"
+        ]
+      },
+      "LumaInteger": {
+        "cases_detecting": 4,
+        "examples": [
+          "random_s6_128",
+          "luma_ties_1688colours_128",
+          "luma_order_sensitive_64",
+          "rect_1024x768"
+        ]
+      },
+      "LumaReassociated": {
+        "cases_detecting": 3,
+        "examples": [
+          "random_s6_128",
+          "luma_ties_1688colours_128",
+          "luma_order_sensitive_64"
+        ]
+      },
+      "LumaRec601": {
+        "cases_detecting": 77,
+        "examples": [
+          "const_255_0_0_128",
+          "const_0_255_0_128",
+          "const_0_0_255_128",
+          "const_128_64_200_128",
+          "const_17_230_99_128"
+        ]
+      },
+      "MirroredAngles": {
+        "cases_detecting": 72,
+        "examples": [
+          "hgrad_128",
+          "vgrad_128",
+          "hgrad_rgb_256",
+          "diag_grad_128",
+          "radial_128"
+        ]
+      },
+      "NormReciprocal": {
+        "cases_detecting": 57,
+        "examples": [
+          "hgrad_128",
+          "vgrad_128",
+          "hgrad_rgb_256",
+          "diag_grad_128",
+          "radial_128"
+        ]
+      },
+      "RadiusMaxDim": {
+        "cases_detecting": 6,
+        "examples": [
+          "small_1x2",
+          "small_3x5_midpoint",
+          "small_1x7",
+          "rect_50x200",
+          "rect_64x128"
+        ]
+      },
+      "RadiusMinDim": {
+        "cases_detecting": 9,
+        "examples": [
+          "hgrad_rgb_256",
+          "small_2x1",
+          "small_5x3_midpoint",
+          "small_7x1",
+          "rect_200x50"
+        ]
+      },
+      "RoundFloorHalf": {
+        "cases_detecting": 6,
+        "examples": [
+          "libm_adversarial_angle24_x9.326335692419979e-2_y8e0",
+          "libm_adversarial_angle56_x-3.290375725550417e-1_y8e0",
+          "small_2x1",
+          "small_7x1",
+          "centre_near_half_0.49999999999999994"
+        ]
+      },
+      "RoundHalfAway": {
+        "cases_detecting": 11,
+        "examples": [
+          "small_3x3_midpoint",
+          "small_3x5_midpoint",
+          "small_5x3_midpoint",
+          "rect_127x127_midpoint",
+          "oracle_default_center_129x65"
+        ]
+      },
+      "RoundHalfEven": {
+        "cases_detecting": 63,
+        "examples": [
+          "hgrad_128",
+          "vgrad_128",
+          "hgrad_rgb_256",
+          "diag_grad_128",
+          "radial_128"
+        ]
+      },
+      "SkipCentre": {
+        "cases_detecting": 79,
+        "examples": [
+          "hgrad_128",
+          "vgrad_128",
+          "hgrad_rgb_256",
+          "diag_grad_128",
+          "radial_128"
+        ]
+      },
+      "Truncate": {
+        "cases_detecting": 77,
+        "examples": [
+          "hgrad_128",
+          "vgrad_128",
+          "hgrad_rgb_256",
+          "diag_grad_128",
+          "radial_128"
+        ]
+      },
+      "ZeroDegreesRight": {
+        "cases_detecting": 72,
+        "examples": [
+          "hgrad_128",
+          "vgrad_128",
+          "hgrad_rgb_256",
+          "diag_grad_128",
+          "radial_128"
+        ]
+      }
+    },
+    "mutants_evaluated": true,
+    "passed": 91,
+    "total_matrix_values": 7508480,
+    "total_samples": 1362654
+  }
+}

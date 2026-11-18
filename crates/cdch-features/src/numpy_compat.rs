@@ -128,7 +128,9 @@ mod tests {
     #[test]
     fn slice_and_closure_forms_agree_bitwise() {
         let mut s = 0x9E37_79B9_7F4A_7C15u64;
-        for n in [0usize, 1, 5, 7, 8, 9, 15, 16, 17, 127, 128, 129, 255, 256, 257, 360, 1000] {
+        for n in [
+            0usize, 1, 5, 7, 8, 9, 15, 16, 17, 127, 128, 129, 255, 256, 257, 360, 1000,
+        ] {
             let xs: Vec<f64> = (0..n)
                 .map(|_| {
                     s ^= s << 13;

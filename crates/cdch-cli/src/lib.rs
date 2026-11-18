@@ -27,7 +27,11 @@ impl OwnedRgb {
             let s = (y * self.width + x0) * 3;
             data.extend_from_slice(&self.data[s..s + 3 * w]);
         }
-        OwnedRgb { width: w, height: h, data }
+        OwnedRgb {
+            width: w,
+            height: h,
+            data,
+        }
     }
 }
 
@@ -37,23 +41,42 @@ pub fn read_png(path: &Path) -> Result<OwnedRgb, String> {
     let file = std::fs::File::open(path).map_err(|e| format!("{}: {e}", path.display()))?;
     let mut decoder = png::Decoder::new(BufReader::new(file));
     decoder.set_transformations(png::Transformations::EXPAND | png::Transformations::STRIP_16);
-    let mut reader = decoder.read_info().map_err(|e| format!("{}: {e}", path.display()))?;
+    let mut reader = decoder
+        .read_info()
+        .map_err(|e| format!("{}: {e}", path.display()))?;
     let size = reader.output_buffer_size().ok_or("png too large")?;
     let mut buf = vec![0u8; size];
-    let info = reader.next_frame(&mut buf).map_err(|e| format!("{}: {e}", path.display()))?;
+    let info = reader
+        .next_frame(&mut buf)
+        .map_err(|e| format!("{}: {e}", path.display()))?;
     buf.truncate(info.buffer_size());
     let (w, h) = (info.width as usize, info.height as usize);
     let data = match info.color_type {
         png::ColorType::Rgb => buf,
-        png::ColorType::Rgba => buf.chunks_exact(4).flat_map(|p| [p[0], p[1], p[2]]).collect(),
+        png::ColorType::Rgba => buf
+            .chunks_exact(4)
+            .flat_map(|p| [p[0], p[1], p[2]])
+            .collect(),
         png::ColorType::Grayscale => buf.iter().flat_map(|&g| [g, g, g]).collect(),
-        png::ColorType::GrayscaleAlpha => buf.chunks_exact(2).flat_map(|p| [p[0], p[0], p[0]]).collect(),
-        other => return Err(format!("{}: unsupported colour type {other:?}", path.display())),
+        png::ColorType::GrayscaleAlpha => buf
+            .chunks_exact(2)
+            .flat_map(|p| [p[0], p[0], p[0]])
+            .collect(),
+        other => {
+            return Err(format!(
+                "{}: unsupported colour type {other:?}",
+                path.display()
+            ))
+        }
     };
     if data.len() != w * h * 3 {
         return Err(format!("{}: unexpected decoded size", path.display()));
     }
-    Ok(OwnedRgb { width: w, height: h, data })
+    Ok(OwnedRgb {
+        width: w,
+        height: h,
+        data,
+    })
 }
 
 /// An archived StandardScaler + linear classifier, exported by `python/export_linear_models.py`.
@@ -71,7 +94,8 @@ pub struct LinearModel {
 impl LinearModel {
     pub fn load(path: &Path) -> Result<Self, String> {
         let text = std::fs::read_to_string(path).map_err(|e| format!("{}: {e}", path.display()))?;
-        let v: Value = serde_json::from_str(&text).map_err(|e| format!("{}: {e}", path.display()))?;
+        let v: Value =
+            serde_json::from_str(&text).map_err(|e| format!("{}: {e}", path.display()))?;
         let vec = |k: &str| -> Result<Vec<f64>, String> {
             v[k].as_array()
                 .ok_or(format!("missing {k}"))?
@@ -92,7 +116,10 @@ impl LinearModel {
         };
         let d = feature.dim();
         if m.mean.len() != d || m.scale.len() != d || m.coef.len() != d {
-            return Err(format!("{}: dimensions do not match representation {feature:?}", path.display()));
+            return Err(format!(
+                "{}: dimensions do not match representation {feature:?}",
+                path.display()
+            ));
         }
         Ok(m)
     }
@@ -101,8 +128,9 @@ impl LinearModel {
     /// product order differs from BLAS, so agreement is to rounding error, not bitwise.
     pub fn decision(&self, x: &[f64]) -> f64 {
         let mut acc = 0.0;
-        for i in 0..x.len() {
-            acc += (x[i] - self.mean[i]) / self.scale[i] * self.coef[i];
+        // Same per-term arithmetic and left-to-right accumulation order as before.
+        for (i, &xi) in x.iter().enumerate() {
+            acc += (xi - self.mean[i]) / self.scale[i] * self.coef[i];
         }
         acc + self.intercept
     }

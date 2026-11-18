@@ -39,16 +39,30 @@ struct Opts {
 }
 
 fn parse(args: &[String]) -> Result<Opts, String> {
-    let mut o = Opts { kind: Representation::A, center: None, step: 1, threads: None, json: false, timing: false, model: None, files: vec![] };
+    let mut o = Opts {
+        kind: Representation::A,
+        center: None,
+        step: 1,
+        threads: None,
+        json: false,
+        timing: false,
+        model: None,
+        files: vec![],
+    };
     let mut it = args.iter();
     while let Some(a) = it.next() {
         let mut value = || it.next().cloned().ok_or(format!("{a} needs a value"));
         match a.as_str() {
-            "--kind" => o.kind = Representation::parse(&value()?).ok_or("--kind must be A, B, C or D")?,
+            "--kind" => {
+                o.kind = Representation::parse(&value()?).ok_or("--kind must be A, B, C or D")?
+            }
             "--center" => {
                 let v = value()?;
                 let (x, y) = v.split_once(',').ok_or("--center X,Y")?;
-                o.center = Some((x.parse().map_err(|_| "bad centre x")?, y.parse().map_err(|_| "bad centre y")?));
+                o.center = Some((
+                    x.parse().map_err(|_| "bad centre x")?,
+                    y.parse().map_err(|_| "bad centre y")?,
+                ));
             }
             "--step" => o.step = value()?.parse().map_err(|_| "bad --step")?,
             "--threads" => o.threads = Some(value()?.parse().map_err(|_| "bad --threads")?),
@@ -63,21 +77,35 @@ fn parse(args: &[String]) -> Result<Opts, String> {
 }
 
 fn params(o: &Opts, w: usize, h: usize) -> Params {
-    Params { center: o.center.map_or(Center::archived(w, h), |(x, y)| Center::new(x, y)), angle_step: o.step }
+    Params {
+        center: o
+            .center
+            .map_or(Center::archived(w, h), |(x, y)| Center::new(x, y)),
+        angle_step: o.step,
+    }
 }
 
 /// Run `f` over the files on `threads` workers (serial for 1), preserving order.
-fn map_files<T: Send>(o: &Opts, f: impl Fn(&mut FeatureExtractor, &Path) -> Result<T, String> + Sync) -> Result<Vec<T>, String> {
+fn map_files<T: Send>(
+    o: &Opts,
+    f: impl Fn(&mut FeatureExtractor, &Path) -> Result<T, String> + Sync,
+) -> Result<Vec<T>, String> {
     let engine = Arc::new(Engine::new());
     if o.threads == Some(1) {
         let mut fx = FeatureExtractor::with_engine(engine);
         return o.files.iter().map(|p| f(&mut fx, p)).collect();
     }
-    let pool = rayon::ThreadPoolBuilder::new().num_threads(o.threads.unwrap_or(0)).build().map_err(|e| e.to_string())?;
+    let pool = rayon::ThreadPoolBuilder::new()
+        .num_threads(o.threads.unwrap_or(0))
+        .build()
+        .map_err(|e| e.to_string())?;
     pool.install(|| {
         o.files
             .par_iter()
-            .map_init(|| FeatureExtractor::with_engine(Arc::clone(&engine)), |fx, p| f(fx, p))
+            .map_init(
+                || FeatureExtractor::with_engine(Arc::clone(&engine)),
+                |fx, p| f(fx, p),
+            )
             .collect()
     })
 }
@@ -101,12 +129,21 @@ fn run(cmd: &str, o: Opts) -> Result<(), String> {
             let rows = map_files(&o, |fx, p| {
                 let img = read_png(p)?;
                 let mut out = vec![0.0; kind.dim()];
-                fx.extract(&img.view(), &params(&o, img.width, img.height), kind, &mut out).map_err(|e| format!("{}: {e}", p.display()))?;
+                fx.extract(
+                    &img.view(),
+                    &params(&o, img.width, img.height),
+                    kind,
+                    &mut out,
+                )
+                .map_err(|e| format!("{}: {e}", p.display()))?;
                 Ok(out)
             })?;
             for (p, v) in o.files.iter().zip(rows) {
                 if o.json {
-                    println!("{}", json!({"path": p, "kind": format!("{kind:?}"), "features": v}));
+                    println!(
+                        "{}",
+                        json!({"path": p, "kind": format!("{kind:?}"), "features": v})
+                    );
                 } else {
                     let vals: Vec<String> = v.iter().map(|x| format!("{x:?}")).collect();
                     println!("{},{}", p.display(), vals.join(","));
@@ -115,12 +152,15 @@ fn run(cmd: &str, o: Opts) -> Result<(), String> {
             Ok(())
         }
         "matrix" => {
-            let [path] = o.files.as_slice() else { return Err("matrix takes exactly one image".into()) };
+            let [path] = o.files.as_slice() else {
+                return Err("matrix takes exactly one image".into());
+            };
             let img = read_png(path)?;
             let p = params(&o, img.width, img.height);
             let mut fx = FeatureExtractor::new();
             let mut m = vec![0.0; p.n_rays() * cdch_core::BINS];
-            fx.matrix_into(&img.view(), &p, &mut m).map_err(|e| e.to_string())?;
+            fx.matrix_into(&img.view(), &p, &mut m)
+                .map_err(|e| e.to_string())?;
             for row in m.chunks(cdch_core::BINS) {
                 let vals: Vec<String> = row.iter().map(|x| format!("{x:?}")).collect();
                 println!("{}", vals.join(","));
@@ -135,23 +175,50 @@ fn run(cmd: &str, o: Opts) -> Result<(), String> {
                 let img = read_png(p)?;
                 let t1 = Instant::now();
                 let mut x = vec![0.0; model.feature.dim()];
-                fx.extract(&img.view(), &params(&o, img.width, img.height), model.feature, &mut x).map_err(|e| format!("{}: {e}", p.display()))?;
+                fx.extract(
+                    &img.view(),
+                    &params(&o, img.width, img.height),
+                    model.feature,
+                    &mut x,
+                )
+                .map_err(|e| format!("{}: {e}", p.display()))?;
                 let t2 = Instant::now();
                 let s = model.decision(&x);
                 let t3 = Instant::now();
-                Ok((s, [(t1 - t0).as_secs_f64(), (t2 - t1).as_secs_f64(), (t3 - t2).as_secs_f64()]))
+                Ok((
+                    s,
+                    [
+                        (t1 - t0).as_secs_f64(),
+                        (t2 - t1).as_secs_f64(),
+                        (t3 - t2).as_secs_f64(),
+                    ],
+                ))
             })?;
             let wall = start.elapsed().as_secs_f64();
             for (p, (s, t)) in o.files.iter().zip(&rows) {
                 let label = (*s >= model.threshold) as u8;
                 if o.timing {
-                    println!("{},{:?},{},{:.1},{:.1},{:.2}", p.display(), s, label, t[0] * 1e6, t[1] * 1e6, t[2] * 1e6);
+                    println!(
+                        "{},{:?},{},{:.1},{:.1},{:.2}",
+                        p.display(),
+                        s,
+                        label,
+                        t[0] * 1e6,
+                        t[1] * 1e6,
+                        t[2] * 1e6
+                    );
                 } else {
                     println!("{},{:?},{}", p.display(), s, label);
                 }
             }
             if o.timing {
-                eprintln!("{} images in {:.3} s ({:.0} img/s) using model {}", rows.len(), wall, rows.len() as f64 / wall, model.name);
+                eprintln!(
+                    "{} images in {:.3} s ({:.0} img/s) using model {}",
+                    rows.len(),
+                    wall,
+                    rows.len() as f64 / wall,
+                    model.name
+                );
             }
             Ok(())
         }

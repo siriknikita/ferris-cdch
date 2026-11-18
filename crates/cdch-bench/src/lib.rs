@@ -86,11 +86,17 @@ pub fn base64_decode(s: &str) -> Result<Vec<u8>, String> {
 }
 
 pub fn f64s_le(bytes: &[u8]) -> Vec<f64> {
-    bytes.chunks_exact(8).map(|c| f64::from_le_bytes(c.try_into().unwrap())).collect()
+    bytes
+        .chunks_exact(8)
+        .map(|c| f64::from_le_bytes(c.try_into().unwrap()))
+        .collect()
 }
 
 pub fn i32s_le(bytes: &[u8]) -> Vec<i32> {
-    bytes.chunks_exact(4).map(|c| i32::from_le_bytes(c.try_into().unwrap())).collect()
+    bytes
+        .chunks_exact(4)
+        .map(|c| i32::from_le_bytes(c.try_into().unwrap()))
+        .collect()
 }
 
 /// Result of one oracle evaluation.
@@ -127,7 +133,12 @@ impl Oracle {
             .spawn()?;
         let stdin = child.stdin.take().expect("stdin");
         let stdout = BufReader::new(child.stdout.take().expect("stdout"));
-        Ok(Self { child, stdin, stdout, next_id: 0 })
+        Ok(Self {
+            child,
+            stdin,
+            stdout,
+            next_id: 0,
+        })
     }
 
     pub fn compute(
@@ -151,7 +162,9 @@ impl Oracle {
         self.stdin.write_all(&frame).map_err(|e| e.to_string())?;
         self.stdin.flush().map_err(|e| e.to_string())?;
         let mut line = String::new();
-        self.stdout.read_line(&mut line).map_err(|e| e.to_string())?;
+        self.stdout
+            .read_line(&mut line)
+            .map_err(|e| e.to_string())?;
         if line.is_empty() {
             return Err("oracle exited".into());
         }
@@ -166,7 +179,12 @@ impl Oracle {
         let trace = if v["trace"].is_object() {
             let t = &v["trace"];
             Some(OracleTrace {
-                ray_lengths: t["ray_lengths"].as_array().unwrap().iter().map(|x| x.as_u64().unwrap() as usize).collect(),
+                ray_lengths: t["ray_lengths"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .map(|x| x.as_u64().unwrap() as usize)
+                    .collect(),
                 coords: i32s_le(&base64_decode(t["coords"].as_str().unwrap())?),
                 matrix: f64s_le(&base64_decode(t["matrix"].as_str().unwrap())?),
             })
@@ -184,6 +202,76 @@ impl Oracle {
 }
 
 impl Drop for Oracle {
+    fn drop(&mut self) {
+        let _ = self.child.kill();
+        let _ = self.child.wait();
+    }
+}
+
+/// Persistent Node process running `oracle/centroid_worker.js`: the unmodified
+/// `findIntensityCenter` of `ip-1.js`.
+pub struct CentroidOracle {
+    child: Child,
+    stdin: ChildStdin,
+    stdout: BufReader<ChildStdout>,
+    next_id: u64,
+}
+
+impl CentroidOracle {
+    pub fn spawn(oracle_dir: &Path) -> std::io::Result<Self> {
+        let mut child = Command::new("node")
+            .arg(oracle_dir.join("centroid_worker.js"))
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .spawn()?;
+        let stdin = child.stdin.take().expect("stdin");
+        let stdout = BufReader::new(child.stdout.take().expect("stdout"));
+        Ok(Self {
+            child,
+            stdin,
+            stdout,
+            next_id: 0,
+        })
+    }
+
+    /// `Some((x, y))` as written by the original code, or `None` when it raised its
+    /// "no pixels in range" alert.
+    pub fn centroid(
+        &mut self,
+        img: &OwnedRgb,
+        min: u8,
+        max: u8,
+    ) -> Result<Option<(f64, f64)>, String> {
+        self.next_id += 1;
+        let header = json!({"id": self.next_id, "width": img.width, "height": img.height, "min": min, "max": max})
+            .to_string();
+        let mut frame = Vec::with_capacity(8 + header.len() + img.data.len());
+        frame.extend_from_slice(&(header.len() as u32).to_le_bytes());
+        frame.extend_from_slice(header.as_bytes());
+        frame.extend_from_slice(&(img.data.len() as u32).to_le_bytes());
+        frame.extend_from_slice(&img.data);
+        self.stdin.write_all(&frame).map_err(|e| e.to_string())?;
+        self.stdin.flush().map_err(|e| e.to_string())?;
+        let mut line = String::new();
+        self.stdout
+            .read_line(&mut line)
+            .map_err(|e| e.to_string())?;
+        let v: Value = serde_json::from_str(&line).map_err(|e| e.to_string())?;
+        if let Some(err) = v.get("error") {
+            return Err(format!("centroid oracle error: {err}"));
+        }
+        if v["id"].as_u64() != Some(self.next_id) {
+            return Err("centroid oracle reply out of order".into());
+        }
+        match (v["x"].as_f64(), v["y"].as_f64(), v["alert"].as_bool()) {
+            (Some(x), Some(y), Some(false)) => Ok(Some((x, y))),
+            (None, None, Some(true)) => Ok(None),
+            _ => Err(format!("unexpected centroid reply {line}")),
+        }
+    }
+}
+
+impl Drop for CentroidOracle {
     fn drop(&mut self) {
         let _ = self.child.kill();
         let _ = self.child.wait();
@@ -210,19 +298,37 @@ pub fn peak_rss_bytes() -> Option<u64> {
     if let Ok(s) = std::fs::read_to_string("/proc/self/status") {
         for line in s.lines() {
             if let Some(rest) = line.strip_prefix("VmHWM:") {
-                return rest.trim().trim_end_matches(" kB").trim().parse::<u64>().ok().map(|k| k * 1024);
+                return rest
+                    .trim()
+                    .trim_end_matches(" kB")
+                    .trim()
+                    .parse::<u64>()
+                    .ok()
+                    .map(|k| k * 1024);
             }
         }
     }
-    let out = Command::new("ps").args(["-o", "rss=", "-p", &std::process::id().to_string()]).output().ok()?;
-    String::from_utf8(out.stdout).ok()?.trim().parse::<u64>().ok().map(|k| k * 1024)
+    let out = Command::new("ps")
+        .args(["-o", "rss=", "-p", &std::process::id().to_string()])
+        .output()
+        .ok()?;
+    String::from_utf8(out.stdout)
+        .ok()?
+        .trim()
+        .parse::<u64>()
+        .ok()
+        .map(|k| k * 1024)
 }
-
 
 /// Host description for reports.
 pub fn host_info() -> Value {
     let sh = |cmd: &str, args: &[&str]| {
-        Command::new(cmd).args(args).output().ok().and_then(|o| String::from_utf8(o.stdout).ok()).map(|s| s.trim().to_string())
+        Command::new(cmd)
+            .args(args)
+            .output()
+            .ok()
+            .and_then(|o| String::from_utf8(o.stdout).ok())
+            .map(|s| s.trim().to_string())
     };
     json!({
         "os": std::env::consts::OS,

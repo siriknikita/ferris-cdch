@@ -7,7 +7,7 @@
 //! The JavaScript remains the authoritative definition. This crate provides two
 //! implementations that must agree with it bit for bit:
 //!
-//! * [`reference`] — a line-by-line port of `drawRaysAndGenerateHistograms` and
+//! * [`mod@reference`] — a line-by-line port of `drawRaysAndGenerateHistograms` and
 //!   `calculateCumulativeHistogram`, kept deliberately simple.
 //! * [`engine`] — the optimized path: a precomputed [`SamplingPlan`] (pixel
 //!   indices per ray, which depend only on geometry) applied to each image, with
@@ -58,17 +58,27 @@ pub enum CdchError {
     /// The canonical matrix failed the archived validity checks (empty ray, NaN, ...).
     InvalidMatrix(String),
     /// An image was evaluated with a sampling plan built for another size.
-    Dimensions { plan: (usize, usize), image: (usize, usize) },
+    Dimensions {
+        plan: (usize, usize),
+        image: (usize, usize),
+    },
 }
 
 impl fmt::Display for CdchError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             CdchError::BufferSize { expected, actual } => {
-                write!(f, "pixel buffer has {actual} bytes, expected at least {expected}")
+                write!(
+                    f,
+                    "pixel buffer has {actual} bytes, expected at least {expected}"
+                )
             }
             CdchError::RowStride { stride, width } => {
-                write!(f, "row stride {stride} is smaller than 3 * width ({})", 3 * width)
+                write!(
+                    f,
+                    "row stride {stride} is smaller than 3 * width ({})",
+                    3 * width
+                )
             }
             CdchError::TooLarge { width, height } => {
                 write!(f, "image {width}x{height} exceeds the supported size")
@@ -110,20 +120,43 @@ impl<'a> RgbImage<'a> {
         Self::with_stride(width, height, 3 * width, data)
     }
 
-    pub fn with_stride(width: usize, height: usize, row_stride: usize, data: &'a [u8]) -> Result<Self> {
-        if width > u32::MAX as usize / 4 || height > u32::MAX as usize / 4
-            || width.checked_mul(height).map_or(true, |n| n > u32::MAX as usize)
+    pub fn with_stride(
+        width: usize,
+        height: usize,
+        row_stride: usize,
+        data: &'a [u8],
+    ) -> Result<Self> {
+        if width > u32::MAX as usize / 4
+            || height > u32::MAX as usize / 4
+            || width
+                .checked_mul(height)
+                .is_none_or(|n| n > u32::MAX as usize)
         {
             return Err(CdchError::TooLarge { width, height });
         }
         if row_stride < 3 * width {
-            return Err(CdchError::RowStride { stride: row_stride, width });
+            return Err(CdchError::RowStride {
+                stride: row_stride,
+                width,
+            });
         }
-        let expected = if height == 0 { 0 } else { (height - 1) * row_stride + 3 * width };
+        let expected = if height == 0 {
+            0
+        } else {
+            (height - 1) * row_stride + 3 * width
+        };
         if data.len() < expected {
-            return Err(CdchError::BufferSize { expected, actual: data.len() });
+            return Err(CdchError::BufferSize {
+                expected,
+                actual: data.len(),
+            });
         }
-        Ok(Self { width, height, row_stride, data })
+        Ok(Self {
+            width,
+            height,
+            row_stride,
+            data,
+        })
     }
 
     #[inline]
@@ -170,13 +203,19 @@ impl Center {
     /// Archived research protocol: `[width // 2, height // 2]` (Python integer division),
     /// as sent by `native_features.matrix` and `cdch_features.generate`.
     pub fn archived(width: usize, height: usize) -> Self {
-        Self { x: (width / 2) as f64, y: (height / 2) as f64 }
+        Self {
+            x: (width / 2) as f64,
+            y: (height / 2) as f64,
+        }
     }
 
     /// The oracle's fallback when no centre is supplied and `ip-1.js`'s "centre"
     /// button: `width / 2`, `height / 2` as floating-point values.
     pub fn midpoint(width: usize, height: usize) -> Self {
-        Self { x: width as f64 / 2.0, y: height as f64 / 2.0 }
+        Self {
+            x: width as f64 / 2.0,
+            y: height as f64 / 2.0,
+        }
     }
 }
 
@@ -191,12 +230,18 @@ pub struct Params {
 impl Params {
     /// The archived protocol: centre `[w // 2, h // 2]`, 360 rays.
     pub fn archived(width: usize, height: usize) -> Self {
-        Self { center: Center::archived(width, height), angle_step: 1 }
+        Self {
+            center: Center::archived(width, height),
+            angle_step: 1,
+        }
     }
 
     pub fn validate(&self) -> Result<()> {
         if !self.center.x.is_finite() || !self.center.y.is_finite() {
-            return Err(CdchError::NonFiniteCenter { x: self.center.x, y: self.center.y });
+            return Err(CdchError::NonFiniteCenter {
+                x: self.center.x,
+                y: self.center.y,
+            });
         }
         if !(1..=360).contains(&self.angle_step) {
             return Err(CdchError::AngleStep(self.angle_step));
@@ -206,7 +251,7 @@ impl Params {
 
     /// Number of rays: angles `0, step, 2*step, ... < 360`.
     pub fn n_rays(&self) -> usize {
-        (360 + self.angle_step as usize - 1) / self.angle_step as usize
+        360_usize.div_ceil(self.angle_step as usize)
     }
 
     /// The angles (degrees) in emission order.
@@ -226,7 +271,10 @@ pub struct CdchMatrix {
 impl CdchMatrix {
     pub fn from_vec(rows: usize, data: Vec<f64>) -> Result<Self> {
         if data.len() != rows * BINS {
-            return Err(CdchError::BufferSize { expected: rows * BINS, actual: data.len() });
+            return Err(CdchError::BufferSize {
+                expected: rows * BINS,
+                actual: data.len(),
+            });
         }
         Ok(Self { rows, data })
     }
@@ -243,7 +291,10 @@ impl CdchMatrix {
         &self.data[i * BINS..(i + 1) * BINS]
     }
     pub fn view(&self) -> MatrixView<'_> {
-        MatrixView { rows: self.rows, data: &self.data }
+        MatrixView {
+            rows: self.rows,
+            data: &self.data,
+        }
     }
 }
 
@@ -257,7 +308,10 @@ pub struct MatrixView<'a> {
 impl<'a> MatrixView<'a> {
     pub fn new(rows: usize, data: &'a [f64]) -> Result<Self> {
         if data.len() != rows * BINS {
-            return Err(CdchError::BufferSize { expected: rows * BINS, actual: data.len() });
+            return Err(CdchError::BufferSize {
+                expected: rows * BINS,
+                actual: data.len(),
+            });
         }
         Ok(Self { rows, data })
     }
