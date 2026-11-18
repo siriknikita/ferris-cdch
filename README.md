@@ -1,90 +1,88 @@
-# Project Ferris — Rust-native CDCH
+# Ferris — canonical CDCH in Rust
 
-A validated Rust implementation of Muzyka's canonical CDCH algorithm (`oracle/ip-1.js`,
-SHA-256 `110732b48bc6e8b2d5167eec30f7277245913bed98b9baaa3c65c0c22aab44d8`), with:
+Ferris is a reusable Rust library that computes the **CDCH** (cumulative directional
+colour histogram) exactly as Muzyka's original JavaScript does (`oracle/ip-1.js`,
+SHA-256 `110732b48bc6e8b2d5167eec30f7277245913bed98b9baaa3c65c0c22aab44d8`). Bit for bit.
 
-- fused feature extraction;
-- NumPy bindings;
-- a differential and mutation test harness against the original JavaScript;
-- a standalone CLI;
-- integration into the archived CDCH research pipeline.
+It exists so that CDCH research is not limited by the speed of the original browser
+implementation: large statistical experiments, parameter sweeps, image comparisons and
+machine-learning studies become practical when one CDCH costs about 60 µs instead of
+about 20 ms. Speed is the only thing Ferris changes. It does not make CDCH a better
+descriptor, and no accuracy claim follows from it.
 
-| Result (Apple M4 Pro, one core) | Value |
+| | |
 |---|---|
-| Canonical matrices reproduced bit for bit | 713/713 differential cases; 640/640 archived evaluation images |
-| Classifier AUROC across extraction paths | 840/840 identical; headline 0.5925 / 0.70125 reproduced |
-| `cdch_A_logistic` end to end | 21.4 ms → **0.43 ms** (49.7×) |
-| CDCH stage (pixels → A) | 20.8 ms → **55 µs** (380×) |
-| Batch, A features | 17.7 k img/s per core; 171 k img/s on 14 threads |
+| Public crate | [`ferris-cdch`](crates/ferris-cdch) (version 0.2.0) |
+| Exactness | 713/713 differential cases bitwise equal to `ip-1.js` (18.0 M samples, 64.8 M values); 15/15 deliberately wrong variants detected; intensity centroid equal in 5,680/5,680 comparisons |
+| Speed (Apple M4 Pro, one core) | 128 × 128 image, 360 rays: 62 µs for the matrix, 66 µs with integer counts |
+| Dependencies | none beyond `std` (optional `representations` feature adds the A/B/C/D feature extractors) |
+| Licence | MIT OR Apache-2.0 |
 
-## Reports
+## Use it from another Rust project
 
-| Report | Contents |
+Ferris is not on crates.io. Depend on it through Git, pinned to a release tag:
+
+```toml
+[dependencies]
+ferris-cdch = { git = "https://github.com/siriknikita/project-ferris-rust-cdch.git", tag = "v0.2.0" }
+```
+
+(The repository is private, and the `v0.2.0` tag exists locally until it is pushed. See
+[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md#consuming-an-unpublished-tag) for local use.)
+
+```rust
+use ferris_cdch::{Analyzer, CdchConfig, CenterSpec, OwnedRgbImage};
+
+// Decode the image with any library (Ferris has no codecs) into packed 8-bit RGB.
+let image = OwnedRgbImage::new(width, height, rgb_bytes)?;
+
+let analyzer = Analyzer::new();                       // reuse: caches ray geometry
+let config = CdchConfig::default()                     // archived protocol:
+    .with_center(CenterSpec::Archived)                 //   centre (w // 2, h // 2)
+    .with_angle_step(1);                               //   360 rays
+let result = analyzer.compute(&image.view(), &config)?;
+
+let cdf: &[f64] = result.cdf(90);                      // ray at 90°, 256 values
+let counts: &[u32] = result.counts(90);                // its integer histogram
+result.write_matrix_csv(std::fs::File::create("cdch.csv")?)?;  // lossless CSV
+```
+
+The complete guide is [docs/API.md](docs/API.md). Runnable examples are
+`cargo run -p ferris-cdch --example basic` and `--example rgba`, plus the separate
+project in [`examples/independent-consumer`](examples/independent-consumer).
+
+## Documentation
+
+| Document | Contents |
 |---|---|
-| [RUST_PORT_VALIDATION.md](RUST_PORT_VALIDATION.md) | Exact semantics, differential testing, mutation testing, feature arithmetic |
-| [RUST_CLASSIFIER_COMPATIBILITY.md](RUST_CLASSIFIER_COMPATIBILITY.md) | Features, scores, labels and AUROC vs canonical JS and the archive |
-| [RUST_PERFORMANCE_REPORT.md](RUST_PERFORMANCE_REPORT.md) | Latency, throughput, memory, speedups, bottlenecks |
-| [RUST_ARCHITECTURE.md](RUST_ARCHITECTURE.md) | Crates, data structures, APIs, design decisions |
-| [PROJECT_STATE.md](PROJECT_STATE.md) | Completed work, answers to the study questions, limitations, next steps |
+| [docs/API.md](docs/API.md) | Public API, errors, threading, versioning |
+| [docs/MATHEMATICAL_COMPATIBILITY.md](docs/MATHEMATICAL_COMPATIBILITY.md) | Exactly what is computed, and every compatibility assumption |
+| [docs/VALIDATION.md](docs/VALIDATION.md) | How equivalence is verified, and the current evidence |
+| [docs/BENCHMARKING.md](docs/BENCHMARKING.md) | Methodology and measured performance |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Crates, data flow, design decisions |
+| [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Building, testing, releasing |
+| [docs/adr/](docs/adr) | Architectural decision records |
+| [docs/ENGINEERING_INVENTORY.md](docs/ENGINEERING_INVENTORY.md) | State of the project before the library extraction |
+| [docs/IMPLEMENTATION_REPORT.md](docs/IMPLEMENTATION_REPORT.md) | What was done in v0.2.0 and the evidence for it |
+| [CHANGELOG.md](CHANGELOG.md), [CONTRIBUTING.md](CONTRIBUTING.md) | History, contribution rules |
+| `RUST_*.md`, `PROJECT_STATE.md` | Historical reports of the v0.1.0 port (phases A–J) |
 
-Machine-readable results are in `reports/` (`results_summary.json` collects the headline numbers).
-
-## Layout
+## Repository layout
 
 | Path | Contents |
 |---|---|
-| `crates/cdch-core` | Canonical CDCH: literal reference port + precomputed-sampling-plan engine |
-| `crates/cdch-features` | Representations A (56), B (98), C (768), D (24×32); fused checkpoint path |
-| `crates/cdch-python` | PyO3/maturin extension `cdch_ferris` |
-| `crates/cdch-cli` | `cdch` executable: features, matrices, linear-model scoring (no Python/Node) |
-| `crates/cdch-bench` | `ferris-diff` (differential + mutation tests), `ferris-bench` (microbenchmarks) |
-| `oracle/` | Canonical `ip-1.js`, archived `oracle.js`, differential worker, V8 direction table |
-| `python/` | uv project: backend-selectable pipeline, reproduction, benchmarks, tests |
-| `models/` | Archived linear checkpoints exported to JSON for the CLI |
-| `study/` | The original CDCH research archive, unchanged (`shasum -a 256 -c SHA256SUMS`) |
-| `reports/` | Differential, classifier-compatibility and performance results |
+| `crates/ferris-cdch` | **The public library API** |
+| `crates/cdch-core` | Canonical CDCH: literal reference port and optimized sampling-plan engine |
+| `crates/cdch-features` | Statistical representations A (56), B (98), C (768), D (24 × 32) |
+| `crates/cdch-python` | PyO3 / NumPy bindings (`cdch_ferris`) |
+| `crates/cdch-cli` | `cdch` command-line tool |
+| `crates/cdch-bench` | `ferris-diff` (differential and mutation tests), `ferris-bench` |
+| `oracle/` | Canonical `ip-1.js`, archived oracle and Node workers |
+| `examples/independent-consumer` | A separate Cargo project that uses Ferris only through Git |
+| `python/`, `models/`, `study/` | Research pipeline, exported models, the original study archive (unchanged) |
+| `reports/` | Machine-readable evidence |
 
-## Build
+## Related project
 
-Requirements: stable Rust ≥ 1.85, Python 3.12 via `uv`, and Node.js (only for the canonical
-oracle and differential tests).
-
-```bash
-cargo build --release --workspace --exclude cdch-python
-cargo test  --release --workspace --exclude cdch-python
-cd python && uv sync      # archived Python pins + builds cdch_ferris with maturin
-```
-
-A standalone wheel: `uvx maturin build --release -m crates/cdch-python/Cargo.toml -o dist`.
-
-## Use
-
-```python
-import numpy as np, cdch_ferris as cf
-from PIL import Image
-rgb = np.asarray(Image.open("crop.png").convert("RGB"))        # (H, W, 3) uint8
-cf.cdch(rgb)                      # (360, 256) canonical matrix, centre (W//2, H//2)
-cf.features(rgb, "A")             # (56,)  fused, no matrix formed
-cf.features_multi(rgb, ["A", "B", "C"])
-cf.batch_features(stack, "A", threads=None)   # (n, 56), GIL released
-```
-
-```bash
-target/release/cdch features --kind A crop.png
-target/release/cdch score --model models/cdch_A_logistic.json --timing images/*.png
-```
-
-In the research pipeline:
-`ferris_pipeline.load_deploy("cdch_A_logistic", backend="rust")`, where `backend` is one of
-`canonical_js | rust_matrix | rust`.
-
-## Verify
-
-```bash
-cargo run --release -p cdch-bench --bin ferris-diff -- --oracle-dir oracle --out reports/differential --mutants
-cd python && FERRIS_PAIRS=<pairs dir> .venv/bin/python -m pytest -q tests
-```
-
-External inputs (the DIV2K validation HR archive, SwinIR/Real-ESRGAN weights, regenerated
-pairs) are not stored here. See PROJECT_STATE.md → Reproduction, and
-`study/pilot/config/assets.json` for the pinned sources.
+[CDCH Research Studio](../cdch-research-studio) is a native desktop application that uses
+Ferris as an external dependency. Ferris does not depend on it.
