@@ -1,0 +1,39 @@
+ferris-bench: 80 images of 128x128
+plan_build                                   median    427.94 µs   p95    589.32 µs
+core_reference_matrix                        median    356.17 µs   p95    362.67 µs
+core_engine_matrix_into                      median     56.17 µs   p95     65.54 µs
+core_engine_matrix_alloc                     median     62.00 µs   p95     70.84 µs
+core_engine_checkpoints_into                 median     28.33 µs   p95     30.25 µs
+core_engine_histograms_u32                   median     27.88 µs   p95     29.92 µs
+core_engine_histograms_and_matrix_into       median     58.04 µs   p95     67.00 µs
+ferris_cdch_analyzer_matrix                  median     61.96 µs   p95     71.79 µs
+ferris_cdch_analyzer_compute                 median     65.92 µs   p95     74.34 µs
+ferris_cdch_compute_cold_plan                median    480.44 µs   p95    493.25 µs
+features_A_from_matrix(validate+stats)       median     54.83 µs   p95     55.79 µs
+features_validate_matrix                     median     23.88 µs   p95     24.62 µs
+features_A_from_checkpoints                  median     28.04 µs   p95     28.62 µs
+features_rich42_from_matrix                  median   1128.73 µs   p95   1212.92 µs
+features_B_from_matrix                       median   1172.44 µs   p95   1252.30 µs
+features_C_from_matrix                       median     14.62 µs   p95     16.33 µs
+features_C_from_checkpoints                  median      1.17 µs   p95      1.33 µs
+e2e_A_fused                                  median     56.00 µs   p95     58.08 µs
+e2e_A_via_matrix                             median    109.83 µs   p95    118.71 µs
+e2e_B_fused                                  median   1205.15 µs   p95   1281.67 µs
+e2e_B_via_matrix                             median   1228.15 µs   p95   1305.22 µs
+e2e_C_fused                                  median     28.92 µs   p95     30.79 µs
+e2e_C_via_matrix                             median     61.83 µs   p95     70.60 µs
+batch A threads  1:      17757 img/s
+batch B threads  1:        895 img/s
+batch C threads  1:      33915 img/s
+batch A threads  2:      34916 img/s
+batch B threads  2:       1762 img/s
+batch C threads  2:      64777 img/s
+batch A threads  4:      68364 img/s
+batch B threads  4:       3452 img/s
+batch C threads  4:     129766 img/s
+batch A threads  8:     131319 img/s
+batch B threads  8:       6768 img/s
+batch C threads  8:     249554 img/s
+batch A threads 14:     179683 img/s
+batch B threads 14:       9389 img/s
+batch C threads 14:     320436 img/s
