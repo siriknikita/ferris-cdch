@@ -16,7 +16,10 @@ use std::sync::{Arc, OnceLock};
 use cdch_core::{reference, CdchError, Center, Engine, MatrixView, Params, RgbImage, BINS};
 use cdch_features::{FeatureExtractor, Representation};
 use numpy::ndarray::{Array2, Array3};
-use numpy::{IntoPyArray, PyArray2, PyArray3, PyArray4, PyArrayDescrMethods, PyArrayDyn, PyArrayMethods, PyUntypedArray, PyUntypedArrayMethods};
+use numpy::{
+    IntoPyArray, PyArray2, PyArray3, PyArray4, PyArrayDescrMethods, PyArrayDyn, PyArrayMethods,
+    PyUntypedArray, PyUntypedArrayMethods,
+};
 use pyo3::exceptions::{PyTypeError, PyValueError};
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
@@ -72,9 +75,15 @@ fn check_uint8(arr: &Bound<'_, PyUntypedArray>, what: &str) -> PyResult<()> {
 }
 
 fn as_array<'py>(obj: &Bound<'py, PyAny>, what: &str) -> PyResult<Bound<'py, PyUntypedArray>> {
-    obj.cast::<PyUntypedArray>()
-        .map(|a| a.clone())
-        .map_err(|_| PyTypeError::new_err(format!("{what} must be a numpy.ndarray, got {}", obj.get_type().name().map(|n| n.to_string()).unwrap_or_default())))
+    obj.cast::<PyUntypedArray>().cloned().map_err(|_| {
+        PyTypeError::new_err(format!(
+            "{what} must be a numpy.ndarray, got {}",
+            obj.get_type()
+                .name()
+                .map(|n| n.to_string())
+                .unwrap_or_default()
+        ))
+    })
 }
 
 /// Extract a single `(H, W, 3)` uint8 image.
@@ -94,10 +103,19 @@ fn image_from<'py>(obj: &Bound<'py, PyAny>) -> PyResult<Pixels<'py>> {
     } else {
         PixelData::Owned(typed.as_array().iter().copied().collect())
     };
-    Ok(Pixels { width: shape[1], height: shape[0], data })
+    Ok(Pixels {
+        width: shape[1],
+        height: shape[0],
+        data,
+    })
 }
 
-fn params_for(width: usize, height: usize, center: Option<(f64, f64)>, angle_step: u32) -> PyResult<Params> {
+fn params_for(
+    width: usize,
+    height: usize,
+    center: Option<(f64, f64)>,
+    angle_step: u32,
+) -> PyResult<Params> {
     let params = Params {
         center: center.map_or(Center::archived(width, height), |(x, y)| Center::new(x, y)),
         angle_step,
@@ -107,8 +125,11 @@ fn params_for(width: usize, height: usize, center: Option<(f64, f64)>, angle_ste
 }
 
 fn representation(kind: &str) -> PyResult<Representation> {
-    Representation::parse(kind)
-        .ok_or_else(|| PyValueError::new_err(format!("unknown CDCH representation {kind:?}; expected 'A', 'B', 'C' or 'D'")))
+    Representation::parse(kind).ok_or_else(|| {
+        PyValueError::new_err(format!(
+            "unknown CDCH representation {kind:?}; expected 'A', 'B', 'C' or 'D'"
+        ))
+    })
 }
 
 /// Canonical CDCH matrix, shape `(n_rays, 256)`, float64.
@@ -117,39 +138,67 @@ fn representation(kind: &str) -> PyResult<Representation> {
 /// pass `(width / 2, height / 2)` to reproduce the oracle's own default.
 #[pyfunction]
 #[pyo3(signature = (rgb, center=None, angle_step=1))]
-fn cdch<'py>(py: Python<'py>, rgb: &Bound<'py, PyAny>, center: Option<(f64, f64)>, angle_step: u32) -> PyResult<Bound<'py, PyArray2<f64>>> {
+fn cdch<'py>(
+    py: Python<'py>,
+    rgb: &Bound<'py, PyAny>,
+    center: Option<(f64, f64)>,
+    angle_step: u32,
+) -> PyResult<Bound<'py, PyArray2<f64>>> {
     let px = image_from(rgb)?;
     let params = params_for(px.width, px.height, center, angle_step)?;
     let rows = params.n_rays();
     let img = px.image().map_err(err)?;
     let mut out = vec![0.0; rows * BINS];
-    EXTRACTOR.with(|fx| fx.borrow_mut().matrix_into(&img, &params, &mut out)).map_err(err)?;
-    Ok(Array2::from_shape_vec((rows, BINS), out).expect("shape").into_pyarray(py))
+    EXTRACTOR
+        .with(|fx| fx.borrow_mut().matrix_into(&img, &params, &mut out))
+        .map_err(err)?;
+    Ok(Array2::from_shape_vec((rows, BINS), out)
+        .expect("shape")
+        .into_pyarray(py))
 }
 
 /// Canonical CDCH via the literal reference port (slow; for verification).
 #[pyfunction]
 #[pyo3(signature = (rgb, center=None, angle_step=1))]
-fn cdch_reference<'py>(py: Python<'py>, rgb: &Bound<'py, PyAny>, center: Option<(f64, f64)>, angle_step: u32) -> PyResult<Bound<'py, PyArray2<f64>>> {
+fn cdch_reference<'py>(
+    py: Python<'py>,
+    rgb: &Bound<'py, PyAny>,
+    center: Option<(f64, f64)>,
+    angle_step: u32,
+) -> PyResult<Bound<'py, PyArray2<f64>>> {
     let px = image_from(rgb)?;
     let params = params_for(px.width, px.height, center, angle_step)?;
     let m = reference::cdch(&px.image().map_err(err)?, &params).map_err(err)?;
     let rows = m.rows();
-    Ok(Array2::from_shape_vec((rows, BINS), m.into_vec()).expect("shape").into_pyarray(py))
+    Ok(Array2::from_shape_vec((rows, BINS), m.into_vec())
+        .expect("shape")
+        .into_pyarray(py))
 }
 
 /// Integer ray histograms, shape `(n_rays, 256)`, uint32.
 #[pyfunction]
 #[pyo3(signature = (rgb, center=None, angle_step=1))]
-fn histograms<'py>(py: Python<'py>, rgb: &Bound<'py, PyAny>, center: Option<(f64, f64)>, angle_step: u32) -> PyResult<Bound<'py, PyArray2<u32>>> {
+fn histograms<'py>(
+    py: Python<'py>,
+    rgb: &Bound<'py, PyAny>,
+    center: Option<(f64, f64)>,
+    angle_step: u32,
+) -> PyResult<Bound<'py, PyArray2<u32>>> {
     let px = image_from(rgb)?;
     let params = params_for(px.width, px.height, center, angle_step)?;
     let rows = params.n_rays();
     let plan = engine().plan(px.width, px.height, params).map_err(err)?;
     let mut ws = cdch_core::Workspace::new();
-    let data = plan.histograms(&px.image().map_err(err)?, &mut ws).map_err(err)?;
-    Ok(Array2::from_shape_vec((rows, BINS), data).expect("shape").into_pyarray(py))
+    let data = plan
+        .histograms(&px.image().map_err(err)?, &mut ws)
+        .map_err(err)?;
+    Ok(Array2::from_shape_vec((rows, BINS), data)
+        .expect("shape")
+        .into_pyarray(py))
 }
+
+/// `(ray_lengths, coordinates)` returned by `sample_coordinates`.
+type SampleCoordinates<'py> = (Bound<'py, PyArrayDyn<i64>>, Bound<'py, PyArray2<i64>>);
 
 /// Sampled coordinates: `(ray_lengths, coords)` with `coords` of shape `(N, 2)` holding
 /// `(px, py)` in emission order (multiplicities preserved).
@@ -161,7 +210,7 @@ fn sample_coordinates<'py>(
     height: usize,
     center: Option<(f64, f64)>,
     angle_step: u32,
-) -> PyResult<(Bound<'py, PyArrayDyn<i64>>, Bound<'py, PyArray2<i64>>)> {
+) -> PyResult<SampleCoordinates<'py>> {
     let params = params_for(width, height, center, angle_step)?;
     let plan = engine().plan(width, height, params).map_err(err)?;
     let lengths: Vec<i64> = (0..plan.n_rays()).map(|i| plan.ray_len(i) as i64).collect();
@@ -174,21 +223,37 @@ fn sample_coordinates<'py>(
     }
     let n = coords.len() / 2;
     Ok((
-        numpy::ndarray::ArrayD::from_shape_vec(vec![lengths.len()], lengths).expect("shape").into_pyarray(py),
-        Array2::from_shape_vec((n, 2), coords).expect("shape").into_pyarray(py),
+        numpy::ndarray::ArrayD::from_shape_vec(vec![lengths.len()], lengths)
+            .expect("shape")
+            .into_pyarray(py),
+        Array2::from_shape_vec((n, 2), coords)
+            .expect("shape")
+            .into_pyarray(py),
     ))
 }
 
 fn shaped<'py>(py: Python<'py>, rep: Representation, v: Vec<f64>) -> Bound<'py, PyArrayDyn<f64>> {
-    let shape = if rep == Representation::D { vec![24, 32] } else { vec![v.len()] };
-    numpy::ndarray::ArrayD::from_shape_vec(shape, v).expect("shape").into_pyarray(py)
+    let shape = if rep == Representation::D {
+        vec![24, 32]
+    } else {
+        vec![v.len()]
+    };
+    numpy::ndarray::ArrayD::from_shape_vec(shape, v)
+        .expect("shape")
+        .into_pyarray(py)
 }
 
 /// One representation computed directly from pixels (fused where possible).
 /// A: (56,), B: (98,), C: (768,), D: (24, 32).
 #[pyfunction]
 #[pyo3(signature = (rgb, kind="A", center=None, fused=true))]
-fn features<'py>(py: Python<'py>, rgb: &Bound<'py, PyAny>, kind: &str, center: Option<(f64, f64)>, fused: bool) -> PyResult<Bound<'py, PyArrayDyn<f64>>> {
+fn features<'py>(
+    py: Python<'py>,
+    rgb: &Bound<'py, PyAny>,
+    kind: &str,
+    center: Option<(f64, f64)>,
+    fused: bool,
+) -> PyResult<Bound<'py, PyArrayDyn<f64>>> {
     let rep = representation(kind)?;
     let px = image_from(rgb)?;
     let params = params_for(px.width, px.height, center, 1)?;
@@ -210,8 +275,16 @@ fn features<'py>(py: Python<'py>, rgb: &Bound<'py, PyAny>, kind: &str, center: O
 /// Several representations from one image in a single call: returns `{kind: array}`.
 #[pyfunction]
 #[pyo3(signature = (rgb, kinds, center=None))]
-fn features_multi<'py>(py: Python<'py>, rgb: &Bound<'py, PyAny>, kinds: Vec<String>, center: Option<(f64, f64)>) -> PyResult<Bound<'py, PyDict>> {
-    let reps = kinds.iter().map(|k| representation(k)).collect::<PyResult<Vec<_>>>()?;
+fn features_multi<'py>(
+    py: Python<'py>,
+    rgb: &Bound<'py, PyAny>,
+    kinds: Vec<String>,
+    center: Option<(f64, f64)>,
+) -> PyResult<Bound<'py, PyDict>> {
+    let reps = kinds
+        .iter()
+        .map(|k| representation(k))
+        .collect::<PyResult<Vec<_>>>()?;
     let px = image_from(rgb)?;
     let params = params_for(px.width, px.height, center, 1)?;
     let img = px.image().map_err(err)?;
@@ -236,15 +309,24 @@ fn features_multi<'py>(py: Python<'py>, rgb: &Bound<'py, PyAny>, kinds: Vec<Stri
 /// A representation from an existing canonical matrix of shape `(n_rays, 256)`.
 #[pyfunction]
 #[pyo3(signature = (cdf, kind="A"))]
-fn features_from_matrix<'py>(py: Python<'py>, cdf: &Bound<'py, PyAny>, kind: &str) -> PyResult<Bound<'py, PyArrayDyn<f64>>> {
+fn features_from_matrix<'py>(
+    py: Python<'py>,
+    cdf: &Bound<'py, PyAny>,
+    kind: &str,
+) -> PyResult<Bound<'py, PyArrayDyn<f64>>> {
     let rep = representation(kind)?;
     let arr = as_array(cdf, "cdf")?;
     if !arr.dtype().is_equiv_to(&numpy::dtype::<f64>(py)) {
-        return Err(PyTypeError::new_err(format!("cdf must have dtype float64, got {}", arr.dtype().str()?)));
+        return Err(PyTypeError::new_err(format!(
+            "cdf must have dtype float64, got {}",
+            arr.dtype().str()?
+        )));
     }
     let shape = arr.shape().to_vec();
     if shape.len() != 2 || shape[1] != BINS {
-        return Err(PyValueError::new_err(format!("cdf must have shape (n_rays, 256), got {shape:?}")));
+        return Err(PyValueError::new_err(format!(
+            "cdf must have shape (n_rays, 256), got {shape:?}"
+        )));
     }
     let typed = arr.cast::<PyArray2<f64>>()?.readonly();
     let owned: Vec<f64>;
@@ -255,7 +337,12 @@ fn features_from_matrix<'py>(py: Python<'py>, cdf: &Bound<'py, PyAny>, kind: &st
         &owned
     };
     let mut out = vec![0.0; rep.dim()];
-    cdch_features::from_matrix(&MatrixView::new(shape[0], data).map_err(err)?, rep, &mut out).map_err(err)?;
+    cdch_features::from_matrix(
+        &MatrixView::new(shape[0], data).map_err(err)?,
+        rep,
+        &mut out,
+    )
+    .map_err(err)?;
     Ok(shaped(py, rep, out))
 }
 
@@ -264,7 +351,9 @@ fn stack_from(obj: &Bound<'_, PyAny>) -> PyResult<(usize, usize, usize, Vec<u8>)
     check_uint8(&arr, "images")?;
     let shape = arr.shape().to_vec();
     if shape.len() != 4 || shape[3] != 3 {
-        return Err(PyValueError::new_err(format!("images must have shape (n, height, width, 3), got {shape:?}")));
+        return Err(PyValueError::new_err(format!(
+            "images must have shape (n, height, width, 3), got {shape:?}"
+        )));
     }
     let typed = arr.cast::<PyArray4<u8>>()?.readonly();
     let data = if typed.is_c_contiguous() {
@@ -279,17 +368,25 @@ fn stack_from(obj: &Bound<'_, PyAny>) -> PyResult<(usize, usize, usize, Vec<u8>)
 /// calls (building a pool costs far more than a typical batch item). `None`/`0` means
 /// the global pool.
 fn pool(threads: Option<usize>) -> PyResult<Option<Arc<rayon::ThreadPool>>> {
-    static POOLS: OnceLock<std::sync::Mutex<std::collections::HashMap<usize, Arc<rayon::ThreadPool>>>> = OnceLock::new();
+    static POOLS: OnceLock<
+        std::sync::Mutex<std::collections::HashMap<usize, Arc<rayon::ThreadPool>>>,
+    > = OnceLock::new();
     let n = match threads {
         None | Some(0) => return Ok(None),
         Some(n) => n,
     };
-    let mut pools = POOLS.get_or_init(Default::default).lock().expect("pool cache poisoned");
+    let mut pools = POOLS
+        .get_or_init(Default::default)
+        .lock()
+        .expect("pool cache poisoned");
     if let Some(p) = pools.get(&n) {
         return Ok(Some(Arc::clone(p)));
     }
     let p = Arc::new(
-        rayon::ThreadPoolBuilder::new().num_threads(n).build().map_err(|e| PyValueError::new_err(e.to_string()))?,
+        rayon::ThreadPoolBuilder::new()
+            .num_threads(n)
+            .build()
+            .map_err(|e| PyValueError::new_err(e.to_string()))?,
     );
     pools.insert(n, Arc::clone(&p));
     Ok(Some(p))
@@ -317,7 +414,13 @@ fn for_each_item(
 /// `threads=1` runs serially on the calling thread; `None` uses all cores (rayon).
 #[pyfunction]
 #[pyo3(signature = (images, kind="A", center=None, threads=None))]
-fn batch_features<'py>(py: Python<'py>, images: &Bound<'py, PyAny>, kind: &str, center: Option<(f64, f64)>, threads: Option<usize>) -> PyResult<Bound<'py, PyArray2<f64>>> {
+fn batch_features<'py>(
+    py: Python<'py>,
+    images: &Bound<'py, PyAny>,
+    kind: &str,
+    center: Option<(f64, f64)>,
+    threads: Option<usize>,
+) -> PyResult<Bound<'py, PyArray2<f64>>> {
     let rep = representation(kind)?;
     let (n, h, w, data) = stack_from(images)?;
     let params = params_for(w, h, center, 1)?;
@@ -334,13 +437,21 @@ fn batch_features<'py>(py: Python<'py>, images: &Bound<'py, PyAny>, kind: &str, 
             Ok::<_, CdchError>(out)
         })
         .map_err(err)?;
-    Ok(Array2::from_shape_vec((n, dim), out).expect("shape").into_pyarray(py))
+    Ok(Array2::from_shape_vec((n, dim), out)
+        .expect("shape")
+        .into_pyarray(py))
 }
 
 /// Batch canonical matrices: `(n, H, W, 3)` uint8 → `(n, n_rays, 256)` float64.
 #[pyfunction]
 #[pyo3(signature = (images, center=None, angle_step=1, threads=None))]
-fn batch_cdch<'py>(py: Python<'py>, images: &Bound<'py, PyAny>, center: Option<(f64, f64)>, angle_step: u32, threads: Option<usize>) -> PyResult<Bound<'py, PyArray3<f64>>> {
+fn batch_cdch<'py>(
+    py: Python<'py>,
+    images: &Bound<'py, PyAny>,
+    center: Option<(f64, f64)>,
+    angle_step: u32,
+    threads: Option<usize>,
+) -> PyResult<Bound<'py, PyArray3<f64>>> {
     let (n, h, w, data) = stack_from(images)?;
     let params = params_for(w, h, center, angle_step)?;
     let rows = params.n_rays();
@@ -359,7 +470,9 @@ fn batch_cdch<'py>(py: Python<'py>, images: &Bound<'py, PyAny>, center: Option<(
             Ok::<_, CdchError>(out)
         })
         .map_err(err)?;
-    Ok(Array3::from_shape_vec((n, rows, BINS), out).expect("shape").into_pyarray(py))
+    Ok(Array3::from_shape_vec((n, rows, BINS), out)
+        .expect("shape")
+        .into_pyarray(py))
 }
 
 /// Build metadata (for benchmark provenance).

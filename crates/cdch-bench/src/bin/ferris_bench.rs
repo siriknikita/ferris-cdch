@@ -34,7 +34,14 @@ struct Args {
 static ONLY: std::sync::OnceLock<Option<String>> = std::sync::OnceLock::new();
 
 fn parse() -> Args {
-    let mut a = Args { images: PathBuf::new(), warmup: 50, trials: 2000, out: PathBuf::from("reports/perf/rust_microbench.json"), batch_images: 4000, only: None };
+    let mut a = Args {
+        images: PathBuf::new(),
+        warmup: 50,
+        trials: 2000,
+        out: PathBuf::from("reports/perf/rust_microbench.json"),
+        batch_images: 4000,
+        only: None,
+    };
     let mut it = std::env::args().skip(1);
     while let Some(k) = it.next() {
         match k.as_str() {
@@ -51,7 +58,13 @@ fn parse() -> Args {
 }
 
 /// Time `f(image_index)` per call; returns summary in microseconds.
-fn bench(name: &str, n_images: usize, warmup: usize, trials: usize, mut f: impl FnMut(usize)) -> Value {
+fn bench(
+    name: &str,
+    n_images: usize,
+    warmup: usize,
+    trials: usize,
+    mut f: impl FnMut(usize),
+) -> Value {
     if let Some(Some(only)) = ONLY.get() {
         if !name.contains(only.as_str()) {
             return json!({"name": name, "skipped": true});
@@ -73,17 +86,30 @@ fn bench(name: &str, n_images: usize, warmup: usize, trials: usize, mut f: impl 
         "mean_us": us.iter().sum::<f64>() / us.len() as f64, "min_us": us.iter().cloned().fold(f64::INFINITY, f64::min),
         "throughput_img_s_at_median": 1e6 / median,
     });
-    eprintln!("{name:<44} median {median:>9.2} µs   p95 {:>9.2} µs", v["p95_us"].as_f64().unwrap());
+    eprintln!(
+        "{name:<44} median {median:>9.2} µs   p95 {:>9.2} µs",
+        v["p95_us"].as_f64().unwrap()
+    );
     v
 }
 
 fn main() {
     let args = parse();
     ONLY.set(args.only.clone()).unwrap();
-    let images: Vec<OwnedRgb> = png_files(&args.images).iter().map(|p| read_png(p).unwrap()).collect();
-    assert!(!images.is_empty(), "no PNG images in {}", args.images.display());
+    let images: Vec<OwnedRgb> = png_files(&args.images)
+        .iter()
+        .map(|p| read_png(p).unwrap())
+        .collect();
+    assert!(
+        !images.is_empty(),
+        "no PNG images in {}",
+        args.images.display()
+    );
     let (w, h) = (images[0].width, images[0].height);
-    let images: Vec<OwnedRgb> = images.into_iter().filter(|i| i.width == w && i.height == h).collect();
+    let images: Vec<OwnedRgb> = images
+        .into_iter()
+        .filter(|i| i.width == w && i.height == h)
+        .collect();
     let n = images.len();
     eprintln!("ferris-bench: {n} images of {w}x{h}");
     let params = Params::archived(w, h);
@@ -98,45 +124,114 @@ fn main() {
     let plan_info = json!({"rays": plan.n_rays(), "total_samples": plan.total_samples(), "unique_pixels": plan.unique_pixels().len(), "heap_bytes": plan.heap_bytes()});
 
     // Correctness-first reference port (allocates its output).
-    results.push(bench("core_reference_matrix", n, warm.min(10), trials.min(500), |i| {
-        black_box(reference::cdch(&images[i].view(), &params).unwrap());
-    }));
+    results.push(bench(
+        "core_reference_matrix",
+        n,
+        warm.min(10),
+        trials.min(500),
+        |i| {
+            black_box(reference::cdch(&images[i].view(), &params).unwrap());
+        },
+    ));
 
     let mut ws = Workspace::new();
     let mut matrix = vec![0.0; plan.n_rays() * BINS];
     results.push(bench("core_engine_matrix_into", n, warm, trials, |i| {
-        plan.matrix_into(&images[i].view(), &mut ws, &mut matrix).unwrap();
+        plan.matrix_into(&images[i].view(), &mut ws, &mut matrix)
+            .unwrap();
         black_box(&matrix);
     }));
     results.push(bench("core_engine_matrix_alloc", n, warm, trials, |i| {
         black_box(plan.matrix(&images[i].view(), &mut ws).unwrap());
     }));
     let mut cp = vec![0.0; plan.n_rays() * CHECKPOINTS];
-    results.push(bench("core_engine_checkpoints_into", n, warm, trials, |i| {
-        plan.checkpoints_into(&images[i].view(), &mut ws, &mut cp).unwrap();
-        black_box(&cp);
-    }));
+    results.push(bench(
+        "core_engine_checkpoints_into",
+        n,
+        warm,
+        trials,
+        |i| {
+            plan.checkpoints_into(&images[i].view(), &mut ws, &mut cp)
+                .unwrap();
+            black_box(&cp);
+        },
+    ));
     results.push(bench("core_engine_histograms_u32", n, warm, trials, |i| {
         black_box(plan.histograms(&images[i].view(), &mut ws).unwrap());
     }));
+    let mut counts = vec![0u32; plan.n_rays() * BINS];
+    results.push(bench(
+        "core_engine_histograms_and_matrix_into",
+        n,
+        warm,
+        trials,
+        |i| {
+            plan.histograms_and_matrix_into(&images[i].view(), &mut ws, &mut counts, &mut matrix)
+                .unwrap();
+            black_box((&counts, &matrix));
+        },
+    ));
+
+    // Public API (`ferris-cdch`): plan cache lookup, allocation of the result, and
+    // (for `compute`) counts plus ray lengths in addition to the matrix.
+    let analyzer = ferris_cdch::Analyzer::new();
+    let config = ferris_cdch::CdchConfig::archived();
+    results.push(bench("ferris_cdch_analyzer_matrix", n, warm, trials, |i| {
+        black_box(analyzer.matrix(&images[i].view(), &config).unwrap());
+    }));
+    results.push(bench(
+        "ferris_cdch_analyzer_compute",
+        n,
+        warm,
+        trials,
+        |i| {
+            black_box(analyzer.compute(&images[i].view(), &config).unwrap());
+        },
+    ));
+    results.push(bench(
+        "ferris_cdch_compute_cold_plan",
+        n,
+        warm.min(10),
+        trials.min(300),
+        |i| {
+            black_box(ferris_cdch::compute(&images[i].view(), &config).unwrap());
+        },
+    ));
 
     // Feature construction alone, from precomputed matrices / checkpoints.
-    let matrices: Vec<Vec<f64>> = images.iter().map(|im| plan.matrix(&im.view(), &mut ws).unwrap().into_vec()).collect();
-    let cps: Vec<Vec<f64>> = images.iter().map(|im| plan.checkpoints(&im.view(), &mut ws).unwrap().values).collect();
+    let matrices: Vec<Vec<f64>> = images
+        .iter()
+        .map(|im| plan.matrix(&im.view(), &mut ws).unwrap().into_vec())
+        .collect();
+    let cps: Vec<Vec<f64>> = images
+        .iter()
+        .map(|im| plan.checkpoints(&im.view(), &mut ws).unwrap().values)
+        .collect();
     let mut out_a = vec![0.0; 56];
     let mut out_b = vec![0.0; 98];
     let mut out_c = vec![0.0; 768];
     let mut out_r = vec![0.0; 42];
     let (mut sampled, mut scratch) = (Vec::new(), Vec::new());
-    results.push(bench("features_A_from_matrix(validate+stats)", n, warm, trials, |i| {
-        cdch_features::compact(&MatrixView::new(360, &matrices[i]).unwrap(), &mut out_a).unwrap();
-        black_box(&out_a);
-    }));
+    results.push(bench(
+        "features_A_from_matrix(validate+stats)",
+        n,
+        warm,
+        trials,
+        |i| {
+            cdch_features::compact(&MatrixView::new(360, &matrices[i]).unwrap(), &mut out_a)
+                .unwrap();
+            black_box(&out_a);
+        },
+    ));
     results.push(bench("features_validate_matrix", n, warm, trials, |i| {
-        black_box(cdch_features::validate_matrix(&MatrixView::new(360, &matrices[i]).unwrap()).unwrap());
+        let validated =
+            cdch_features::validate_matrix(&MatrixView::new(360, &matrices[i]).unwrap());
+        black_box(&validated);
+        validated.unwrap();
     }));
     results.push(bench("features_A_from_checkpoints", n, warm, trials, |i| {
-        cdch_features::compact_from_checkpoints(&cps[i], &mut sampled, &mut scratch, &mut out_a).unwrap();
+        cdch_features::compact_from_checkpoints(&cps[i], &mut sampled, &mut scratch, &mut out_a)
+            .unwrap();
         black_box(&out_a);
     }));
     results.push(bench("features_rich42_from_matrix", n, warm, trials, |i| {
@@ -158,22 +253,35 @@ fn main() {
 
     // End-to-end single image (pixels -> representation), fused vs unfused.
     let mut fx = FeatureExtractor::new();
-    for (rep, out) in [(Representation::A, &mut out_a), (Representation::B, &mut out_b), (Representation::C, &mut out_c)] {
+    for (rep, out) in [
+        (Representation::A, &mut out_a),
+        (Representation::B, &mut out_b),
+        (Representation::C, &mut out_c),
+    ] {
         results.push(bench(&format!("e2e_{rep:?}_fused"), n, warm, trials, |i| {
             fx.extract(&images[i].view(), &params, rep, out).unwrap();
             black_box(&*out);
         }));
-        results.push(bench(&format!("e2e_{rep:?}_via_matrix"), n, warm, trials, |i| {
-            fx.extract_via_matrix(&images[i].view(), &params, rep, out).unwrap();
-            black_box(&*out);
-        }));
+        results.push(bench(
+            &format!("e2e_{rep:?}_via_matrix"),
+            n,
+            warm,
+            trials,
+            |i| {
+                fx.extract_via_matrix(&images[i].view(), &params, rep, out)
+                    .unwrap();
+                black_box(&*out);
+            },
+        ));
     }
 
     // Batch throughput (A, fused), 1..N threads.
     let engine = Arc::new(Engine::new());
     let total = args.batch_images;
     let mut batch = Vec::new();
-    let max_threads = std::thread::available_parallelism().map(|x| x.get()).unwrap_or(1);
+    let max_threads = std::thread::available_parallelism()
+        .map(|x| x.get())
+        .unwrap_or(1);
     let mut counts: Vec<usize> = vec![1, 2, 4, 8];
     counts.push(max_threads);
     counts.retain(|&t| t <= max_threads);
@@ -182,7 +290,10 @@ fn main() {
         counts.clear();
     }
     for &threads in &counts {
-        let pool = rayon::ThreadPoolBuilder::new().num_threads(threads).build().unwrap();
+        let pool = rayon::ThreadPoolBuilder::new()
+            .num_threads(threads)
+            .build()
+            .unwrap();
         for rep in [Representation::A, Representation::B, Representation::C] {
             let dim = rep.dim();
             let mut out = vec![0.0; total * dim];
@@ -190,7 +301,10 @@ fn main() {
                 pool.install(|| {
                     out.par_chunks_mut(dim).enumerate().for_each_init(
                         || FeatureExtractor::with_engine(Arc::clone(&engine)),
-                        |fx, (i, dst)| fx.extract(&images[i % n].view(), &params, rep, dst).unwrap(),
+                        |fx, (i, dst)| {
+                            fx.extract(&images[i % n].view(), &params, rep, dst)
+                                .unwrap()
+                        },
                     )
                 })
             };

@@ -30,7 +30,11 @@ pub fn cdch(img: &RgbImage<'_>, params: &Params) -> Result<CdchMatrix> {
 }
 
 /// Canonical CDCH plus a full per-ray trace (coordinates, multiplicities, counts).
-pub fn cdch_traced(img: &RgbImage<'_>, params: &Params, trig: Trig) -> Result<(CdchMatrix, Vec<RayTrace>)> {
+pub fn cdch_traced(
+    img: &RgbImage<'_>,
+    params: &Params,
+    trig: Trig,
+) -> Result<(CdchMatrix, Vec<RayTrace>)> {
     let mut traces = Vec::with_capacity(params.n_rays());
     let m = cdch_with(img, params, trig, Some(&mut traces))?;
     Ok((m, traces))
@@ -86,7 +90,11 @@ pub fn cdch_with(
         // const cumulativeHist = calculateCumulativeHistogram(rayHistogram);
         calculate_cumulative_histogram(&ray_histogram, &mut data);
         if let Some(t) = trace.as_deref_mut() {
-            t.push(RayTrace { angle, coords, counts: ray_histogram.to_vec() });
+            t.push(RayTrace {
+                angle,
+                coords,
+                counts: ray_histogram.to_vec(),
+            });
         }
         angle += params.angle_step;
     }

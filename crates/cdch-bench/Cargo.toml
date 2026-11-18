@@ -10,6 +10,8 @@ publish.workspace = true
 [dependencies]
 cdch-core.workspace = true
 cdch-features.workspace = true
+# The public facade is checked against the oracle as well.
+ferris-cdch.workspace = true
 # Shared PNG decoding (cdch_cli::read_png).
 cdch-cli = { path = "../cdch-cli" }
 # JSON reports and the oracle wire protocol. `float_roundtrip` makes number parsing

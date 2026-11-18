@@ -21,8 +21,8 @@
 
 #![forbid(unsafe_code)]
 
-pub mod numpy_compat;
 mod extractor;
+pub mod numpy_compat;
 
 pub use extractor::FeatureExtractor;
 
@@ -79,7 +79,10 @@ impl Representation {
 /// (`|x - 1| <= 1e-8 + 1e-5`), and `np.diff(cdf, axis=1) >= -1e-12`.
 pub fn validate_matrix(m: &MatrixView<'_>) -> Result<()> {
     if m.rows() != RAYS_ARCHIVED {
-        return Err(CdchError::RayCount { expected: RAYS_ARCHIVED, actual: m.rows() });
+        return Err(CdchError::RayCount {
+            expected: RAYS_ARCHIVED,
+            actual: m.rows(),
+        });
     }
     // One branch-light pass; errors are reported in the order descriptor() checks them.
     let (mut non_finite, mut negative) = (false, false);
@@ -102,13 +105,17 @@ pub fn validate_matrix(m: &MatrixView<'_>) -> Result<()> {
         }
     }
     if non_finite {
-        return Err(CdchError::InvalidMatrix("non-finite values (empty ray?)".into()));
+        return Err(CdchError::InvalidMatrix(
+            "non-finite values (empty ray?)".into(),
+        ));
     }
     if negative {
         return Err(CdchError::InvalidMatrix("negative values".into()));
     }
     if let Some(i) = unterminated {
-        return Err(CdchError::InvalidMatrix(format!("row {i} does not end at 1")));
+        return Err(CdchError::InvalidMatrix(format!(
+            "row {i} does not end at 1"
+        )));
     }
     if let Some(i) = non_monotone {
         return Err(CdchError::InvalidMatrix(format!("row {i} is not monotone")));
@@ -254,9 +261,17 @@ pub(crate) fn compact_prevalidated(m: &MatrixView<'_>, out: &mut [f64]) {
 /// Representation A from the `360 x 32` checkpoint matrix (fused path). The caller
 /// must establish validity (every ray non-empty), which for the canonical engine
 /// is a property of the sampling plan.
-pub fn compact_from_checkpoints(cp: &[f64], sampled: &mut Vec<f64>, scratch: &mut Vec<f64>, out: &mut [f64]) -> Result<()> {
+pub fn compact_from_checkpoints(
+    cp: &[f64],
+    sampled: &mut Vec<f64>,
+    scratch: &mut Vec<f64>,
+    out: &mut [f64],
+) -> Result<()> {
     if cp.len() != RAYS_ARCHIVED * CHECKPOINTS {
-        return Err(CdchError::RayCount { expected: RAYS_ARCHIVED, actual: cp.len() / CHECKPOINTS });
+        return Err(CdchError::RayCount {
+            expected: RAYS_ARCHIVED,
+            actual: cp.len() / CHECKPOINTS,
+        });
     }
     sampled.clear();
     for i in 0..RAYS_ARCHIVED {
@@ -272,7 +287,10 @@ pub fn compact_from_checkpoints(cp: &[f64], sampled: &mut Vec<f64>, scratch: &mu
 /// `cdf[:, 7::8].reshape(24, 15, 32).mean(axis=1).ravel()` (sequential sum over 15 rays).
 pub fn sector(m: &MatrixView<'_>, out: &mut [f64]) -> Result<()> {
     if m.rows() != RAYS_ARCHIVED {
-        return Err(CdchError::RayCount { expected: RAYS_ARCHIVED, actual: m.rows() });
+        return Err(CdchError::RayCount {
+            expected: RAYS_ARCHIVED,
+            actual: m.rows(),
+        });
     }
     sector_by(|i, j| m.at(i, 8 * j + 7), out);
     Ok(())
@@ -281,7 +299,10 @@ pub fn sector(m: &MatrixView<'_>, out: &mut [f64]) -> Result<()> {
 /// Representation C (and D) from the checkpoint matrix (fused path).
 pub fn sector_from_checkpoints(cp: &[f64], out: &mut [f64]) -> Result<()> {
     if cp.len() != RAYS_ARCHIVED * CHECKPOINTS {
-        return Err(CdchError::RayCount { expected: RAYS_ARCHIVED, actual: cp.len() / CHECKPOINTS });
+        return Err(CdchError::RayCount {
+            expected: RAYS_ARCHIVED,
+            actual: cp.len() / CHECKPOINTS,
+        });
     }
     sector_by(|i, j| cp[i * CHECKPOINTS + j], out);
     Ok(())
@@ -336,14 +357,41 @@ pub fn rich(m: &MatrixView<'_>, out: &mut [f64]) {
         // products are signed zeros and libm is skipped with bit-identical results:
         // ±0·pow(c,3) = ±0·c (pow keeps c's sign), ±0·pow(c,4) = ±0·1, and
         // ±0·log2(max(±0, 1e-300)) = ∓0 because log2(1e-300) < 0.
-        let c3 = sum(&|b| if pmf[b] == 0.0 { pmf[b] * centered[b] } else { pmf[b] * centered[b].powf(3.0) }, BINS);
-        let c4 = sum(&|b| if pmf[b] == 0.0 { pmf[b] } else { pmf[b] * centered[b].powf(4.0) }, BINS);
+        let c3 = sum(
+            &|b| {
+                if pmf[b] == 0.0 {
+                    pmf[b] * centered[b]
+                } else {
+                    pmf[b] * centered[b].powf(3.0)
+                }
+            },
+            BINS,
+        );
+        let c4 = sum(
+            &|b| {
+                if pmf[b] == 0.0 {
+                    pmf[b]
+                } else {
+                    pmf[b] * centered[b].powf(4.0)
+                }
+            },
+            BINS,
+        );
         let (skew, kurt) = if variance > 1e-10 {
             (c3 / variance.powf(1.5), c4 / (variance * variance))
         } else {
             (0.0, 0.0)
         };
-        let entropy = -sum(&|b| if pmf[b] == 0.0 { -pmf[b] } else { pmf[b] * pmf[b].max(1e-300).log2() }, BINS) / 8.0;
+        let entropy = -sum(
+            &|b| {
+                if pmf[b] == 0.0 {
+                    -pmf[b]
+                } else {
+                    pmf[b] * pmf[b].max(1e-300).log2()
+                }
+            },
+            BINS,
+        ) / 8.0;
         let concentration = sum(&|b| pmf[b] * pmf[b], BINS);
         let max_mass = pmf.iter().copied().fold(f64::NEG_INFINITY, f64::max);
         let mad = sum(&|b| (pmf[b + 1] - pmf[b]).abs(), BINS - 1) / (BINS - 1) as f64;
@@ -351,7 +399,13 @@ pub fn rich(m: &MatrixView<'_>, out: &mut [f64]) {
             // (cdf >= p).argmax() / 255 — 0 when no bin qualifies.
             cdf.iter().position(|&v| v >= p).unwrap_or(0) as f64 / 255.0
         };
-        let qs = [quantile(0.1), quantile(0.25), quantile(0.5), quantile(0.75), quantile(0.9)];
+        let qs = [
+            quantile(0.1),
+            quantile(0.25),
+            quantile(0.5),
+            quantile(0.75),
+            quantile(0.9),
+        ];
         let vals = [
             mean,
             variance.sqrt(),
@@ -398,7 +452,10 @@ pub fn enriched(m: &MatrixView<'_>, out: &mut [f64]) -> Result<()> {
 /// Any representation from the full matrix.
 pub fn from_matrix(m: &MatrixView<'_>, rep: Representation, out: &mut [f64]) -> Result<()> {
     if out.len() != rep.dim() {
-        return Err(CdchError::BufferSize { expected: rep.dim(), actual: out.len() });
+        return Err(CdchError::BufferSize {
+            expected: rep.dim(),
+            actual: out.len(),
+        });
     }
     match rep {
         Representation::A => compact(m, out),
@@ -439,9 +496,27 @@ mod rich_shortcut_tests {
         let mean = pairwise_sum_by(BINS, &|b| pmf[b] * bins[b]);
         let c: Vec<f64> = bins.iter().map(|x| x - mean).collect();
         [
-            pairwise_sum_by(BINS, &|b| if pmf[b] == 0.0 { pmf[b] * c[b] } else { pmf[b] * c[b].powf(3.0) }),
-            pairwise_sum_by(BINS, &|b| if pmf[b] == 0.0 { pmf[b] } else { pmf[b] * c[b].powf(4.0) }),
-            pairwise_sum_by(BINS, &|b| if pmf[b] == 0.0 { -pmf[b] } else { pmf[b] * pmf[b].max(1e-300).log2() }),
+            pairwise_sum_by(BINS, &|b| {
+                if pmf[b] == 0.0 {
+                    pmf[b] * c[b]
+                } else {
+                    pmf[b] * c[b].powf(3.0)
+                }
+            }),
+            pairwise_sum_by(BINS, &|b| {
+                if pmf[b] == 0.0 {
+                    pmf[b]
+                } else {
+                    pmf[b] * c[b].powf(4.0)
+                }
+            }),
+            pairwise_sum_by(BINS, &|b| {
+                if pmf[b] == 0.0 {
+                    -pmf[b]
+                } else {
+                    pmf[b] * pmf[b].max(1e-300).log2()
+                }
+            }),
         ]
     }
 
@@ -473,7 +548,13 @@ mod rich_shortcut_tests {
             }
             let (a, b) = (per_ray_reference(&cdf), per_ray_shortcut(&cdf));
             for k in 0..3 {
-                assert_eq!(a[k].to_bits(), b[k].to_bits(), "case {case} term {k}: {} vs {}", a[k], b[k]);
+                assert_eq!(
+                    a[k].to_bits(),
+                    b[k].to_bits(),
+                    "case {case} term {k}: {} vs {}",
+                    a[k],
+                    b[k]
+                );
             }
         }
     }

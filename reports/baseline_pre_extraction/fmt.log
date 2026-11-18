@@ -1,0 +1,2480 @@
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_bench.rs:34:
+ static ONLY: std::sync::OnceLock<Option<String>> = std::sync::OnceLock::new();
+ 
+ fn parse() -> Args {
+[31m-    let mut a = Args { images: PathBuf::new(), warmup: 50, trials: 2000, out: PathBuf::from("reports/perf/rust_microbench.json"), batch_images: 4000, only: None };
+(B[m[32m+    let mut a = Args {
+(B[m[32m+        images: PathBuf::new(),
+(B[m[32m+        warmup: 50,
+(B[m[32m+        trials: 2000,
+(B[m[32m+        out: PathBuf::from("reports/perf/rust_microbench.json"),
+(B[m[32m+        batch_images: 4000,
+(B[m[32m+        only: None,
+(B[m[32m+    };
+(B[m     let mut it = std::env::args().skip(1);
+     while let Some(k) = it.next() {
+         match k.as_str() {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_bench.rs:51:
+ }
+ 
+ /// Time `f(image_index)` per call; returns summary in microseconds.
+[31m-fn bench(name: &str, n_images: usize, warmup: usize, trials: usize, mut f: impl FnMut(usize)) -> Value {
+(B[m[32m+fn bench(
+(B[m[32m+    name: &str,
+(B[m[32m+    n_images: usize,
+(B[m[32m+    warmup: usize,
+(B[m[32m+    trials: usize,
+(B[m[32m+    mut f: impl FnMut(usize),
+(B[m[32m+) -> Value {
+(B[m     if let Some(Some(only)) = ONLY.get() {
+         if !name.contains(only.as_str()) {
+             return json!({"name": name, "skipped": true});
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_bench.rs:73:
+         "mean_us": us.iter().sum::<f64>() / us.len() as f64, "min_us": us.iter().cloned().fold(f64::INFINITY, f64::min),
+         "throughput_img_s_at_median": 1e6 / median,
+     });
+[31m-    eprintln!("{name:<44} median {median:>9.2} µs   p95 {:>9.2} µs", v["p95_us"].as_f64().unwrap());
+(B[m[32m+    eprintln!(
+(B[m[32m+        "{name:<44} median {median:>9.2} µs   p95 {:>9.2} µs",
+(B[m[32m+        v["p95_us"].as_f64().unwrap()
+(B[m[32m+    );
+(B[m     v
+ }
+ 
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_bench.rs:80:
+ fn main() {
+     let args = parse();
+     ONLY.set(args.only.clone()).unwrap();
+[31m-    let images: Vec<OwnedRgb> = png_files(&args.images).iter().map(|p| read_png(p).unwrap()).collect();
+(B[m[31m-    assert!(!images.is_empty(), "no PNG images in {}", args.images.display());
+(B[m[32m+    let images: Vec<OwnedRgb> = png_files(&args.images)
+(B[m[32m+        .iter()
+(B[m[32m+        .map(|p| read_png(p).unwrap())
+(B[m[32m+        .collect();
+(B[m[32m+    assert!(
+(B[m[32m+        !images.is_empty(),
+(B[m[32m+        "no PNG images in {}",
+(B[m[32m+        args.images.display()
+(B[m[32m+    );
+(B[m     let (w, h) = (images[0].width, images[0].height);
+[31m-    let images: Vec<OwnedRgb> = images.into_iter().filter(|i| i.width == w && i.height == h).collect();
+(B[m[32m+    let images: Vec<OwnedRgb> = images
+(B[m[32m+        .into_iter()
+(B[m[32m+        .filter(|i| i.width == w && i.height == h)
+(B[m[32m+        .collect();
+(B[m     let n = images.len();
+     eprintln!("ferris-bench: {n} images of {w}x{h}");
+     let params = Params::archived(w, h);
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_bench.rs:98:
+     let plan_info = json!({"rays": plan.n_rays(), "total_samples": plan.total_samples(), "unique_pixels": plan.unique_pixels().len(), "heap_bytes": plan.heap_bytes()});
+ 
+     // Correctness-first reference port (allocates its output).
+[31m-    results.push(bench("core_reference_matrix", n, warm.min(10), trials.min(500), |i| {
+(B[m[31m-        black_box(reference::cdch(&images[i].view(), &params).unwrap());
+(B[m[31m-    }));
+(B[m[32m+    results.push(bench(
+(B[m[32m+        "core_reference_matrix",
+(B[m[32m+        n,
+(B[m[32m+        warm.min(10),
+(B[m[32m+        trials.min(500),
+(B[m[32m+        |i| {
+(B[m[32m+            black_box(reference::cdch(&images[i].view(), &params).unwrap());
+(B[m[32m+        },
+(B[m[32m+    ));
+(B[m 
+     let mut ws = Workspace::new();
+     let mut matrix = vec![0.0; plan.n_rays() * BINS];
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_bench.rs:107:
+     results.push(bench("core_engine_matrix_into", n, warm, trials, |i| {
+[31m-        plan.matrix_into(&images[i].view(), &mut ws, &mut matrix).unwrap();
+(B[m[32m+        plan.matrix_into(&images[i].view(), &mut ws, &mut matrix)
+(B[m[32m+            .unwrap();
+(B[m         black_box(&matrix);
+     }));
+     results.push(bench("core_engine_matrix_alloc", n, warm, trials, |i| {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_bench.rs:112:
+         black_box(plan.matrix(&images[i].view(), &mut ws).unwrap());
+     }));
+     let mut cp = vec![0.0; plan.n_rays() * CHECKPOINTS];
+[31m-    results.push(bench("core_engine_checkpoints_into", n, warm, trials, |i| {
+(B[m[31m-        plan.checkpoints_into(&images[i].view(), &mut ws, &mut cp).unwrap();
+(B[m[31m-        black_box(&cp);
+(B[m[31m-    }));
+(B[m[32m+    results.push(bench(
+(B[m[32m+        "core_engine_checkpoints_into",
+(B[m[32m+        n,
+(B[m[32m+        warm,
+(B[m[32m+        trials,
+(B[m[32m+        |i| {
+(B[m[32m+            plan.checkpoints_into(&images[i].view(), &mut ws, &mut cp)
+(B[m[32m+                .unwrap();
+(B[m[32m+            black_box(&cp);
+(B[m[32m+        },
+(B[m[32m+    ));
+(B[m     results.push(bench("core_engine_histograms_u32", n, warm, trials, |i| {
+         black_box(plan.histograms(&images[i].view(), &mut ws).unwrap());
+     }));
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_bench.rs:122:
+ 
+     // Feature construction alone, from precomputed matrices / checkpoints.
+[31m-    let matrices: Vec<Vec<f64>> = images.iter().map(|im| plan.matrix(&im.view(), &mut ws).unwrap().into_vec()).collect();
+(B[m[31m-    let cps: Vec<Vec<f64>> = images.iter().map(|im| plan.checkpoints(&im.view(), &mut ws).unwrap().values).collect();
+(B[m[32m+    let matrices: Vec<Vec<f64>> = images
+(B[m[32m+        .iter()
+(B[m[32m+        .map(|im| plan.matrix(&im.view(), &mut ws).unwrap().into_vec())
+(B[m[32m+        .collect();
+(B[m[32m+    let cps: Vec<Vec<f64>> = images
+(B[m[32m+        .iter()
+(B[m[32m+        .map(|im| plan.checkpoints(&im.view(), &mut ws).unwrap().values)
+(B[m[32m+        .collect();
+(B[m     let mut out_a = vec![0.0; 56];
+     let mut out_b = vec![0.0; 98];
+     let mut out_c = vec![0.0; 768];
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_bench.rs:129:
+     let mut out_r = vec![0.0; 42];
+     let (mut sampled, mut scratch) = (Vec::new(), Vec::new());
+[31m-    results.push(bench("features_A_from_matrix(validate+stats)", n, warm, trials, |i| {
+(B[m[31m-        cdch_features::compact(&MatrixView::new(360, &matrices[i]).unwrap(), &mut out_a).unwrap();
+(B[m[31m-        black_box(&out_a);
+(B[m[31m-    }));
+(B[m[32m+    results.push(bench(
+(B[m[32m+        "features_A_from_matrix(validate+stats)",
+(B[m[32m+        n,
+(B[m[32m+        warm,
+(B[m[32m+        trials,
+(B[m[32m+        |i| {
+(B[m[32m+            cdch_features::compact(&MatrixView::new(360, &matrices[i]).unwrap(), &mut out_a)
+(B[m[32m+                .unwrap();
+(B[m[32m+            black_box(&out_a);
+(B[m[32m+        },
+(B[m[32m+    ));
+(B[m     results.push(bench("features_validate_matrix", n, warm, trials, |i| {
+[31m-        black_box(cdch_features::validate_matrix(&MatrixView::new(360, &matrices[i]).unwrap()).unwrap());
+(B[m[32m+        black_box(
+(B[m[32m+            cdch_features::validate_matrix(&MatrixView::new(360, &matrices[i]).unwrap()).unwrap(),
+(B[m[32m+        );
+(B[m     }));
+     results.push(bench("features_A_from_checkpoints", n, warm, trials, |i| {
+[31m-        cdch_features::compact_from_checkpoints(&cps[i], &mut sampled, &mut scratch, &mut out_a).unwrap();
+(B[m[32m+        cdch_features::compact_from_checkpoints(&cps[i], &mut sampled, &mut scratch, &mut out_a)
+(B[m[32m+            .unwrap();
+(B[m         black_box(&out_a);
+     }));
+     results.push(bench("features_rich42_from_matrix", n, warm, trials, |i| {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_bench.rs:158:
+ 
+     // End-to-end single image (pixels -> representation), fused vs unfused.
+     let mut fx = FeatureExtractor::new();
+[31m-    for (rep, out) in [(Representation::A, &mut out_a), (Representation::B, &mut out_b), (Representation::C, &mut out_c)] {
+(B[m[32m+    for (rep, out) in [
+(B[m[32m+        (Representation::A, &mut out_a),
+(B[m[32m+        (Representation::B, &mut out_b),
+(B[m[32m+        (Representation::C, &mut out_c),
+(B[m[32m+    ] {
+(B[m         results.push(bench(&format!("e2e_{rep:?}_fused"), n, warm, trials, |i| {
+             fx.extract(&images[i].view(), &params, rep, out).unwrap();
+             black_box(&*out);
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_bench.rs:165:
+         }));
+[31m-        results.push(bench(&format!("e2e_{rep:?}_via_matrix"), n, warm, trials, |i| {
+(B[m[31m-            fx.extract_via_matrix(&images[i].view(), &params, rep, out).unwrap();
+(B[m[31m-            black_box(&*out);
+(B[m[31m-        }));
+(B[m[32m+        results.push(bench(
+(B[m[32m+            &format!("e2e_{rep:?}_via_matrix"),
+(B[m[32m+            n,
+(B[m[32m+            warm,
+(B[m[32m+            trials,
+(B[m[32m+            |i| {
+(B[m[32m+                fx.extract_via_matrix(&images[i].view(), &params, rep, out)
+(B[m[32m+                    .unwrap();
+(B[m[32m+                black_box(&*out);
+(B[m[32m+            },
+(B[m[32m+        ));
+(B[m     }
+ 
+     // Batch throughput (A, fused), 1..N threads.
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_bench.rs:173:
+     let engine = Arc::new(Engine::new());
+     let total = args.batch_images;
+     let mut batch = Vec::new();
+[31m-    let max_threads = std::thread::available_parallelism().map(|x| x.get()).unwrap_or(1);
+(B[m[32m+    let max_threads = std::thread::available_parallelism()
+(B[m[32m+        .map(|x| x.get())
+(B[m[32m+        .unwrap_or(1);
+(B[m     let mut counts: Vec<usize> = vec![1, 2, 4, 8];
+     counts.push(max_threads);
+     counts.retain(|&t| t <= max_threads);
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_bench.rs:182:
+         counts.clear();
+     }
+     for &threads in &counts {
+[31m-        let pool = rayon::ThreadPoolBuilder::new().num_threads(threads).build().unwrap();
+(B[m[32m+        let pool = rayon::ThreadPoolBuilder::new()
+(B[m[32m+            .num_threads(threads)
+(B[m[32m+            .build()
+(B[m[32m+            .unwrap();
+(B[m         for rep in [Representation::A, Representation::B, Representation::C] {
+             let dim = rep.dim();
+             let mut out = vec![0.0; total * dim];
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_bench.rs:190:
+                 pool.install(|| {
+                     out.par_chunks_mut(dim).enumerate().for_each_init(
+                         || FeatureExtractor::with_engine(Arc::clone(&engine)),
+[31m-                        |fx, (i, dst)| fx.extract(&images[i % n].view(), &params, rep, dst).unwrap(),
+(B[m[32m+                        |fx, (i, dst)| {
+(B[m[32m+                            fx.extract(&images[i % n].view(), &params, rep, dst)
+(B[m[32m+                                .unwrap()
+(B[m[32m+                        },
+(B[m                     )
+                 })
+             };
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_diff.rs:75:
+             let (w, h) = (img.width, img.height);
+             // Pilot-style centre crop (128 px), archived centre.
+             let c = img.crop((w - 128) / 2, (h - 128) / 2, 128, 128);
+[31m-            out.push(Case { id: format!("div2k_{stem}_crop128"), category: "natural", img: c, center: Some((64.0, 64.0)), angle_step: 1 });
+(B[m[32m+            out.push(Case {
+(B[m[32m+                id: format!("div2k_{stem}_crop128"),
+(B[m[32m+                category: "natural",
+(B[m[32m+                img: c,
+(B[m[32m+                center: Some((64.0, 64.0)),
+(B[m[32m+                angle_step: 1,
+(B[m[32m+            });
+(B[m             if i % 10 == 0 {
+                 let c = img.crop((w - 500) / 2, (h - 333) / 2, 500, 333);
+[31m-                out.push(Case { id: format!("div2k_{stem}_crop500x333"), category: "natural", img: c, center: Some((250.0, 166.0)), angle_step: 1 });
+(B[m[32m+                out.push(Case {
+(B[m[32m+                    id: format!("div2k_{stem}_crop500x333"),
+(B[m[32m+                    category: "natural",
+(B[m[32m+                    img: c,
+(B[m[32m+                    center: Some((250.0, 166.0)),
+(B[m[32m+                    angle_step: 1,
+(B[m[32m+                });
+(B[m                 let c = img.crop(0, 0, 255, 255);
+[31m-                out.push(Case { id: format!("div2k_{stem}_crop255_halfcentre"), category: "natural", img: c, center: Some((127.5, 127.5)), angle_step: 1 });
+(B[m[32m+                out.push(Case {
+(B[m[32m+                    id: format!("div2k_{stem}_crop255_halfcentre"),
+(B[m[32m+                    category: "natural",
+(B[m[32m+                    img: c,
+(B[m[32m+                    center: Some((127.5, 127.5)),
+(B[m[32m+                    angle_step: 1,
+(B[m[32m+                });
+(B[m             }
+             if i % 50 == 0 {
+[31m-                out.push(Case { id: format!("div2k_{stem}_full_{w}x{h}"), category: "natural_full", img: img.clone(), center: Some(((w / 2) as f64, (h / 2) as f64)), angle_step: 1 });
+(B[m[32m+                out.push(Case {
+(B[m[32m+                    id: format!("div2k_{stem}_full_{w}x{h}"),
+(B[m[32m+                    category: "natural_full",
+(B[m[32m+                    img: img.clone(),
+(B[m[32m+                    center: Some(((w / 2) as f64, (h / 2) as f64)),
+(B[m[32m+                    angle_step: 1,
+(B[m[32m+                });
+(B[m             }
+         }
+     }
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_diff.rs:90:
+     for (label, dir) in &args.png_dirs {
+         for path in png_files(dir).into_iter().take(args.png_limit) {
+             let img = read_png(&path).expect("decode PNG");
+[31m-            let rel = path.strip_prefix(dir).unwrap_or(&path).to_string_lossy().to_string();
+(B[m[32m+            let rel = path
+(B[m[32m+                .strip_prefix(dir)
+(B[m[32m+                .unwrap_or(&path)
+(B[m[32m+                .to_string_lossy()
+(B[m[32m+                .to_string();
+(B[m             let center = Some(((img.width / 2) as f64, (img.height / 2) as f64));
+[31m-            out.push(Case { id: format!("{label}:{rel}"), category: "pilot_pairs", img, center, angle_step: 1 });
+(B[m[32m+            out.push(Case {
+(B[m[32m+                id: format!("{label}:{rel}"),
+(B[m[32m+                category: "pilot_pairs",
+(B[m[32m+                img,
+(B[m[32m+                center,
+(B[m[32m+                angle_step: 1,
+(B[m[32m+            });
+(B[m         }
+     }
+     out
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_diff.rs:106:
+         Some((x, y)) => Center::new(x, y),
+         None => Center::midpoint(w, h),
+     };
+[31m-    let params = Params { center, angle_step: case.angle_step };
+(B[m[32m+    let params = Params {
+(B[m[32m+        center,
+(B[m[32m+        angle_step: case.angle_step,
+(B[m[32m+    };
+(B[m 
+[31m-    let js = oracle.compute(img, case.center, case.angle_step, true).expect("oracle");
+(B[m[32m+    let js = oracle
+(B[m[32m+        .compute(img, case.center, case.angle_step, true)
+(B[m[32m+        .expect("oracle");
+(B[m     let trace = js.trace.as_ref().expect("trace");
+ 
+     let t0 = Instant::now();
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_diff.rs:129:
+     let mut mismatches: Vec<String> = Vec::new();
+     let center_ok = same(js.center.0, center.x) && same(js.center.1, center.y);
+     if !center_ok {
+[31m-        mismatches.push(format!("centre js={:?} rust=({}, {})", js.center, center.x, center.y));
+(B[m[32m+        mismatches.push(format!(
+(B[m[32m+            "centre js={:?} rust=({}, {})",
+(B[m[32m+            js.center, center.x, center.y
+(B[m[32m+        ));
+(B[m     }
+     let shape_ok = js.rows == rows && js.matrix.len() == rows * BINS;
+     if !shape_ok {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_diff.rs:136:
+         mismatches.push(format!("shape js rows={} rust rows={rows}", js.rows));
+     }
+[31m-    let harness_ok = trace.matrix.len() == js.matrix.len() && trace.matrix.iter().zip(&js.matrix).all(|(a, b)| same(*a, *b));
+(B[m[32m+    let harness_ok = trace.matrix.len() == js.matrix.len()
+(B[m[32m+        && trace
+(B[m[32m+            .matrix
+(B[m[32m+            .iter()
+(B[m[32m+            .zip(&js.matrix)
+(B[m[32m+            .all(|(a, b)| same(*a, *b));
+(B[m     if !harness_ok {
+         mismatches.push("tracing harness matrix differs from archived oracle".into());
+     }
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_diff.rs:142:
+ 
+     // Coordinates and multiplicities.
+[31m-    let ray_lengths_ok = trace.ray_lengths.len() == rows && trace.ray_lengths.iter().zip(&ref_traces).all(|(n, t)| *n == t.coords.len());
+(B[m[32m+    let ray_lengths_ok = trace.ray_lengths.len() == rows
+(B[m[32m+        && trace
+(B[m[32m+            .ray_lengths
+(B[m[32m+            .iter()
+(B[m[32m+            .zip(&ref_traces)
+(B[m[32m+            .all(|(n, t)| *n == t.coords.len());
+(B[m     let mut coords_ok = ray_lengths_ok;
+     let mut offset = 0usize;
+     let (mut total_samples, mut duplicate_samples, mut consecutive_dups) = (0usize, 0usize, 0usize);
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_diff.rs:150:
+     for (i, t) in ref_traces.iter().enumerate() {
+         let n = *trace.ray_lengths.get(i).unwrap_or(&0);
+         let js_coords: Vec<(i64, i64)> = (0..n)
+[31m-            .map(|k| (trace.coords[2 * (offset + k)] as i64, trace.coords[2 * (offset + k) + 1] as i64))
+(B[m[32m+            .map(|k| {
+(B[m[32m+                (
+(B[m[32m+                    trace.coords[2 * (offset + k)] as i64,
+(B[m[32m+                    trace.coords[2 * (offset + k) + 1] as i64,
+(B[m[32m+                )
+(B[m[32m+            })
+(B[m             .collect();
+         offset += n;
+         if js_coords != t.coords {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_diff.rs:178:
+         }
+     }
+     if !coords_ok {
+[31m-        mismatches.push(format!("coordinates differ, first at {}", first_coord_mismatch.unwrap_or_default()));
+(B[m[32m+        mismatches.push(format!(
+(B[m[32m+            "coordinates differ, first at {}",
+(B[m[32m+            first_coord_mismatch.unwrap_or_default()
+(B[m[32m+        ));
+(B[m     }
+     if !counts_ok {
+         mismatches.push("histogram counts differ".into());
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_diff.rs:199:
+         }
+         (n, max_abs)
+     };
+[31m-    let (ref_diff, ref_max) = if shape_ok { cmp(ref_m.as_slice()) } else { (usize::MAX, f64::NAN) };
+(B[m[31m-    let (eng_diff, eng_max) = if shape_ok { cmp(eng_m.as_slice()) } else { (usize::MAX, f64::NAN) };
+(B[m[31m-    let (libm_diff, _) = if shape_ok { cmp(libm_m.as_slice()) } else { (usize::MAX, f64::NAN) };
+(B[m[32m+    let (ref_diff, ref_max) = if shape_ok {
+(B[m[32m+        cmp(ref_m.as_slice())
+(B[m[32m+    } else {
+(B[m[32m+        (usize::MAX, f64::NAN)
+(B[m[32m+    };
+(B[m[32m+    let (eng_diff, eng_max) = if shape_ok {
+(B[m[32m+        cmp(eng_m.as_slice())
+(B[m[32m+    } else {
+(B[m[32m+        (usize::MAX, f64::NAN)
+(B[m[32m+    };
+(B[m[32m+    let (libm_diff, _) = if shape_ok {
+(B[m[32m+        cmp(libm_m.as_slice())
+(B[m[32m+    } else {
+(B[m[32m+        (usize::MAX, f64::NAN)
+(B[m[32m+    };
+(B[m     if ref_diff != 0 {
+[31m-        mismatches.push(format!("reference matrix: {ref_diff} values differ (max abs {ref_max:e})"));
+(B[m[32m+        mismatches.push(format!(
+(B[m[32m+            "reference matrix: {ref_diff} values differ (max abs {ref_max:e})"
+(B[m[32m+        ));
+(B[m     }
+     if eng_diff != 0 {
+[31m-        mismatches.push(format!("engine matrix: {eng_diff} values differ (max abs {eng_max:e})"));
+(B[m[32m+        mismatches.push(format!(
+(B[m[32m+            "engine matrix: {eng_diff} values differ (max abs {eng_max:e})"
+(B[m[32m+        ));
+(B[m     }
+     let mut cp_diff = 0;
+     if shape_ok {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_diff.rs:213:
+         for i in 0..rows {
+             for j in 0..CHECKPOINTS {
+[31m-                if !same(cp.values[i * CHECKPOINTS + j], js.matrix[i * BINS + checkpoint_bin(j)]) {
+(B[m[32m+                if !same(
+(B[m[32m+                    cp.values[i * CHECKPOINTS + j],
+(B[m[32m+                    js.matrix[i * BINS + checkpoint_bin(j)],
+(B[m[32m+                ) {
+(B[m                     cp_diff += 1;
+                 }
+             }
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_diff.rs:221:
+     if cp_diff != 0 {
+         mismatches.push(format!("checkpoint matrix: {cp_diff} values differ"));
+     }
+[31m-    let libm_coord_rays = ref_traces.iter().zip(&libm_traces).filter(|(a, b)| a.coords != b.coords).count();
+(B[m[31m-    let nan_rows = (0..rows).filter(|&i| js.matrix.get(i * BINS).is_some_and(|v| v.is_nan())).count();
+(B[m[32m+    let libm_coord_rays = ref_traces
+(B[m[32m+        .iter()
+(B[m[32m+        .zip(&libm_traces)
+(B[m[32m+        .filter(|(a, b)| a.coords != b.coords)
+(B[m[32m+        .count();
+(B[m[32m+    let nan_rows = (0..rows)
+(B[m[32m+        .filter(|&i| js.matrix.get(i * BINS).is_some_and(|v| v.is_nan()))
+(B[m[32m+        .count();
+(B[m     let detected: Vec<String> = if with_mutants && shape_ok {
+         mutants::ALL
+             .iter()
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_diff.rs:259:
+ 
+ fn main() {
+     let args = parse_args();
+[31m-    let mut cases = if args.skip_synthetic { vec![] } else { synth::cases() };
+(B[m[32m+    let mut cases = if args.skip_synthetic {
+(B[m[32m+        vec![]
+(B[m[32m+    } else {
+(B[m[32m+        synth::cases()
+(B[m[32m+    };
+(B[m     cases.extend(natural_cases(&args));
+     eprintln!("ferris-diff: {} cases", cases.len());
+     let mut oracle = Oracle::spawn(&args.oracle_dir).expect("spawn node oracle");
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_diff.rs:274:
+         }
+         results.push(r);
+     }
+[31m-    let passed = results.iter().filter(|r| r["pass"].as_bool().unwrap()).count();
+(B[m[31m-    let mut by_cat: std::collections::BTreeMap<String, (usize, usize, usize, usize)> = Default::default();
+(B[m[32m+    let passed = results
+(B[m[32m+        .iter()
+(B[m[32m+        .filter(|r| r["pass"].as_bool().unwrap())
+(B[m[32m+        .count();
+(B[m[32m+    let mut by_cat: std::collections::BTreeMap<String, (usize, usize, usize, usize)> =
+(B[m[32m+        Default::default();
+(B[m     let mut libm_cases = 0;
+     let mut libm_rays = 0u64;
+     for r in &results {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_diff.rs:282:
+[31m-        let e = by_cat.entry(r["category"].as_str().unwrap().to_string()).or_default();
+(B[m[32m+        let e = by_cat
+(B[m[32m+            .entry(r["category"].as_str().unwrap().to_string())
+(B[m[32m+            .or_default();
+(B[m         e.0 += 1;
+         e.1 += r["pass"].as_bool().unwrap() as usize;
+         e.2 += r["samples"].as_u64().unwrap() as usize;
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_diff.rs:286:
+         e.3 += r["within_ray_duplicate_samples"].as_u64().unwrap() as usize;
+[31m-        let lr = r["diagnostic_libm"]["rays_with_different_coordinates"].as_u64().unwrap();
+(B[m[32m+        let lr = r["diagnostic_libm"]["rays_with_different_coordinates"]
+(B[m[32m+            .as_u64()
+(B[m[32m+            .unwrap();
+(B[m         libm_rays += lr;
+         libm_cases += (lr > 0) as usize;
+     }
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/bin/ferris_diff.rs:312:
+     });
+     std::fs::create_dir_all(&args.out).unwrap();
+     let report = json!({"host": host_info(), "canonical_sha256": cdch_core::CANONICAL_SHA256, "summary": summary, "cases": results});
+[31m-    std::fs::write(args.out.join("differential_results.json"), serde_json::to_string_pretty(&report).unwrap()).unwrap();
+(B[m[32m+    std::fs::write(
+(B[m[32m+        args.out.join("differential_results.json"),
+(B[m[32m+        serde_json::to_string_pretty(&report).unwrap(),
+(B[m[32m+    )
+(B[m[32m+    .unwrap();
+(B[m     println!("{}", serde_json::to_string_pretty(&summary).unwrap());
+     if passed != results.len() {
+         std::process::exit(1);
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/lib.rs:86:
+ }
+ 
+ pub fn f64s_le(bytes: &[u8]) -> Vec<f64> {
+[31m-    bytes.chunks_exact(8).map(|c| f64::from_le_bytes(c.try_into().unwrap())).collect()
+(B[m[32m+    bytes
+(B[m[32m+        .chunks_exact(8)
+(B[m[32m+        .map(|c| f64::from_le_bytes(c.try_into().unwrap()))
+(B[m[32m+        .collect()
+(B[m }
+ 
+ pub fn i32s_le(bytes: &[u8]) -> Vec<i32> {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/lib.rs:93:
+[31m-    bytes.chunks_exact(4).map(|c| i32::from_le_bytes(c.try_into().unwrap())).collect()
+(B[m[32m+    bytes
+(B[m[32m+        .chunks_exact(4)
+(B[m[32m+        .map(|c| i32::from_le_bytes(c.try_into().unwrap()))
+(B[m[32m+        .collect()
+(B[m }
+ 
+ /// Result of one oracle evaluation.
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/lib.rs:127:
+             .spawn()?;
+         let stdin = child.stdin.take().expect("stdin");
+         let stdout = BufReader::new(child.stdout.take().expect("stdout"));
+[31m-        Ok(Self { child, stdin, stdout, next_id: 0 })
+(B[m[32m+        Ok(Self {
+(B[m[32m+            child,
+(B[m[32m+            stdin,
+(B[m[32m+            stdout,
+(B[m[32m+            next_id: 0,
+(B[m[32m+        })
+(B[m     }
+ 
+     pub fn compute(
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/lib.rs:151:
+         self.stdin.write_all(&frame).map_err(|e| e.to_string())?;
+         self.stdin.flush().map_err(|e| e.to_string())?;
+         let mut line = String::new();
+[31m-        self.stdout.read_line(&mut line).map_err(|e| e.to_string())?;
+(B[m[32m+        self.stdout
+(B[m[32m+            .read_line(&mut line)
+(B[m[32m+            .map_err(|e| e.to_string())?;
+(B[m         if line.is_empty() {
+             return Err("oracle exited".into());
+         }
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/lib.rs:166:
+         let trace = if v["trace"].is_object() {
+             let t = &v["trace"];
+             Some(OracleTrace {
+[31m-                ray_lengths: t["ray_lengths"].as_array().unwrap().iter().map(|x| x.as_u64().unwrap() as usize).collect(),
+(B[m[32m+                ray_lengths: t["ray_lengths"]
+(B[m[32m+                    .as_array()
+(B[m[32m+                    .unwrap()
+(B[m[32m+                    .iter()
+(B[m[32m+                    .map(|x| x.as_u64().unwrap() as usize)
+(B[m[32m+                    .collect(),
+(B[m                 coords: i32s_le(&base64_decode(t["coords"].as_str().unwrap())?),
+                 matrix: f64s_le(&base64_decode(t["matrix"].as_str().unwrap())?),
+             })
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/lib.rs:210:
+     if let Ok(s) = std::fs::read_to_string("/proc/self/status") {
+         for line in s.lines() {
+             if let Some(rest) = line.strip_prefix("VmHWM:") {
+[31m-                return rest.trim().trim_end_matches(" kB").trim().parse::<u64>().ok().map(|k| k * 1024);
+(B[m[32m+                return rest
+(B[m[32m+                    .trim()
+(B[m[32m+                    .trim_end_matches(" kB")
+(B[m[32m+                    .trim()
+(B[m[32m+                    .parse::<u64>()
+(B[m[32m+                    .ok()
+(B[m[32m+                    .map(|k| k * 1024);
+(B[m             }
+         }
+     }
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/lib.rs:217:
+[31m-    let out = Command::new("ps").args(["-o", "rss=", "-p", &std::process::id().to_string()]).output().ok()?;
+(B[m[31m-    String::from_utf8(out.stdout).ok()?.trim().parse::<u64>().ok().map(|k| k * 1024)
+(B[m[32m+    let out = Command::new("ps")
+(B[m[32m+        .args(["-o", "rss=", "-p", &std::process::id().to_string()])
+(B[m[32m+        .output()
+(B[m[32m+        .ok()?;
+(B[m[32m+    String::from_utf8(out.stdout)
+(B[m[32m+        .ok()?
+(B[m[32m+        .trim()
+(B[m[32m+        .parse::<u64>()
+(B[m[32m+        .ok()
+(B[m[32m+        .map(|k| k * 1024)
+(B[m }
+ 
+[31m-
+(B[m /// Host description for reports.
+ pub fn host_info() -> Value {
+     let sh = |cmd: &str, args: &[&str]| {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/lib.rs:225:
+[31m-        Command::new(cmd).args(args).output().ok().and_then(|o| String::from_utf8(o.stdout).ok()).map(|s| s.trim().to_string())
+(B[m[32m+        Command::new(cmd)
+(B[m[32m+            .args(args)
+(B[m[32m+            .output()
+(B[m[32m+            .ok()
+(B[m[32m+            .and_then(|o| String::from_utf8(o.stdout).ok())
+(B[m[32m+            .map(|s| s.trim().to_string())
+(B[m     };
+     json!({
+         "os": std::env::consts::OS,
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/mutants.rs:71:
+ fn luma_with(m: Mutant, r: u8, g: u8, b: u8) -> usize {
+     let (r, g, b) = (r as f64, g as f64, b as f64);
+     match m {
+[31m-        Mutant::LumaInteger => ((2125 * r as u32 + 7154 * g as u32 + 721 * b as u32 + 5000) / 10000) as usize,
+(B[m[32m+        Mutant::LumaInteger => {
+(B[m[32m+            ((2125 * r as u32 + 7154 * g as u32 + 721 * b as u32 + 5000) / 10000) as usize
+(B[m[32m+        }
+(B[m         Mutant::LumaReassociated => js::round(r * R_COEF + (g * G_COEF + b * B_COEF)) as usize,
+         Mutant::LumaRec601 => js::round(r * 0.299 + g * 0.587 + b * 0.114) as usize,
+         _ => js::round(r * R_COEF + g * G_COEF + b * B_COEF) as usize,
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/mutants.rs:132:
+         let inv = 1.0 / total as f64;
+         for &v in &hist {
+             cum += v;
+[31m-            out.push(if m == Mutant::NormReciprocal { cum as f64 * inv } else { cum as f64 / total as f64 });
+(B[m[32m+            out.push(if m == Mutant::NormReciprocal {
+(B[m[32m+                cum as f64 * inv
+(B[m[32m+            } else {
+(B[m[32m+                cum as f64 / total as f64
+(B[m[32m+            });
+(B[m         }
+     }
+     out
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/synth.rs:20:
+             data.extend_from_slice(&f(x, y));
+         }
+     }
+[31m-    OwnedRgb { width: w, height: h, data }
+(B[m[32m+    OwnedRgb {
+(B[m[32m+        width: w,
+(B[m[32m+        height: h,
+(B[m[32m+        data,
+(B[m[32m+    }
+(B[m }
+ 
+ fn random(w: usize, h: usize, seed: u64) -> OwnedRgb {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/synth.rs:27:
+     let mut rng = SplitMix(seed);
+     let mut data = vec![0u8; w * h * 3];
+     rng.fill(&mut data);
+[31m-    OwnedRgb { width: w, height: h, data }
+(B[m[32m+    OwnedRgb {
+(B[m[32m+        width: w,
+(B[m[32m+        height: h,
+(B[m[32m+        data,
+(B[m[32m+    }
+(B[m }
+ 
+ /// Colours whose binary64 luma lies within `tol` of a half-integer: the cases where
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/synth.rs:117:
+ 
+ pub fn cases() -> Vec<Case> {
+     let mut v = Vec::new();
+[31m-    let mut push = |id: String, category: &'static str, img: OwnedRgb, center: Option<(f64, f64)>, step: u32| {
+(B[m[31m-        v.push(Case { id, category, img, center, angle_step: step });
+(B[m[32m+    let mut push = |id: String,
+(B[m[32m+                    category: &'static str,
+(B[m[32m+                    img: OwnedRgb,
+(B[m[32m+                    center: Option<(f64, f64)>,
+(B[m[32m+                    step: u32| {
+(B[m[32m+        v.push(Case {
+(B[m[32m+            id,
+(B[m[32m+            category,
+(B[m[32m+            img,
+(B[m[32m+            center,
+(B[m[32m+            angle_step: step,
+(B[m[32m+        });
+(B[m     };
+     let archived = |w: usize, h: usize| Some(((w / 2) as f64, (h / 2) as f64));
+ 
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/synth.rs:125:
+     // Uniform images.
+[31m-    push("black_128".into(), "uniform", image(128, 128, |_, _| [0, 0, 0]), archived(128, 128), 1);
+(B[m[31m-    push("white_128".into(), "uniform", image(128, 128, |_, _| [255, 255, 255]), archived(128, 128), 1);
+(B[m[31m-    for c in [[255, 0, 0], [0, 255, 0], [0, 0, 255], [128, 64, 200], [17, 230, 99]] {
+(B[m[31m-        push(format!("const_{}_{}_{}_128", c[0], c[1], c[2]), "uniform", image(128, 128, move |_, _| c), archived(128, 128), 1);
+(B[m[32m+    push(
+(B[m[32m+        "black_128".into(),
+(B[m[32m+        "uniform",
+(B[m[32m+        image(128, 128, |_, _| [0, 0, 0]),
+(B[m[32m+        archived(128, 128),
+(B[m[32m+        1,
+(B[m[32m+    );
+(B[m[32m+    push(
+(B[m[32m+        "white_128".into(),
+(B[m[32m+        "uniform",
+(B[m[32m+        image(128, 128, |_, _| [255, 255, 255]),
+(B[m[32m+        archived(128, 128),
+(B[m[32m+        1,
+(B[m[32m+    );
+(B[m[32m+    for c in [
+(B[m[32m+        [255, 0, 0],
+(B[m[32m+        [0, 255, 0],
+(B[m[32m+        [0, 0, 255],
+(B[m[32m+        [128, 64, 200],
+(B[m[32m+        [17, 230, 99],
+(B[m[32m+    ] {
+(B[m[32m+        push(
+(B[m[32m+            format!("const_{}_{}_{}_128", c[0], c[1], c[2]),
+(B[m[32m+            "uniform",
+(B[m[32m+            image(128, 128, move |_, _| c),
+(B[m[32m+            archived(128, 128),
+(B[m[32m+            1,
+(B[m[32m+        );
+(B[m     }
+ 
+     // Gradients and patterns.
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/synth.rs:133:
+[31m-    push("hgrad_128".into(), "gradient", image(128, 128, |x, _| [(2 * x) as u8; 3]), archived(128, 128), 1);
+(B[m[31m-    push("vgrad_128".into(), "gradient", image(128, 128, |_, y| [(2 * y) as u8; 3]), archived(128, 128), 1);
+(B[m[31m-    push("hgrad_rgb_256".into(), "gradient", image(256, 64, |x, y| [x as u8, (255 - x) as u8, (4 * y) as u8]), archived(256, 64), 1);
+(B[m[31m-    push("diag_grad_128".into(), "gradient", image(128, 128, |x, y| [(x + y) as u8, x as u8, y as u8]), archived(128, 128), 1);
+(B[m[31m-    push("radial_128".into(), "gradient", image(128, 128, |x, y| {
+(B[m[31m-        let d = (((x as f64 - 64.0).powi(2) + (y as f64 - 64.0).powi(2)).sqrt() * 2.0).min(255.0) as u8;
+(B[m[31m-        [d, 255 - d, d / 2]
+(B[m[31m-    }), archived(128, 128), 1);
+(B[m[31m-    push("checker1_128".into(), "pattern", image(128, 128, |x, y| if (x + y) % 2 == 0 { [0; 3] } else { [255; 3] }), archived(128, 128), 1);
+(B[m[31m-    push("checker8_128".into(), "pattern", image(128, 128, |x, y| if (x / 8 + y / 8) % 2 == 0 { [30, 60, 90] } else { [220, 180, 140] }), archived(128, 128), 1);
+(B[m[31m-    push("stripes_v_128".into(), "pattern", image(128, 128, |x, _| if x % 3 == 0 { [250, 10, 10] } else { [10, 10, 250] }), archived(128, 128), 1);
+(B[m[32m+    push(
+(B[m[32m+        "hgrad_128".into(),
+(B[m[32m+        "gradient",
+(B[m[32m+        image(128, 128, |x, _| [(2 * x) as u8; 3]),
+(B[m[32m+        archived(128, 128),
+(B[m[32m+        1,
+(B[m[32m+    );
+(B[m[32m+    push(
+(B[m[32m+        "vgrad_128".into(),
+(B[m[32m+        "gradient",
+(B[m[32m+        image(128, 128, |_, y| [(2 * y) as u8; 3]),
+(B[m[32m+        archived(128, 128),
+(B[m[32m+        1,
+(B[m[32m+    );
+(B[m[32m+    push(
+(B[m[32m+        "hgrad_rgb_256".into(),
+(B[m[32m+        "gradient",
+(B[m[32m+        image(256, 64, |x, y| [x as u8, (255 - x) as u8, (4 * y) as u8]),
+(B[m[32m+        archived(256, 64),
+(B[m[32m+        1,
+(B[m[32m+    );
+(B[m[32m+    push(
+(B[m[32m+        "diag_grad_128".into(),
+(B[m[32m+        "gradient",
+(B[m[32m+        image(128, 128, |x, y| [(x + y) as u8, x as u8, y as u8]),
+(B[m[32m+        archived(128, 128),
+(B[m[32m+        1,
+(B[m[32m+    );
+(B[m[32m+    push(
+(B[m[32m+        "radial_128".into(),
+(B[m[32m+        "gradient",
+(B[m[32m+        image(128, 128, |x, y| {
+(B[m[32m+            let d = (((x as f64 - 64.0).powi(2) + (y as f64 - 64.0).powi(2)).sqrt() * 2.0)
+(B[m[32m+                .min(255.0) as u8;
+(B[m[32m+            [d, 255 - d, d / 2]
+(B[m[32m+        }),
+(B[m[32m+        archived(128, 128),
+(B[m[32m+        1,
+(B[m[32m+    );
+(B[m[32m+    push(
+(B[m[32m+        "checker1_128".into(),
+(B[m[32m+        "pattern",
+(B[m[32m+        image(
+(B[m[32m+            128,
+(B[m[32m+            128,
+(B[m[32m+            |x, y| if (x + y) % 2 == 0 { [0; 3] } else { [255; 3] },
+(B[m[32m+        ),
+(B[m[32m+        archived(128, 128),
+(B[m[32m+        1,
+(B[m[32m+    );
+(B[m[32m+    push(
+(B[m[32m+        "checker8_128".into(),
+(B[m[32m+        "pattern",
+(B[m[32m+        image(128, 128, |x, y| {
+(B[m[32m+            if (x / 8 + y / 8) % 2 == 0 {
+(B[m[32m+                [30, 60, 90]
+(B[m[32m+            } else {
+(B[m[32m+                [220, 180, 140]
+(B[m[32m+            }
+(B[m[32m+        }),
+(B[m[32m+        archived(128, 128),
+(B[m[32m+        1,
+(B[m[32m+    );
+(B[m[32m+    push(
+(B[m[32m+        "stripes_v_128".into(),
+(B[m[32m+        "pattern",
+(B[m[32m+        image(128, 128, |x, _| {
+(B[m[32m+            if x % 3 == 0 {
+(B[m[32m+                [250, 10, 10]
+(B[m[32m+            } else {
+(B[m[32m+                [10, 10, 250]
+(B[m[32m+            }
+(B[m[32m+        }),
+(B[m[32m+        archived(128, 128),
+(B[m[32m+        1,
+(B[m[32m+    );
+(B[m 
+     // Random RGB.
+     for seed in 0..8u64 {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/synth.rs:147:
+[31m-        push(format!("random_s{seed}_128"), "random", random(128, 128, 1000 + seed), archived(128, 128), 1);
+(B[m[32m+        push(
+(B[m[32m+            format!("random_s{seed}_128"),
+(B[m[32m+            "random",
+(B[m[32m+            random(128, 128, 1000 + seed),
+(B[m[32m+            archived(128, 128),
+(B[m[32m+            1,
+(B[m[32m+        );
+(B[m     }
+ 
+     // Luma tie colours (floating-point rounding of the intensity).
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/synth.rs:152:
+     let tie_img = {
+         let mut rng = SplitMix(4242);
+         let t = ties.clone();
+[31m-        let picks: Vec<[u8; 3]> = (0..128 * 128).map(|_| t[rng.below(t.len() as u64) as usize]).collect();
+(B[m[32m+        let picks: Vec<[u8; 3]> = (0..128 * 128)
+(B[m[32m+            .map(|_| t[rng.below(t.len() as u64) as usize])
+(B[m[32m+            .collect();
+(B[m         image(128, 128, move |x, y| picks[y * 128 + x])
+     };
+[31m-    push(format!("luma_ties_{}colours_128", ties.len()), "fp_luma", tie_img, archived(128, 128), 1);
+(B[m[32m+    push(
+(B[m[32m+        format!("luma_ties_{}colours_128", ties.len()),
+(B[m[32m+        "fp_luma",
+(B[m[32m+        tie_img,
+(B[m[32m+        archived(128, 128),
+(B[m[32m+        1,
+(B[m[32m+    );
+(B[m 
+     // The 42 colours for which the luma evaluation order is observable.
+     let sensitive = luma_order_sensitive_colours();
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/synth.rs:162:
+[31m-    let order_img = image(64, 64, move |x, y| sensitive[(y * 64 + x) % sensitive.len()]);
+(B[m[31m-    push("luma_order_sensitive_64".into(), "fp_luma", order_img, archived(64, 64), 1);
+(B[m[32m+    let order_img = image(64, 64, move |x, y| {
+(B[m[32m+        sensitive[(y * 64 + x) % sensitive.len()]
+(B[m[32m+    });
+(B[m[32m+    push(
+(B[m[32m+        "luma_order_sensitive_64".into(),
+(B[m[32m+        "fp_luma",
+(B[m[32m+        order_img,
+(B[m[32m+        archived(64, 64),
+(B[m[32m+        1,
+(B[m[32m+    );
+(B[m 
+     // Centres on which V8 and libm directions round differently (V8 table necessity).
+     let adv_img = random(32, 32, 2024);
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/synth.rs:167:
+     for (angle, x, y) in libm_adversarial_centres(8) {
+[31m-        push(format!("libm_adversarial_angle{angle}_x{x:e}_y{y:e}"), "fp_trig", adv_img.clone(), Some((x, y)), 1);
+(B[m[32m+        push(
+(B[m[32m+            format!("libm_adversarial_angle{angle}_x{x:e}_y{y:e}"),
+(B[m[32m+            "fp_trig",
+(B[m[32m+            adv_img.clone(),
+(B[m[32m+            Some((x, y)),
+(B[m[32m+            1,
+(B[m[32m+        );
+(B[m     }
+ 
+     // Small and degenerate sizes.
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/synth.rs:172:
+[31m-    for (w, h) in [(1, 1), (1, 2), (2, 1), (2, 2), (3, 3), (3, 5), (5, 3), (7, 1), (1, 7), (4, 4)] {
+(B[m[31m-        push(format!("small_{w}x{h}"), "small", random(w, h, (w * 31 + h) as u64), archived(w, h), 1);
+(B[m[31m-        push(format!("small_{w}x{h}_midpoint"), "small", random(w, h, (w * 37 + h) as u64), Some((w as f64 / 2.0, h as f64 / 2.0)), 1);
+(B[m[32m+    for (w, h) in [
+(B[m[32m+        (1, 1),
+(B[m[32m+        (1, 2),
+(B[m[32m+        (2, 1),
+(B[m[32m+        (2, 2),
+(B[m[32m+        (3, 3),
+(B[m[32m+        (3, 5),
+(B[m[32m+        (5, 3),
+(B[m[32m+        (7, 1),
+(B[m[32m+        (1, 7),
+(B[m[32m+        (4, 4),
+(B[m[32m+    ] {
+(B[m[32m+        push(
+(B[m[32m+            format!("small_{w}x{h}"),
+(B[m[32m+            "small",
+(B[m[32m+            random(w, h, (w * 31 + h) as u64),
+(B[m[32m+            archived(w, h),
+(B[m[32m+            1,
+(B[m[32m+        );
+(B[m[32m+        push(
+(B[m[32m+            format!("small_{w}x{h}_midpoint"),
+(B[m[32m+            "small",
+(B[m[32m+            random(w, h, (w * 37 + h) as u64),
+(B[m[32m+            Some((w as f64 / 2.0, h as f64 / 2.0)),
+(B[m[32m+            1,
+(B[m[32m+        );
+(B[m     }
+ 
+     // Rectangular (the radius limit is the canvas WIDTH, even for tall images).
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/synth.rs:178:
+[31m-    for (w, h) in [(200, 50), (50, 200), (128, 64), (64, 128), (300, 17), (17, 300), (129, 65), (127, 127), (500, 500)] {
+(B[m[31m-        push(format!("rect_{w}x{h}"), "rectangular", random(w, h, (w * 7919 + h) as u64), archived(w, h), 1);
+(B[m[32m+    for (w, h) in [
+(B[m[32m+        (200, 50),
+(B[m[32m+        (50, 200),
+(B[m[32m+        (128, 64),
+(B[m[32m+        (64, 128),
+(B[m[32m+        (300, 17),
+(B[m[32m+        (17, 300),
+(B[m[32m+        (129, 65),
+(B[m[32m+        (127, 127),
+(B[m[32m+        (500, 500),
+(B[m[32m+    ] {
+(B[m[32m+        push(
+(B[m[32m+            format!("rect_{w}x{h}"),
+(B[m[32m+            "rectangular",
+(B[m[32m+            random(w, h, (w * 7919 + h) as u64),
+(B[m[32m+            archived(w, h),
+(B[m[32m+            1,
+(B[m[32m+        );
+(B[m     }
+[31m-    push("rect_1024x768".into(), "rectangular", random(1024, 768, 77), archived(1024, 768), 1);
+(B[m[31m-    push("rect_127x127_midpoint".into(), "rounding", random(127, 127, 5), Some((63.5, 63.5)), 1);
+(B[m[31m-    push("oracle_default_center_129x65".into(), "rounding", random(129, 65, 6), None, 1);
+(B[m[32m+    push(
+(B[m[32m+        "rect_1024x768".into(),
+(B[m[32m+        "rectangular",
+(B[m[32m+        random(1024, 768, 77),
+(B[m[32m+        archived(1024, 768),
+(B[m[32m+        1,
+(B[m[32m+    );
+(B[m[32m+    push(
+(B[m[32m+        "rect_127x127_midpoint".into(),
+(B[m[32m+        "rounding",
+(B[m[32m+        random(127, 127, 5),
+(B[m[32m+        Some((63.5, 63.5)),
+(B[m[32m+        1,
+(B[m[32m+    );
+(B[m[32m+    push(
+(B[m[32m+        "oracle_default_center_129x65".into(),
+(B[m[32m+        "rounding",
+(B[m[32m+        random(129, 65, 6),
+(B[m[32m+        None,
+(B[m[32m+        1,
+(B[m[32m+    );
+(B[m 
+     // Centres designed to stress coordinate rounding and boundaries (on a 128x128 random image).
+     let base = random(128, 128, 31337);
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/synth.rs:190:
+         ("half_64.5_64", 64.5, 64.0, "rounding"),
+         ("quarter_10.25_99.75", 10.25, 99.75, "rounding"),
+         ("third_33.3_77.7", 33.3, 77.7, "rounding"),
+[31m-        ("near_half_0.49999999999999994", 0.49999999999999994, 0.5, "rounding"),
+(B[m[31m-        ("tiny_offset_64+1e-13", 64.0 + 1e-13, 64.0 - 1e-13, "rounding"),
+(B[m[32m+        (
+(B[m[32m+            "near_half_0.49999999999999994",
+(B[m[32m+            0.49999999999999994,
+(B[m[32m+            0.5,
+(B[m[32m+            "rounding",
+(B[m[32m+        ),
+(B[m[32m+        (
+(B[m[32m+            "tiny_offset_64+1e-13",
+(B[m[32m+            64.0 + 1e-13,
+(B[m[32m+            64.0 - 1e-13,
+(B[m[32m+            "rounding",
+(B[m[32m+        ),
+(B[m         ("corner_0_0", 0.0, 0.0, "border"),
+         ("corner_127_127", 127.0, 127.0, "border"),
+         ("edge_127.5_0", 127.5, 0.0, "border"),
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-bench/src/synth.rs:208:
+     // Angle steps (integer steps accepted by ip-1.js's UI validation).
+     let small = random(64, 48, 99);
+     for step in [2u32, 3, 5, 7, 10, 45, 90, 120, 359, 360] {
+[31m-        push(format!("step_{step}_64x48"), "angle_step", small.clone(), archived(64, 48), step);
+(B[m[32m+        push(
+(B[m[32m+            format!("step_{step}_64x48"),
+(B[m[32m+            "angle_step",
+(B[m[32m+            small.clone(),
+(B[m[32m+            archived(64, 48),
+(B[m[32m+            step,
+(B[m[32m+        );
+(B[m     }
+[31m-    push("step_7_half_centre".into(), "angle_step", small.clone(), Some((31.5, 23.5)), 7);
+(B[m[32m+    push(
+(B[m[32m+        "step_7_half_centre".into(),
+(B[m[32m+        "angle_step",
+(B[m[32m+        small.clone(),
+(B[m[32m+        Some((31.5, 23.5)),
+(B[m[32m+        7,
+(B[m[32m+    );
+(B[m     v
+ }
+ 
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-cli/src/lib.rs:27:
+             let s = (y * self.width + x0) * 3;
+             data.extend_from_slice(&self.data[s..s + 3 * w]);
+         }
+[31m-        OwnedRgb { width: w, height: h, data }
+(B[m[32m+        OwnedRgb {
+(B[m[32m+            width: w,
+(B[m[32m+            height: h,
+(B[m[32m+            data,
+(B[m[32m+        }
+(B[m     }
+ }
+ 
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-cli/src/lib.rs:37:
+     let file = std::fs::File::open(path).map_err(|e| format!("{}: {e}", path.display()))?;
+     let mut decoder = png::Decoder::new(BufReader::new(file));
+     decoder.set_transformations(png::Transformations::EXPAND | png::Transformations::STRIP_16);
+[31m-    let mut reader = decoder.read_info().map_err(|e| format!("{}: {e}", path.display()))?;
+(B[m[32m+    let mut reader = decoder
+(B[m[32m+        .read_info()
+(B[m[32m+        .map_err(|e| format!("{}: {e}", path.display()))?;
+(B[m     let size = reader.output_buffer_size().ok_or("png too large")?;
+     let mut buf = vec![0u8; size];
+[31m-    let info = reader.next_frame(&mut buf).map_err(|e| format!("{}: {e}", path.display()))?;
+(B[m[32m+    let info = reader
+(B[m[32m+        .next_frame(&mut buf)
+(B[m[32m+        .map_err(|e| format!("{}: {e}", path.display()))?;
+(B[m     buf.truncate(info.buffer_size());
+     let (w, h) = (info.width as usize, info.height as usize);
+     let data = match info.color_type {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-cli/src/lib.rs:47:
+         png::ColorType::Rgb => buf,
+[31m-        png::ColorType::Rgba => buf.chunks_exact(4).flat_map(|p| [p[0], p[1], p[2]]).collect(),
+(B[m[32m+        png::ColorType::Rgba => buf
+(B[m[32m+            .chunks_exact(4)
+(B[m[32m+            .flat_map(|p| [p[0], p[1], p[2]])
+(B[m[32m+            .collect(),
+(B[m         png::ColorType::Grayscale => buf.iter().flat_map(|&g| [g, g, g]).collect(),
+[31m-        png::ColorType::GrayscaleAlpha => buf.chunks_exact(2).flat_map(|p| [p[0], p[0], p[0]]).collect(),
+(B[m[31m-        other => return Err(format!("{}: unsupported colour type {other:?}", path.display())),
+(B[m[32m+        png::ColorType::GrayscaleAlpha => buf
+(B[m[32m+            .chunks_exact(2)
+(B[m[32m+            .flat_map(|p| [p[0], p[0], p[0]])
+(B[m[32m+            .collect(),
+(B[m[32m+        other => {
+(B[m[32m+            return Err(format!(
+(B[m[32m+                "{}: unsupported colour type {other:?}",
+(B[m[32m+                path.display()
+(B[m[32m+            ))
+(B[m[32m+        }
+(B[m     };
+     if data.len() != w * h * 3 {
+         return Err(format!("{}: unexpected decoded size", path.display()));
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-cli/src/lib.rs:55:
+     }
+[31m-    Ok(OwnedRgb { width: w, height: h, data })
+(B[m[32m+    Ok(OwnedRgb {
+(B[m[32m+        width: w,
+(B[m[32m+        height: h,
+(B[m[32m+        data,
+(B[m[32m+    })
+(B[m }
+ 
+ /// An archived StandardScaler + linear classifier, exported by `python/export_linear_models.py`.
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-cli/src/lib.rs:71:
+ impl LinearModel {
+     pub fn load(path: &Path) -> Result<Self, String> {
+         let text = std::fs::read_to_string(path).map_err(|e| format!("{}: {e}", path.display()))?;
+[31m-        let v: Value = serde_json::from_str(&text).map_err(|e| format!("{}: {e}", path.display()))?;
+(B[m[32m+        let v: Value =
+(B[m[32m+            serde_json::from_str(&text).map_err(|e| format!("{}: {e}", path.display()))?;
+(B[m         let vec = |k: &str| -> Result<Vec<f64>, String> {
+             v[k].as_array()
+                 .ok_or(format!("missing {k}"))?
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-cli/src/lib.rs:92:
+         };
+         let d = feature.dim();
+         if m.mean.len() != d || m.scale.len() != d || m.coef.len() != d {
+[31m-            return Err(format!("{}: dimensions do not match representation {feature:?}", path.display()));
+(B[m[32m+            return Err(format!(
+(B[m[32m+                "{}: dimensions do not match representation {feature:?}",
+(B[m[32m+                path.display()
+(B[m[32m+            ));
+(B[m         }
+         Ok(m)
+     }
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-cli/src/main.rs:39:
+ }
+ 
+ fn parse(args: &[String]) -> Result<Opts, String> {
+[31m-    let mut o = Opts { kind: Representation::A, center: None, step: 1, threads: None, json: false, timing: false, model: None, files: vec![] };
+(B[m[32m+    let mut o = Opts {
+(B[m[32m+        kind: Representation::A,
+(B[m[32m+        center: None,
+(B[m[32m+        step: 1,
+(B[m[32m+        threads: None,
+(B[m[32m+        json: false,
+(B[m[32m+        timing: false,
+(B[m[32m+        model: None,
+(B[m[32m+        files: vec![],
+(B[m[32m+    };
+(B[m     let mut it = args.iter();
+     while let Some(a) = it.next() {
+         let mut value = || it.next().cloned().ok_or(format!("{a} needs a value"));
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-cli/src/main.rs:46:
+         match a.as_str() {
+[31m-            "--kind" => o.kind = Representation::parse(&value()?).ok_or("--kind must be A, B, C or D")?,
+(B[m[32m+            "--kind" => {
+(B[m[32m+                o.kind = Representation::parse(&value()?).ok_or("--kind must be A, B, C or D")?
+(B[m[32m+            }
+(B[m             "--center" => {
+                 let v = value()?;
+                 let (x, y) = v.split_once(',').ok_or("--center X,Y")?;
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-cli/src/main.rs:51:
+[31m-                o.center = Some((x.parse().map_err(|_| "bad centre x")?, y.parse().map_err(|_| "bad centre y")?));
+(B[m[32m+                o.center = Some((
+(B[m[32m+                    x.parse().map_err(|_| "bad centre x")?,
+(B[m[32m+                    y.parse().map_err(|_| "bad centre y")?,
+(B[m[32m+                ));
+(B[m             }
+             "--step" => o.step = value()?.parse().map_err(|_| "bad --step")?,
+             "--threads" => o.threads = Some(value()?.parse().map_err(|_| "bad --threads")?),
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-cli/src/main.rs:63:
+ }
+ 
+ fn params(o: &Opts, w: usize, h: usize) -> Params {
+[31m-    Params { center: o.center.map_or(Center::archived(w, h), |(x, y)| Center::new(x, y)), angle_step: o.step }
+(B[m[32m+    Params {
+(B[m[32m+        center: o
+(B[m[32m+            .center
+(B[m[32m+            .map_or(Center::archived(w, h), |(x, y)| Center::new(x, y)),
+(B[m[32m+        angle_step: o.step,
+(B[m[32m+    }
+(B[m }
+ 
+ /// Run `f` over the files on `threads` workers (serial for 1), preserving order.
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-cli/src/main.rs:70:
+[31m-fn map_files<T: Send>(o: &Opts, f: impl Fn(&mut FeatureExtractor, &Path) -> Result<T, String> + Sync) -> Result<Vec<T>, String> {
+(B[m[32m+fn map_files<T: Send>(
+(B[m[32m+    o: &Opts,
+(B[m[32m+    f: impl Fn(&mut FeatureExtractor, &Path) -> Result<T, String> + Sync,
+(B[m[32m+) -> Result<Vec<T>, String> {
+(B[m     let engine = Arc::new(Engine::new());
+     if o.threads == Some(1) {
+         let mut fx = FeatureExtractor::with_engine(engine);
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-cli/src/main.rs:74:
+         return o.files.iter().map(|p| f(&mut fx, p)).collect();
+     }
+[31m-    let pool = rayon::ThreadPoolBuilder::new().num_threads(o.threads.unwrap_or(0)).build().map_err(|e| e.to_string())?;
+(B[m[32m+    let pool = rayon::ThreadPoolBuilder::new()
+(B[m[32m+        .num_threads(o.threads.unwrap_or(0))
+(B[m[32m+        .build()
+(B[m[32m+        .map_err(|e| e.to_string())?;
+(B[m     pool.install(|| {
+         o.files
+             .par_iter()
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-cli/src/main.rs:80:
+[31m-            .map_init(|| FeatureExtractor::with_engine(Arc::clone(&engine)), |fx, p| f(fx, p))
+(B[m[32m+            .map_init(
+(B[m[32m+                || FeatureExtractor::with_engine(Arc::clone(&engine)),
+(B[m[32m+                |fx, p| f(fx, p),
+(B[m[32m+            )
+(B[m             .collect()
+     })
+ }
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-cli/src/main.rs:101:
+             let rows = map_files(&o, |fx, p| {
+                 let img = read_png(p)?;
+                 let mut out = vec![0.0; kind.dim()];
+[31m-                fx.extract(&img.view(), &params(&o, img.width, img.height), kind, &mut out).map_err(|e| format!("{}: {e}", p.display()))?;
+(B[m[32m+                fx.extract(
+(B[m[32m+                    &img.view(),
+(B[m[32m+                    &params(&o, img.width, img.height),
+(B[m[32m+                    kind,
+(B[m[32m+                    &mut out,
+(B[m[32m+                )
+(B[m[32m+                .map_err(|e| format!("{}: {e}", p.display()))?;
+(B[m                 Ok(out)
+             })?;
+             for (p, v) in o.files.iter().zip(rows) {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-cli/src/main.rs:108:
+                 if o.json {
+[31m-                    println!("{}", json!({"path": p, "kind": format!("{kind:?}"), "features": v}));
+(B[m[32m+                    println!(
+(B[m[32m+                        "{}",
+(B[m[32m+                        json!({"path": p, "kind": format!("{kind:?}"), "features": v})
+(B[m[32m+                    );
+(B[m                 } else {
+                     let vals: Vec<String> = v.iter().map(|x| format!("{x:?}")).collect();
+                     println!("{},{}", p.display(), vals.join(","));
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-cli/src/main.rs:115:
+             Ok(())
+         }
+         "matrix" => {
+[31m-            let [path] = o.files.as_slice() else { return Err("matrix takes exactly one image".into()) };
+(B[m[32m+            let [path] = o.files.as_slice() else {
+(B[m[32m+                return Err("matrix takes exactly one image".into());
+(B[m[32m+            };
+(B[m             let img = read_png(path)?;
+             let p = params(&o, img.width, img.height);
+             let mut fx = FeatureExtractor::new();
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-cli/src/main.rs:122:
+             let mut m = vec![0.0; p.n_rays() * cdch_core::BINS];
+[31m-            fx.matrix_into(&img.view(), &p, &mut m).map_err(|e| e.to_string())?;
+(B[m[32m+            fx.matrix_into(&img.view(), &p, &mut m)
+(B[m[32m+                .map_err(|e| e.to_string())?;
+(B[m             for row in m.chunks(cdch_core::BINS) {
+                 let vals: Vec<String> = row.iter().map(|x| format!("{x:?}")).collect();
+                 println!("{}", vals.join(","));
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-cli/src/main.rs:135:
+                 let img = read_png(p)?;
+                 let t1 = Instant::now();
+                 let mut x = vec![0.0; model.feature.dim()];
+[31m-                fx.extract(&img.view(), &params(&o, img.width, img.height), model.feature, &mut x).map_err(|e| format!("{}: {e}", p.display()))?;
+(B[m[32m+                fx.extract(
+(B[m[32m+                    &img.view(),
+(B[m[32m+                    &params(&o, img.width, img.height),
+(B[m[32m+                    model.feature,
+(B[m[32m+                    &mut x,
+(B[m[32m+                )
+(B[m[32m+                .map_err(|e| format!("{}: {e}", p.display()))?;
+(B[m                 let t2 = Instant::now();
+                 let s = model.decision(&x);
+                 let t3 = Instant::now();
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-cli/src/main.rs:142:
+[31m-                Ok((s, [(t1 - t0).as_secs_f64(), (t2 - t1).as_secs_f64(), (t3 - t2).as_secs_f64()]))
+(B[m[32m+                Ok((
+(B[m[32m+                    s,
+(B[m[32m+                    [
+(B[m[32m+                        (t1 - t0).as_secs_f64(),
+(B[m[32m+                        (t2 - t1).as_secs_f64(),
+(B[m[32m+                        (t3 - t2).as_secs_f64(),
+(B[m[32m+                    ],
+(B[m[32m+                ))
+(B[m             })?;
+             let wall = start.elapsed().as_secs_f64();
+             for (p, (s, t)) in o.files.iter().zip(&rows) {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-cli/src/main.rs:146:
+                 let label = (*s >= model.threshold) as u8;
+                 if o.timing {
+[31m-                    println!("{},{:?},{},{:.1},{:.1},{:.2}", p.display(), s, label, t[0] * 1e6, t[1] * 1e6, t[2] * 1e6);
+(B[m[32m+                    println!(
+(B[m[32m+                        "{},{:?},{},{:.1},{:.1},{:.2}",
+(B[m[32m+                        p.display(),
+(B[m[32m+                        s,
+(B[m[32m+                        label,
+(B[m[32m+                        t[0] * 1e6,
+(B[m[32m+                        t[1] * 1e6,
+(B[m[32m+                        t[2] * 1e6
+(B[m[32m+                    );
+(B[m                 } else {
+                     println!("{},{:?},{}", p.display(), s, label);
+                 }
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-cli/src/main.rs:152:
+             }
+             if o.timing {
+[31m-                eprintln!("{} images in {:.3} s ({:.0} img/s) using model {}", rows.len(), wall, rows.len() as f64 / wall, model.name);
+(B[m[32m+                eprintln!(
+(B[m[32m+                    "{} images in {:.3} s ({:.0} img/s) using model {}",
+(B[m[32m+                    rows.len(),
+(B[m[32m+                    wall,
+(B[m[32m+                    rows.len() as f64 / wall,
+(B[m[32m+                    model.name
+(B[m[32m+                );
+(B[m             }
+             Ok(())
+         }
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/src/engine.rs:73:
+     }
+ 
+     /// Full canonical matrix into `out` (`n_rays * 256` values).
+[31m-    pub fn matrix_into(&self, img: &RgbImage<'_>, ws: &mut Workspace, out: &mut [f64]) -> Result<()> {
+(B[m[32m+    pub fn matrix_into(
+(B[m[32m+        &self,
+(B[m[32m+        img: &RgbImage<'_>,
+(B[m[32m+        ws: &mut Workspace,
+(B[m[32m+        out: &mut [f64],
+(B[m[32m+    ) -> Result<()> {
+(B[m         check_dims(self, img)?;
+         let rows = self.n_rays();
+         if out.len() != rows * BINS {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/src/engine.rs:80:
+[31m-            return Err(CdchError::BufferSize { expected: rows * BINS, actual: out.len() });
+(B[m[32m+            return Err(CdchError::BufferSize {
+(B[m[32m+                expected: rows * BINS,
+(B[m[32m+                actual: out.len(),
+(B[m[32m+            });
+(B[m         }
+         self.fill_luma(img, ws);
+         let lum = &ws.lum[..];
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/src/engine.rs:123:
+     /// without materializing the 256-bin matrix. Each value is computed as
+     /// `cumulative[8j+7] / cumulative[255]` with the same integer cumulative count
+     /// and the same single division as the full path, so it is bit-identical.
+[31m-    pub fn checkpoints_into(&self, img: &RgbImage<'_>, ws: &mut Workspace, out: &mut [f64]) -> Result<()> {
+(B[m[32m+    pub fn checkpoints_into(
+(B[m[32m+        &self,
+(B[m[32m+        img: &RgbImage<'_>,
+(B[m[32m+        ws: &mut Workspace,
+(B[m[32m+        out: &mut [f64],
+(B[m[32m+    ) -> Result<()> {
+(B[m         check_dims(self, img)?;
+         let rows = self.n_rays();
+         if out.len() != rows * CHECKPOINTS {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/src/engine.rs:130:
+[31m-            return Err(CdchError::BufferSize { expected: rows * CHECKPOINTS, actual: out.len() });
+(B[m[32m+            return Err(CdchError::BufferSize {
+(B[m[32m+                expected: rows * CHECKPOINTS,
+(B[m[32m+                actual: out.len(),
+(B[m[32m+            });
+(B[m         }
+         self.fill_luma(img, ws);
+         // Bucket j collects intensities in (8j - 1, 8j + 7]; i.e. bucket = luma >> 3.
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/src/engine.rs:163:
+     pub fn checkpoints(&self, img: &RgbImage<'_>, ws: &mut Workspace) -> Result<CheckpointMatrix> {
+         let mut values = vec![0.0; self.n_rays() * CHECKPOINTS];
+         self.checkpoints_into(img, ws, &mut values)?;
+[31m-        Ok(CheckpointMatrix { rows: self.n_rays(), values })
+(B[m[32m+        Ok(CheckpointMatrix {
+(B[m[32m+            rows: self.n_rays(),
+(B[m[32m+            values,
+(B[m[32m+        })
+(B[m     }
+ }
+ 
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/src/js.rs:131:
+             (-0.0, -0.0),
+         ];
+         for &(x, want) in cases {
+[31m-            assert!(same(round(x), want), "round({x:e}) = {:e}, want {want:e}", round(x));
+(B[m[32m+            assert!(
+(B[m[32m+                same(round(x), want),
+(B[m[32m+                "round({x:e}) = {:e}, want {want:e}",
+(B[m[32m+                round(x)
+(B[m[32m+            );
+(B[m         }
+         assert!(round(f64::NAN).is_nan());
+         assert_eq!(round(f64::INFINITY), f64::INFINITY);
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/src/js.rs:191:
+             let (c8, s8) = direction(a);
+             let (cl, sl) = direction_libm(a);
+             let radians = (a as f64 - 90.0) * (std::f64::consts::PI / 180.0);
+[31m-            assert_eq!(radians.to_bits(), super::radians(a).to_bits(), "radians differ at {a}");
+(B[m[32m+            assert_eq!(
+(B[m[32m+                radians.to_bits(),
+(B[m[32m+                super::radians(a).to_bits(),
+(B[m[32m+                "radians differ at {a}"
+(B[m[32m+            );
+(B[m             if c8.to_bits() != cl.to_bits() || s8.to_bits() != sl.to_bits() {
+                 diffs.push((a, c8, cl, s8, sl));
+             }
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/src/js.rs:198:
+         }
+         println!("V8_VS_LIBM_DIRECTION_DIFFS {}", diffs.len());
+         for d in &diffs {
+[31m-            println!("  angle {} cos v8={:e} libm={:e} sin v8={:e} libm={:e}", d.0, d.1, d.2, d.3, d.4);
+(B[m[32m+            println!(
+(B[m[32m+                "  angle {} cos v8={:e} libm={:e} sin v8={:e} libm={:e}",
+(B[m[32m+                d.0, d.1, d.2, d.3, d.4
+(B[m[32m+            );
+(B[m         }
+     }
+ }
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/src/lib.rs:58:
+     /// The canonical matrix failed the archived validity checks (empty ray, NaN, ...).
+     InvalidMatrix(String),
+     /// An image was evaluated with a sampling plan built for another size.
+[31m-    Dimensions { plan: (usize, usize), image: (usize, usize) },
+(B[m[32m+    Dimensions {
+(B[m[32m+        plan: (usize, usize),
+(B[m[32m+        image: (usize, usize),
+(B[m[32m+    },
+(B[m }
+ 
+ impl fmt::Display for CdchError {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/src/lib.rs:65:
+     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+         match self {
+             CdchError::BufferSize { expected, actual } => {
+[31m-                write!(f, "pixel buffer has {actual} bytes, expected at least {expected}")
+(B[m[32m+                write!(
+(B[m[32m+                    f,
+(B[m[32m+                    "pixel buffer has {actual} bytes, expected at least {expected}"
+(B[m[32m+                )
+(B[m             }
+             CdchError::RowStride { stride, width } => {
+[31m-                write!(f, "row stride {stride} is smaller than 3 * width ({})", 3 * width)
+(B[m[32m+                write!(
+(B[m[32m+                    f,
+(B[m[32m+                    "row stride {stride} is smaller than 3 * width ({})",
+(B[m[32m+                    3 * width
+(B[m[32m+                )
+(B[m             }
+             CdchError::TooLarge { width, height } => {
+                 write!(f, "image {width}x{height} exceeds the supported size")
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/src/lib.rs:110:
+         Self::with_stride(width, height, 3 * width, data)
+     }
+ 
+[31m-    pub fn with_stride(width: usize, height: usize, row_stride: usize, data: &'a [u8]) -> Result<Self> {
+(B[m[31m-        if width > u32::MAX as usize / 4 || height > u32::MAX as usize / 4
+(B[m[31m-            || width.checked_mul(height).map_or(true, |n| n > u32::MAX as usize)
+(B[m[32m+    pub fn with_stride(
+(B[m[32m+        width: usize,
+(B[m[32m+        height: usize,
+(B[m[32m+        row_stride: usize,
+(B[m[32m+        data: &'a [u8],
+(B[m[32m+    ) -> Result<Self> {
+(B[m[32m+        if width > u32::MAX as usize / 4
+(B[m[32m+            || height > u32::MAX as usize / 4
+(B[m[32m+            || width
+(B[m[32m+                .checked_mul(height)
+(B[m[32m+                .map_or(true, |n| n > u32::MAX as usize)
+(B[m         {
+             return Err(CdchError::TooLarge { width, height });
+         }
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/src/lib.rs:119:
+         if row_stride < 3 * width {
+[31m-            return Err(CdchError::RowStride { stride: row_stride, width });
+(B[m[32m+            return Err(CdchError::RowStride {
+(B[m[32m+                stride: row_stride,
+(B[m[32m+                width,
+(B[m[32m+            });
+(B[m         }
+[31m-        let expected = if height == 0 { 0 } else { (height - 1) * row_stride + 3 * width };
+(B[m[32m+        let expected = if height == 0 {
+(B[m[32m+            0
+(B[m[32m+        } else {
+(B[m[32m+            (height - 1) * row_stride + 3 * width
+(B[m[32m+        };
+(B[m         if data.len() < expected {
+[31m-            return Err(CdchError::BufferSize { expected, actual: data.len() });
+(B[m[32m+            return Err(CdchError::BufferSize {
+(B[m[32m+                expected,
+(B[m[32m+                actual: data.len(),
+(B[m[32m+            });
+(B[m         }
+[31m-        Ok(Self { width, height, row_stride, data })
+(B[m[32m+        Ok(Self {
+(B[m[32m+            width,
+(B[m[32m+            height,
+(B[m[32m+            row_stride,
+(B[m[32m+            data,
+(B[m[32m+        })
+(B[m     }
+ 
+     #[inline]
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/src/lib.rs:170:
+     /// Archived research protocol: `[width // 2, height // 2]` (Python integer division),
+     /// as sent by `native_features.matrix` and `cdch_features.generate`.
+     pub fn archived(width: usize, height: usize) -> Self {
+[31m-        Self { x: (width / 2) as f64, y: (height / 2) as f64 }
+(B[m[32m+        Self {
+(B[m[32m+            x: (width / 2) as f64,
+(B[m[32m+            y: (height / 2) as f64,
+(B[m[32m+        }
+(B[m     }
+ 
+     /// The oracle's fallback when no centre is supplied and `ip-1.js`'s "centre"
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/src/lib.rs:177:
+     /// button: `width / 2`, `height / 2` as floating-point values.
+     pub fn midpoint(width: usize, height: usize) -> Self {
+[31m-        Self { x: width as f64 / 2.0, y: height as f64 / 2.0 }
+(B[m[32m+        Self {
+(B[m[32m+            x: width as f64 / 2.0,
+(B[m[32m+            y: height as f64 / 2.0,
+(B[m[32m+        }
+(B[m     }
+ }
+ 
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/src/lib.rs:191:
+ impl Params {
+     /// The archived protocol: centre `[w // 2, h // 2]`, 360 rays.
+     pub fn archived(width: usize, height: usize) -> Self {
+[31m-        Self { center: Center::archived(width, height), angle_step: 1 }
+(B[m[32m+        Self {
+(B[m[32m+            center: Center::archived(width, height),
+(B[m[32m+            angle_step: 1,
+(B[m[32m+        }
+(B[m     }
+ 
+     pub fn validate(&self) -> Result<()> {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/src/lib.rs:198:
+         if !self.center.x.is_finite() || !self.center.y.is_finite() {
+[31m-            return Err(CdchError::NonFiniteCenter { x: self.center.x, y: self.center.y });
+(B[m[32m+            return Err(CdchError::NonFiniteCenter {
+(B[m[32m+                x: self.center.x,
+(B[m[32m+                y: self.center.y,
+(B[m[32m+            });
+(B[m         }
+         if !(1..=360).contains(&self.angle_step) {
+             return Err(CdchError::AngleStep(self.angle_step));
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/src/lib.rs:226:
+ impl CdchMatrix {
+     pub fn from_vec(rows: usize, data: Vec<f64>) -> Result<Self> {
+         if data.len() != rows * BINS {
+[31m-            return Err(CdchError::BufferSize { expected: rows * BINS, actual: data.len() });
+(B[m[32m+            return Err(CdchError::BufferSize {
+(B[m[32m+                expected: rows * BINS,
+(B[m[32m+                actual: data.len(),
+(B[m[32m+            });
+(B[m         }
+         Ok(Self { rows, data })
+     }
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/src/lib.rs:243:
+         &self.data[i * BINS..(i + 1) * BINS]
+     }
+     pub fn view(&self) -> MatrixView<'_> {
+[31m-        MatrixView { rows: self.rows, data: &self.data }
+(B[m[32m+        MatrixView {
+(B[m[32m+            rows: self.rows,
+(B[m[32m+            data: &self.data,
+(B[m[32m+        }
+(B[m     }
+ }
+ 
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/src/lib.rs:257:
+ impl<'a> MatrixView<'a> {
+     pub fn new(rows: usize, data: &'a [f64]) -> Result<Self> {
+         if data.len() != rows * BINS {
+[31m-            return Err(CdchError::BufferSize { expected: rows * BINS, actual: data.len() });
+(B[m[32m+            return Err(CdchError::BufferSize {
+(B[m[32m+                expected: rows * BINS,
+(B[m[32m+                actual: data.len(),
+(B[m[32m+            });
+(B[m         }
+         Ok(Self { rows, data })
+     }
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/src/plan.rs:35:
+ impl SamplingPlan {
+     pub fn new(width: usize, height: usize, params: Params) -> Result<Self> {
+         params.validate()?;
+[31m-        if width.checked_mul(height).map_or(true, |n| n > u32::MAX as usize) {
+(B[m[32m+        if width
+(B[m[32m+            .checked_mul(height)
+(B[m[32m+            .map_or(true, |n| n > u32::MAX as usize)
+(B[m[32m+        {
+(B[m             return Err(CdchError::TooLarge { width, height });
+         }
+         let (x, y) = (params.center.x, params.center.y);
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/src/plan.rs:80:
+                 })
+             })
+             .collect();
+[31m-        Ok(Self { width, height, params, ray_starts, samples, unique, quotients, quotient_starts })
+(B[m[32m+        Ok(Self {
+(B[m[32m+            width,
+(B[m[32m+            height,
+(B[m[32m+            params,
+(B[m[32m+            ray_starts,
+(B[m[32m+            samples,
+(B[m[32m+            unique,
+(B[m[32m+            quotients,
+(B[m[32m+            quotient_starts,
+(B[m[32m+        })
+(B[m     }
+ 
+     pub fn width(&self) -> usize {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/src/plan.rs:134:
+     }
+     /// Heap bytes held by the plan.
+     pub fn heap_bytes(&self) -> usize {
+[31m-        4 * (self.ray_starts.capacity() + self.samples.capacity() + self.unique.capacity() + self.quotient_starts.capacity())
+(B[m[32m+        4 * (self.ray_starts.capacity()
+(B[m[32m+            + self.samples.capacity()
+(B[m[32m+            + self.unique.capacity()
+(B[m[32m+            + self.quotient_starts.capacity())
+(B[m             + 8 * self.quotients.capacity()
+     }
+ }
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/src/reference.rs:30:
+ }
+ 
+ /// Canonical CDCH plus a full per-ray trace (coordinates, multiplicities, counts).
+[31m-pub fn cdch_traced(img: &RgbImage<'_>, params: &Params, trig: Trig) -> Result<(CdchMatrix, Vec<RayTrace>)> {
+(B[m[32m+pub fn cdch_traced(
+(B[m[32m+    img: &RgbImage<'_>,
+(B[m[32m+    params: &Params,
+(B[m[32m+    trig: Trig,
+(B[m[32m+) -> Result<(CdchMatrix, Vec<RayTrace>)> {
+(B[m     let mut traces = Vec::with_capacity(params.n_rays());
+     let m = cdch_with(img, params, trig, Some(&mut traces))?;
+     Ok((m, traces))
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/src/reference.rs:86:
+         // const cumulativeHist = calculateCumulativeHistogram(rayHistogram);
+         calculate_cumulative_histogram(&ray_histogram, &mut data);
+         if let Some(t) = trace.as_deref_mut() {
+[31m-            t.push(RayTrace { angle, coords, counts: ray_histogram.to_vec() });
+(B[m[32m+            t.push(RayTrace {
+(B[m[32m+                angle,
+(B[m[32m+                coords,
+(B[m[32m+                counts: ray_histogram.to_vec(),
+(B[m[32m+            });
+(B[m         }
+         angle += params.angle_step;
+     }
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/tests/engine_vs_reference.rs:27:
+     let plan = SamplingPlan::new(w, h, params).unwrap();
+     let mut ws = Workspace::new();
+     let got = plan.matrix(&img, &mut ws).unwrap();
+[31m-    assert!(bits_eq(want.as_slice(), got.as_slice()), "matrix mismatch {w}x{h} {params:?}");
+(B[m[32m+    assert!(
+(B[m[32m+        bits_eq(want.as_slice(), got.as_slice()),
+(B[m[32m+        "matrix mismatch {w}x{h} {params:?}"
+(B[m[32m+    );
+(B[m     let cp = plan.checkpoints(&img, &mut ws).unwrap();
+     for i in 0..want.rows() {
+         for j in 0..CHECKPOINTS {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/tests/engine_vs_reference.rs:34:
+[31m-            let (a, b) = (want.row(i)[checkpoint_bin(j)], cp.values[i * CHECKPOINTS + j]);
+(B[m[31m-            assert_eq!(a.to_bits(), b.to_bits(), "checkpoint mismatch ray {i} j {j}");
+(B[m[32m+            let (a, b) = (
+(B[m[32m+                want.row(i)[checkpoint_bin(j)],
+(B[m[32m+                cp.values[i * CHECKPOINTS + j],
+(B[m[32m+            );
+(B[m[32m+            assert_eq!(
+(B[m[32m+                a.to_bits(),
+(B[m[32m+                b.to_bits(),
+(B[m[32m+                "checkpoint mismatch ray {i} j {j}"
+(B[m[32m+            );
+(B[m         }
+     }
+     // Trace coordinates agree with the plan, and counts reconstruct the CDF.
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/tests/engine_vs_reference.rs:39:
+     let (_, traces) = reference::cdch_traced(&img, &params, reference::Trig::V8Table).unwrap();
+     let hists = plan.histograms(&img, &mut ws).unwrap();
+     for (i, t) in traces.iter().enumerate() {
+[31m-        let coords: Vec<(i64, i64)> = plan.ray_coords(i).map(|(x, y)| (x as i64, y as i64)).collect();
+(B[m[32m+        let coords: Vec<(i64, i64)> = plan
+(B[m[32m+            .ray_coords(i)
+(B[m[32m+            .map(|(x, y)| (x as i64, y as i64))
+(B[m[32m+            .collect();
+(B[m         assert_eq!(coords, t.coords);
+         assert_eq!(&hists[i * BINS..(i + 1) * BINS], &t.counts[..]);
+     }
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/tests/engine_vs_reference.rs:55:
+         let center = match case % 6 {
+             0 => Center::archived(w, h),
+             1 => Center::midpoint(w, h),
+[31m-            2 => Center::new(rng.below(w as u64) as f64 + 0.5, rng.below(h as u64) as f64 + 0.5),
+(B[m[31m-            3 => Center::new((rng.next() % 4000) as f64 / 100.0 - 5.0, (rng.next() % 4000) as f64 / 100.0 - 5.0),
+(B[m[32m+            2 => Center::new(
+(B[m[32m+                rng.below(w as u64) as f64 + 0.5,
+(B[m[32m+                rng.below(h as u64) as f64 + 0.5,
+(B[m[32m+            ),
+(B[m[32m+            3 => Center::new(
+(B[m[32m+                (rng.next() % 4000) as f64 / 100.0 - 5.0,
+(B[m[32m+                (rng.next() % 4000) as f64 / 100.0 - 5.0,
+(B[m[32m+            ),
+(B[m             4 => Center::new(-3.0, h as f64 + 2.0), // outside: NaN rows
+             _ => Center::new(0.0, 0.0),
+         };
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/tests/engine_vs_reference.rs:63:
+         let step = [1u32, 1, 1, 2, 7, 45, 90, 359, 360][case % 9];
+[31m-        check(w, h, &pixels, Params { center, angle_step: step });
+(B[m[32m+        check(
+(B[m[32m+            w,
+(B[m[32m+            h,
+(B[m[32m+            &pixels,
+(B[m[32m+            Params {
+(B[m[32m+                center,
+(B[m[32m+                angle_step: step,
+(B[m[32m+            },
+(B[m[32m+        );
+(B[m     }
+ }
+ 
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/tests/engine_vs_reference.rs:80:
+     let stride = 3 * w + pad;
+     let mut strided = vec![0u8; stride * h];
+     for y in 0..h {
+[31m-        strided[y * stride..y * stride + 3 * w].copy_from_slice(&packed[y * 3 * w..(y + 1) * 3 * w]);
+(B[m[32m+        strided[y * stride..y * stride + 3 * w]
+(B[m[32m+            .copy_from_slice(&packed[y * 3 * w..(y + 1) * 3 * w]);
+(B[m     }
+     let params = Params::archived(w, h);
+     let plan = SamplingPlan::new(w, h, params).unwrap();
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/tests/engine_vs_reference.rs:87:
+     let mut ws = Workspace::new();
+[31m-    let a = plan.matrix(&RgbImage::new(w, h, &packed).unwrap(), &mut ws).unwrap();
+(B[m[31m-    let b = plan.matrix(&RgbImage::with_stride(w, h, stride, &strided).unwrap(), &mut ws).unwrap();
+(B[m[32m+    let a = plan
+(B[m[32m+        .matrix(&RgbImage::new(w, h, &packed).unwrap(), &mut ws)
+(B[m[32m+        .unwrap();
+(B[m[32m+    let b = plan
+(B[m[32m+        .matrix(
+(B[m[32m+            &RgbImage::with_stride(w, h, stride, &strided).unwrap(),
+(B[m[32m+            &mut ws,
+(B[m[32m+        )
+(B[m[32m+        .unwrap();
+(B[m     assert!(bits_eq(a.as_slice(), b.as_slice()));
+ }
+ 
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/tests/engine_vs_reference.rs:94:
+ fn empty_rays_are_nan_like_javascript() {
+     let pixels = vec![10u8; 4 * 4 * 3];
+     let img = RgbImage::new(4, 4, &pixels).unwrap();
+[31m-    let m = reference::cdch(&img, &Params { center: Center::new(-1.0, -1.0), angle_step: 1 }).unwrap();
+(B[m[32m+    let m = reference::cdch(
+(B[m[32m+        &img,
+(B[m[32m+        &Params {
+(B[m[32m+            center: Center::new(-1.0, -1.0),
+(B[m[32m+            angle_step: 1,
+(B[m[32m+        },
+(B[m[32m+    )
+(B[m[32m+    .unwrap();
+(B[m     assert!(m.as_slice().iter().all(|v| v.is_nan()));
+ }
+ 
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-core/tests/engine_vs_reference.rs:104:
+     assert!(RgbImage::new(4, 4, &pixels).is_err());
+     let ok = vec![0u8; 48];
+     let img = RgbImage::new(4, 4, &ok).unwrap();
+[31m-    assert!(reference::cdch(&img, &Params { center: Center::new(f64::NAN, 1.0), angle_step: 1 }).is_err());
+(B[m[31m-    assert!(reference::cdch(&img, &Params { center: Center::new(1.0, 1.0), angle_step: 0 }).is_err());
+(B[m[31m-    assert!(reference::cdch(&img, &Params { center: Center::new(1.0, 1.0), angle_step: 361 }).is_err());
+(B[m[32m+    assert!(reference::cdch(
+(B[m[32m+        &img,
+(B[m[32m+        &Params {
+(B[m[32m+            center: Center::new(f64::NAN, 1.0),
+(B[m[32m+            angle_step: 1
+(B[m[32m+        }
+(B[m[32m+    )
+(B[m[32m+    .is_err());
+(B[m[32m+    assert!(reference::cdch(
+(B[m[32m+        &img,
+(B[m[32m+        &Params {
+(B[m[32m+            center: Center::new(1.0, 1.0),
+(B[m[32m+            angle_step: 0
+(B[m[32m+        }
+(B[m[32m+    )
+(B[m[32m+    .is_err());
+(B[m[32m+    assert!(reference::cdch(
+(B[m[32m+        &img,
+(B[m[32m+        &Params {
+(B[m[32m+            center: Center::new(1.0, 1.0),
+(B[m[32m+            angle_step: 361
+(B[m[32m+        }
+(B[m[32m+    )
+(B[m[32m+    .is_err());
+(B[m }
+ 
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/src/extractor.rs:3:
+ use std::sync::Arc;
+ 
+ use cdch_core::engine::CHECKPOINTS;
+[31m-use cdch_core::{CdchError, Engine, MatrixView, Params, Result, RgbImage, SamplingPlan, Workspace, BINS, RAYS_ARCHIVED};
+(B[m[32m+use cdch_core::{
+(B[m[32m+    CdchError, Engine, MatrixView, Params, Result, RgbImage, SamplingPlan, Workspace, BINS,
+(B[m[32m+    RAYS_ARCHIVED,
+(B[m[32m+};
+(B[m 
+[31m-use crate::{compact_from_checkpoints, compact_prevalidated, from_matrix, rich, sector_from_checkpoints, Representation, A_DIM};
+(B[m[32m+use crate::{
+(B[m[32m+    compact_from_checkpoints, compact_prevalidated, from_matrix, rich, sector_from_checkpoints,
+(B[m[32m+    Representation, A_DIM,
+(B[m[32m+};
+(B[m 
+ /// Per-thread extractor. Holds reusable buffers and shares a plan cache.
+ ///
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/src/extractor.rs:54:
+     }
+ 
+     /// Full canonical matrix into `out` (`n_rays * 256`).
+[31m-    pub fn matrix_into(&mut self, img: &RgbImage<'_>, params: &Params, out: &mut [f64]) -> Result<()> {
+(B[m[32m+    pub fn matrix_into(
+(B[m[32m+        &mut self,
+(B[m[32m+        img: &RgbImage<'_>,
+(B[m[32m+        params: &Params,
+(B[m[32m+        out: &mut [f64],
+(B[m[32m+    ) -> Result<()> {
+(B[m         let plan = self.plan(img, params)?;
+         plan.matrix_into(img, &mut self.ws, out)
+     }
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/src/extractor.rs:64:
+     /// geometry replaces the O(360 x 256) scan, exactly.
+     fn require_valid_archived(plan: &SamplingPlan) -> Result<()> {
+         if plan.n_rays() != RAYS_ARCHIVED {
+[31m-            return Err(CdchError::RayCount { expected: RAYS_ARCHIVED, actual: plan.n_rays() });
+(B[m[32m+            return Err(CdchError::RayCount {
+(B[m[32m+                expected: RAYS_ARCHIVED,
+(B[m[32m+                actual: plan.n_rays(),
+(B[m[32m+            });
+(B[m         }
+         if !plan.all_rays_nonempty() {
+[31m-            return Err(CdchError::InvalidMatrix("non-finite values (empty ray?)".into()));
+(B[m[32m+            return Err(CdchError::InvalidMatrix(
+(B[m[32m+                "non-finite values (empty ray?)".into(),
+(B[m[32m+            ));
+(B[m         }
+         Ok(())
+     }
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/src/extractor.rs:76:
+     fn checkpoints(&mut self, img: &RgbImage<'_>, params: &Params) -> Result<Arc<SamplingPlan>> {
+         let plan = self.plan(img, params)?;
+         if plan.n_rays() != RAYS_ARCHIVED {
+[31m-            return Err(CdchError::RayCount { expected: RAYS_ARCHIVED, actual: plan.n_rays() });
+(B[m[32m+            return Err(CdchError::RayCount {
+(B[m[32m+                expected: RAYS_ARCHIVED,
+(B[m[32m+                actual: plan.n_rays(),
+(B[m[32m+            });
+(B[m         }
+         self.cp.resize(plan.n_rays() * CHECKPOINTS, 0.0);
+         plan.checkpoints_into(img, &mut self.ws, &mut self.cp)?;
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/src/extractor.rs:84:
+     }
+ 
+     /// One representation, fused where possible.
+[31m-    pub fn extract(&mut self, img: &RgbImage<'_>, params: &Params, rep: Representation, out: &mut [f64]) -> Result<()> {
+(B[m[32m+    pub fn extract(
+(B[m[32m+        &mut self,
+(B[m[32m+        img: &RgbImage<'_>,
+(B[m[32m+        params: &Params,
+(B[m[32m+        rep: Representation,
+(B[m[32m+        out: &mut [f64],
+(B[m[32m+    ) -> Result<()> {
+(B[m         if out.len() != rep.dim() {
+[31m-            return Err(CdchError::BufferSize { expected: rep.dim(), actual: out.len() });
+(B[m[32m+            return Err(CdchError::BufferSize {
+(B[m[32m+                expected: rep.dim(),
+(B[m[32m+                actual: out.len(),
+(B[m[32m+            });
+(B[m         }
+         match rep {
+             Representation::A => {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/src/extractor.rs:112:
+     }
+ 
+     /// Unfused reference path: full matrix, then the representation from the matrix.
+[31m-    pub fn extract_via_matrix(&mut self, img: &RgbImage<'_>, params: &Params, rep: Representation, out: &mut [f64]) -> Result<()> {
+(B[m[32m+    pub fn extract_via_matrix(
+(B[m[32m+        &mut self,
+(B[m[32m+        img: &RgbImage<'_>,
+(B[m[32m+        params: &Params,
+(B[m[32m+        rep: Representation,
+(B[m[32m+        out: &mut [f64],
+(B[m[32m+    ) -> Result<()> {
+(B[m         let plan = self.plan(img, params)?;
+         self.matrix.resize(plan.n_rays() * BINS, 0.0);
+         plan.matrix_into(img, &mut self.ws, &mut self.matrix)?;
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/src/lib.rs:21:
+ 
+ #![forbid(unsafe_code)]
+ 
+[31m-pub mod numpy_compat;
+(B[m mod extractor;
+[32m+pub mod numpy_compat;
+(B[m 
+ pub use extractor::FeatureExtractor;
+ 
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/src/lib.rs:79:
+ /// (`|x - 1| <= 1e-8 + 1e-5`), and `np.diff(cdf, axis=1) >= -1e-12`.
+ pub fn validate_matrix(m: &MatrixView<'_>) -> Result<()> {
+     if m.rows() != RAYS_ARCHIVED {
+[31m-        return Err(CdchError::RayCount { expected: RAYS_ARCHIVED, actual: m.rows() });
+(B[m[32m+        return Err(CdchError::RayCount {
+(B[m[32m+            expected: RAYS_ARCHIVED,
+(B[m[32m+            actual: m.rows(),
+(B[m[32m+        });
+(B[m     }
+     // One branch-light pass; errors are reported in the order descriptor() checks them.
+     let (mut non_finite, mut negative) = (false, false);
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/src/lib.rs:102:
+         }
+     }
+     if non_finite {
+[31m-        return Err(CdchError::InvalidMatrix("non-finite values (empty ray?)".into()));
+(B[m[32m+        return Err(CdchError::InvalidMatrix(
+(B[m[32m+            "non-finite values (empty ray?)".into(),
+(B[m[32m+        ));
+(B[m     }
+     if negative {
+         return Err(CdchError::InvalidMatrix("negative values".into()));
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/src/lib.rs:109:
+     }
+     if let Some(i) = unterminated {
+[31m-        return Err(CdchError::InvalidMatrix(format!("row {i} does not end at 1")));
+(B[m[32m+        return Err(CdchError::InvalidMatrix(format!(
+(B[m[32m+            "row {i} does not end at 1"
+(B[m[32m+        )));
+(B[m     }
+     if let Some(i) = non_monotone {
+         return Err(CdchError::InvalidMatrix(format!("row {i} is not monotone")));
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/src/lib.rs:254:
+ /// Representation A from the `360 x 32` checkpoint matrix (fused path). The caller
+ /// must establish validity (every ray non-empty), which for the canonical engine
+ /// is a property of the sampling plan.
+[31m-pub fn compact_from_checkpoints(cp: &[f64], sampled: &mut Vec<f64>, scratch: &mut Vec<f64>, out: &mut [f64]) -> Result<()> {
+(B[m[32m+pub fn compact_from_checkpoints(
+(B[m[32m+    cp: &[f64],
+(B[m[32m+    sampled: &mut Vec<f64>,
+(B[m[32m+    scratch: &mut Vec<f64>,
+(B[m[32m+    out: &mut [f64],
+(B[m[32m+) -> Result<()> {
+(B[m     if cp.len() != RAYS_ARCHIVED * CHECKPOINTS {
+[31m-        return Err(CdchError::RayCount { expected: RAYS_ARCHIVED, actual: cp.len() / CHECKPOINTS });
+(B[m[32m+        return Err(CdchError::RayCount {
+(B[m[32m+            expected: RAYS_ARCHIVED,
+(B[m[32m+            actual: cp.len() / CHECKPOINTS,
+(B[m[32m+        });
+(B[m     }
+     sampled.clear();
+     for i in 0..RAYS_ARCHIVED {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/src/lib.rs:272:
+ /// `cdf[:, 7::8].reshape(24, 15, 32).mean(axis=1).ravel()` (sequential sum over 15 rays).
+ pub fn sector(m: &MatrixView<'_>, out: &mut [f64]) -> Result<()> {
+     if m.rows() != RAYS_ARCHIVED {
+[31m-        return Err(CdchError::RayCount { expected: RAYS_ARCHIVED, actual: m.rows() });
+(B[m[32m+        return Err(CdchError::RayCount {
+(B[m[32m+            expected: RAYS_ARCHIVED,
+(B[m[32m+            actual: m.rows(),
+(B[m[32m+        });
+(B[m     }
+     sector_by(|i, j| m.at(i, 8 * j + 7), out);
+     Ok(())
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/src/lib.rs:281:
+ /// Representation C (and D) from the checkpoint matrix (fused path).
+ pub fn sector_from_checkpoints(cp: &[f64], out: &mut [f64]) -> Result<()> {
+     if cp.len() != RAYS_ARCHIVED * CHECKPOINTS {
+[31m-        return Err(CdchError::RayCount { expected: RAYS_ARCHIVED, actual: cp.len() / CHECKPOINTS });
+(B[m[32m+        return Err(CdchError::RayCount {
+(B[m[32m+            expected: RAYS_ARCHIVED,
+(B[m[32m+            actual: cp.len() / CHECKPOINTS,
+(B[m[32m+        });
+(B[m     }
+     sector_by(|i, j| cp[i * CHECKPOINTS + j], out);
+     Ok(())
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/src/lib.rs:336:
+         // products are signed zeros and libm is skipped with bit-identical results:
+         // ±0·pow(c,3) = ±0·c (pow keeps c's sign), ±0·pow(c,4) = ±0·1, and
+         // ±0·log2(max(±0, 1e-300)) = ∓0 because log2(1e-300) < 0.
+[31m-        let c3 = sum(&|b| if pmf[b] == 0.0 { pmf[b] * centered[b] } else { pmf[b] * centered[b].powf(3.0) }, BINS);
+(B[m[31m-        let c4 = sum(&|b| if pmf[b] == 0.0 { pmf[b] } else { pmf[b] * centered[b].powf(4.0) }, BINS);
+(B[m[32m+        let c3 = sum(
+(B[m[32m+            &|b| {
+(B[m[32m+                if pmf[b] == 0.0 {
+(B[m[32m+                    pmf[b] * centered[b]
+(B[m[32m+                } else {
+(B[m[32m+                    pmf[b] * centered[b].powf(3.0)
+(B[m[32m+                }
+(B[m[32m+            },
+(B[m[32m+            BINS,
+(B[m[32m+        );
+(B[m[32m+        let c4 = sum(
+(B[m[32m+            &|b| {
+(B[m[32m+                if pmf[b] == 0.0 {
+(B[m[32m+                    pmf[b]
+(B[m[32m+                } else {
+(B[m[32m+                    pmf[b] * centered[b].powf(4.0)
+(B[m[32m+                }
+(B[m[32m+            },
+(B[m[32m+            BINS,
+(B[m[32m+        );
+(B[m         let (skew, kurt) = if variance > 1e-10 {
+             (c3 / variance.powf(1.5), c4 / (variance * variance))
+         } else {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/src/lib.rs:344:
+             (0.0, 0.0)
+         };
+[31m-        let entropy = -sum(&|b| if pmf[b] == 0.0 { -pmf[b] } else { pmf[b] * pmf[b].max(1e-300).log2() }, BINS) / 8.0;
+(B[m[32m+        let entropy = -sum(
+(B[m[32m+            &|b| {
+(B[m[32m+                if pmf[b] == 0.0 {
+(B[m[32m+                    -pmf[b]
+(B[m[32m+                } else {
+(B[m[32m+                    pmf[b] * pmf[b].max(1e-300).log2()
+(B[m[32m+                }
+(B[m[32m+            },
+(B[m[32m+            BINS,
+(B[m[32m+        ) / 8.0;
+(B[m         let concentration = sum(&|b| pmf[b] * pmf[b], BINS);
+         let max_mass = pmf.iter().copied().fold(f64::NEG_INFINITY, f64::max);
+         let mad = sum(&|b| (pmf[b + 1] - pmf[b]).abs(), BINS - 1) / (BINS - 1) as f64;
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/src/lib.rs:351:
+             // (cdf >= p).argmax() / 255 — 0 when no bin qualifies.
+             cdf.iter().position(|&v| v >= p).unwrap_or(0) as f64 / 255.0
+         };
+[31m-        let qs = [quantile(0.1), quantile(0.25), quantile(0.5), quantile(0.75), quantile(0.9)];
+(B[m[32m+        let qs = [
+(B[m[32m+            quantile(0.1),
+(B[m[32m+            quantile(0.25),
+(B[m[32m+            quantile(0.5),
+(B[m[32m+            quantile(0.75),
+(B[m[32m+            quantile(0.9),
+(B[m[32m+        ];
+(B[m         let vals = [
+             mean,
+             variance.sqrt(),
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/src/lib.rs:398:
+ /// Any representation from the full matrix.
+ pub fn from_matrix(m: &MatrixView<'_>, rep: Representation, out: &mut [f64]) -> Result<()> {
+     if out.len() != rep.dim() {
+[31m-        return Err(CdchError::BufferSize { expected: rep.dim(), actual: out.len() });
+(B[m[32m+        return Err(CdchError::BufferSize {
+(B[m[32m+            expected: rep.dim(),
+(B[m[32m+            actual: out.len(),
+(B[m[32m+        });
+(B[m     }
+     match rep {
+         Representation::A => compact(m, out),
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/src/lib.rs:439:
+         let mean = pairwise_sum_by(BINS, &|b| pmf[b] * bins[b]);
+         let c: Vec<f64> = bins.iter().map(|x| x - mean).collect();
+         [
+[31m-            pairwise_sum_by(BINS, &|b| if pmf[b] == 0.0 { pmf[b] * c[b] } else { pmf[b] * c[b].powf(3.0) }),
+(B[m[31m-            pairwise_sum_by(BINS, &|b| if pmf[b] == 0.0 { pmf[b] } else { pmf[b] * c[b].powf(4.0) }),
+(B[m[31m-            pairwise_sum_by(BINS, &|b| if pmf[b] == 0.0 { -pmf[b] } else { pmf[b] * pmf[b].max(1e-300).log2() }),
+(B[m[32m+            pairwise_sum_by(BINS, &|b| {
+(B[m[32m+                if pmf[b] == 0.0 {
+(B[m[32m+                    pmf[b] * c[b]
+(B[m[32m+                } else {
+(B[m[32m+                    pmf[b] * c[b].powf(3.0)
+(B[m[32m+                }
+(B[m[32m+            }),
+(B[m[32m+            pairwise_sum_by(BINS, &|b| {
+(B[m[32m+                if pmf[b] == 0.0 {
+(B[m[32m+                    pmf[b]
+(B[m[32m+                } else {
+(B[m[32m+                    pmf[b] * c[b].powf(4.0)
+(B[m[32m+                }
+(B[m[32m+            }),
+(B[m[32m+            pairwise_sum_by(BINS, &|b| {
+(B[m[32m+                if pmf[b] == 0.0 {
+(B[m[32m+                    -pmf[b]
+(B[m[32m+                } else {
+(B[m[32m+                    pmf[b] * pmf[b].max(1e-300).log2()
+(B[m[32m+                }
+(B[m[32m+            }),
+(B[m         ]
+     }
+ 
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/src/lib.rs:473:
+             }
+             let (a, b) = (per_ray_reference(&cdf), per_ray_shortcut(&cdf));
+             for k in 0..3 {
+[31m-                assert_eq!(a[k].to_bits(), b[k].to_bits(), "case {case} term {k}: {} vs {}", a[k], b[k]);
+(B[m[32m+                assert_eq!(
+(B[m[32m+                    a[k].to_bits(),
+(B[m[32m+                    b[k].to_bits(),
+(B[m[32m+                    "case {case} term {k}: {} vs {}",
+(B[m[32m+                    a[k],
+(B[m[32m+                    b[k]
+(B[m[32m+                );
+(B[m             }
+         }
+     }
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/src/numpy_compat.rs:128:
+     #[test]
+     fn slice_and_closure_forms_agree_bitwise() {
+         let mut s = 0x9E37_79B9_7F4A_7C15u64;
+[31m-        for n in [0usize, 1, 5, 7, 8, 9, 15, 16, 17, 127, 128, 129, 255, 256, 257, 360, 1000] {
+(B[m[32m+        for n in [
+(B[m[32m+            0usize, 1, 5, 7, 8, 9, 15, 16, 17, 127, 128, 129, 255, 256, 257, 360, 1000,
+(B[m[32m+        ] {
+(B[m             let xs: Vec<f64> = (0..n)
+                 .map(|_| {
+                     s ^= s << 13;
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/tests/fused_equivalence.rs:19:
+ fn fused_equals_matrix_path() {
+     let mut fx = FeatureExtractor::new();
+     for seed in 1..40u64 {
+[31m-        let (w, h) = match seed % 4 { 0 => (128, 128), 1 => (97, 140), 2 => (200, 64), _ => (33, 33) };
+(B[m[32m+        let (w, h) = match seed % 4 {
+(B[m[32m+            0 => (128, 128),
+(B[m[32m+            1 => (97, 140),
+(B[m[32m+            2 => (200, 64),
+(B[m[32m+            _ => (33, 33),
+(B[m[32m+        };
+(B[m         let mut px = rng_bytes(seed, w * h * 3);
+         if seed % 5 == 0 {
+             // smooth image: few distinct intensities, many repeated bins
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/tests/fused_equivalence.rs:26:
+[31m-            for (i, p) in px.iter_mut().enumerate() { *p = ((i / 3) % w) as u8; }
+(B[m[32m+            for (i, p) in px.iter_mut().enumerate() {
+(B[m[32m+                *p = ((i / 3) % w) as u8;
+(B[m[32m+            }
+(B[m         }
+         let img = RgbImage::new(w, h, &px).unwrap();
+[31m-        for params in [Params::archived(w, h), Params { center: Center::new(w as f64 / 2.0 - 0.5, h as f64 / 3.0), angle_step: 1 }] {
+(B[m[31m-            for rep in [Representation::A, Representation::B, Representation::C, Representation::D] {
+(B[m[32m+        for params in [
+(B[m[32m+            Params::archived(w, h),
+(B[m[32m+            Params {
+(B[m[32m+                center: Center::new(w as f64 / 2.0 - 0.5, h as f64 / 3.0),
+(B[m[32m+                angle_step: 1,
+(B[m[32m+            },
+(B[m[32m+        ] {
+(B[m[32m+            for rep in [
+(B[m[32m+                Representation::A,
+(B[m[32m+                Representation::B,
+(B[m[32m+                Representation::C,
+(B[m[32m+                Representation::D,
+(B[m[32m+            ] {
+(B[m                 let mut a = vec![0.0; rep.dim()];
+                 let mut b = vec![0.0; rep.dim()];
+                 fx.extract(&img, &params, rep, &mut a).unwrap();
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/tests/fused_equivalence.rs:34:
+                 fx.extract_via_matrix(&img, &params, rep, &mut b).unwrap();
+                 for (k, (x, y)) in a.iter().zip(&b).enumerate() {
+[31m-                    assert_eq!(x.to_bits(), y.to_bits(), "{rep:?} feature {k} seed {seed}: {x} vs {y}");
+(B[m[32m+                    assert_eq!(
+(B[m[32m+                        x.to_bits(),
+(B[m[32m+                        y.to_bits(),
+(B[m[32m+                        "{rep:?} feature {k} seed {seed}: {x} vs {y}"
+(B[m[32m+                    );
+(B[m                 }
+             }
+         }
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/tests/fused_equivalence.rs:44:
+ fn empty_ray_is_rejected_for_a_like_python() {
+     let px = vec![0u8; 16 * 16 * 3];
+     let img = RgbImage::new(16, 16, &px).unwrap();
+[31m-    let params = Params { center: Center::new(-5.0, 3.0), angle_step: 1 };
+(B[m[32m+    let params = Params {
+(B[m[32m+        center: Center::new(-5.0, 3.0),
+(B[m[32m+        angle_step: 1,
+(B[m[32m+    };
+(B[m     let mut fx = FeatureExtractor::new();
+     let mut out = vec![0.0; 56];
+[31m-    assert!(fx.extract(&img, &params, Representation::A, &mut out).is_err());
+(B[m[31m-    assert!(fx.extract_via_matrix(&img, &params, Representation::A, &mut out).is_err());
+(B[m[32m+    assert!(fx
+(B[m[32m+        .extract(&img, &params, Representation::A, &mut out)
+(B[m[32m+        .is_err());
+(B[m[32m+    assert!(fx
+(B[m[32m+        .extract_via_matrix(&img, &params, Representation::A, &mut out)
+(B[m[32m+        .is_err());
+(B[m     // C does not validate in the Python pipeline; NaN propagates identically.
+     let mut c1 = vec![0.0; 768];
+     let mut c2 = vec![0.0; 768];
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-features/tests/fused_equivalence.rs:55:
+[31m-    fx.extract(&img, &params, Representation::C, &mut c1).unwrap();
+(B[m[31m-    fx.extract_via_matrix(&img, &params, Representation::C, &mut c2).unwrap();
+(B[m[31m-    assert!(c1.iter().zip(&c2).all(|(a, b)| a.to_bits() == b.to_bits() || (a.is_nan() && b.is_nan())));
+(B[m[32m+    fx.extract(&img, &params, Representation::C, &mut c1)
+(B[m[32m+        .unwrap();
+(B[m[32m+    fx.extract_via_matrix(&img, &params, Representation::C, &mut c2)
+(B[m[32m+        .unwrap();
+(B[m[32m+    assert!(c1
+(B[m[32m+        .iter()
+(B[m[32m+        .zip(&c2)
+(B[m[32m+        .all(|(a, b)| a.to_bits() == b.to_bits() || (a.is_nan() && b.is_nan())));
+(B[m }
+ 
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:16:
+ use cdch_core::{reference, CdchError, Center, Engine, MatrixView, Params, RgbImage, BINS};
+ use cdch_features::{FeatureExtractor, Representation};
+ use numpy::ndarray::{Array2, Array3};
+[31m-use numpy::{IntoPyArray, PyArray2, PyArray3, PyArray4, PyArrayDescrMethods, PyArrayDyn, PyArrayMethods, PyUntypedArray, PyUntypedArrayMethods};
+(B[m[32m+use numpy::{
+(B[m[32m+    IntoPyArray, PyArray2, PyArray3, PyArray4, PyArrayDescrMethods, PyArrayDyn, PyArrayMethods,
+(B[m[32m+    PyUntypedArray, PyUntypedArrayMethods,
+(B[m[32m+};
+(B[m use pyo3::exceptions::{PyTypeError, PyValueError};
+ use pyo3::prelude::*;
+ use pyo3::types::PyDict;
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:74:
+ fn as_array<'py>(obj: &Bound<'py, PyAny>, what: &str) -> PyResult<Bound<'py, PyUntypedArray>> {
+     obj.cast::<PyUntypedArray>()
+         .map(|a| a.clone())
+[31m-        .map_err(|_| PyTypeError::new_err(format!("{what} must be a numpy.ndarray, got {}", obj.get_type().name().map(|n| n.to_string()).unwrap_or_default())))
+(B[m[32m+        .map_err(|_| {
+(B[m[32m+            PyTypeError::new_err(format!(
+(B[m[32m+                "{what} must be a numpy.ndarray, got {}",
+(B[m[32m+                obj.get_type()
+(B[m[32m+                    .name()
+(B[m[32m+                    .map(|n| n.to_string())
+(B[m[32m+                    .unwrap_or_default()
+(B[m[32m+            ))
+(B[m[32m+        })
+(B[m }
+ 
+ /// Extract a single `(H, W, 3)` uint8 image.
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:94:
+     } else {
+         PixelData::Owned(typed.as_array().iter().copied().collect())
+     };
+[31m-    Ok(Pixels { width: shape[1], height: shape[0], data })
+(B[m[32m+    Ok(Pixels {
+(B[m[32m+        width: shape[1],
+(B[m[32m+        height: shape[0],
+(B[m[32m+        data,
+(B[m[32m+    })
+(B[m }
+ 
+[31m-fn params_for(width: usize, height: usize, center: Option<(f64, f64)>, angle_step: u32) -> PyResult<Params> {
+(B[m[32m+fn params_for(
+(B[m[32m+    width: usize,
+(B[m[32m+    height: usize,
+(B[m[32m+    center: Option<(f64, f64)>,
+(B[m[32m+    angle_step: u32,
+(B[m[32m+) -> PyResult<Params> {
+(B[m     let params = Params {
+         center: center.map_or(Center::archived(width, height), |(x, y)| Center::new(x, y)),
+         angle_step,
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:107:
+ }
+ 
+ fn representation(kind: &str) -> PyResult<Representation> {
+[31m-    Representation::parse(kind)
+(B[m[31m-        .ok_or_else(|| PyValueError::new_err(format!("unknown CDCH representation {kind:?}; expected 'A', 'B', 'C' or 'D'")))
+(B[m[32m+    Representation::parse(kind).ok_or_else(|| {
+(B[m[32m+        PyValueError::new_err(format!(
+(B[m[32m+            "unknown CDCH representation {kind:?}; expected 'A', 'B', 'C' or 'D'"
+(B[m[32m+        ))
+(B[m[32m+    })
+(B[m }
+ 
+ /// Canonical CDCH matrix, shape `(n_rays, 256)`, float64.
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:117:
+ /// pass `(width / 2, height / 2)` to reproduce the oracle's own default.
+ #[pyfunction]
+ #[pyo3(signature = (rgb, center=None, angle_step=1))]
+[31m-fn cdch<'py>(py: Python<'py>, rgb: &Bound<'py, PyAny>, center: Option<(f64, f64)>, angle_step: u32) -> PyResult<Bound<'py, PyArray2<f64>>> {
+(B[m[32m+fn cdch<'py>(
+(B[m[32m+    py: Python<'py>,
+(B[m[32m+    rgb: &Bound<'py, PyAny>,
+(B[m[32m+    center: Option<(f64, f64)>,
+(B[m[32m+    angle_step: u32,
+(B[m[32m+) -> PyResult<Bound<'py, PyArray2<f64>>> {
+(B[m     let px = image_from(rgb)?;
+     let params = params_for(px.width, px.height, center, angle_step)?;
+     let rows = params.n_rays();
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:124:
+     let img = px.image().map_err(err)?;
+     let mut out = vec![0.0; rows * BINS];
+[31m-    EXTRACTOR.with(|fx| fx.borrow_mut().matrix_into(&img, &params, &mut out)).map_err(err)?;
+(B[m[31m-    Ok(Array2::from_shape_vec((rows, BINS), out).expect("shape").into_pyarray(py))
+(B[m[32m+    EXTRACTOR
+(B[m[32m+        .with(|fx| fx.borrow_mut().matrix_into(&img, &params, &mut out))
+(B[m[32m+        .map_err(err)?;
+(B[m[32m+    Ok(Array2::from_shape_vec((rows, BINS), out)
+(B[m[32m+        .expect("shape")
+(B[m[32m+        .into_pyarray(py))
+(B[m }
+ 
+ /// Canonical CDCH via the literal reference port (slow; for verification).
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:131:
+ #[pyfunction]
+ #[pyo3(signature = (rgb, center=None, angle_step=1))]
+[31m-fn cdch_reference<'py>(py: Python<'py>, rgb: &Bound<'py, PyAny>, center: Option<(f64, f64)>, angle_step: u32) -> PyResult<Bound<'py, PyArray2<f64>>> {
+(B[m[32m+fn cdch_reference<'py>(
+(B[m[32m+    py: Python<'py>,
+(B[m[32m+    rgb: &Bound<'py, PyAny>,
+(B[m[32m+    center: Option<(f64, f64)>,
+(B[m[32m+    angle_step: u32,
+(B[m[32m+) -> PyResult<Bound<'py, PyArray2<f64>>> {
+(B[m     let px = image_from(rgb)?;
+     let params = params_for(px.width, px.height, center, angle_step)?;
+     let m = reference::cdch(&px.image().map_err(err)?, &params).map_err(err)?;
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:137:
+     let rows = m.rows();
+[31m-    Ok(Array2::from_shape_vec((rows, BINS), m.into_vec()).expect("shape").into_pyarray(py))
+(B[m[32m+    Ok(Array2::from_shape_vec((rows, BINS), m.into_vec())
+(B[m[32m+        .expect("shape")
+(B[m[32m+        .into_pyarray(py))
+(B[m }
+ 
+ /// Integer ray histograms, shape `(n_rays, 256)`, uint32.
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:142:
+ #[pyfunction]
+ #[pyo3(signature = (rgb, center=None, angle_step=1))]
+[31m-fn histograms<'py>(py: Python<'py>, rgb: &Bound<'py, PyAny>, center: Option<(f64, f64)>, angle_step: u32) -> PyResult<Bound<'py, PyArray2<u32>>> {
+(B[m[32m+fn histograms<'py>(
+(B[m[32m+    py: Python<'py>,
+(B[m[32m+    rgb: &Bound<'py, PyAny>,
+(B[m[32m+    center: Option<(f64, f64)>,
+(B[m[32m+    angle_step: u32,
+(B[m[32m+) -> PyResult<Bound<'py, PyArray2<u32>>> {
+(B[m     let px = image_from(rgb)?;
+     let params = params_for(px.width, px.height, center, angle_step)?;
+     let rows = params.n_rays();
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:148:
+     let plan = engine().plan(px.width, px.height, params).map_err(err)?;
+     let mut ws = cdch_core::Workspace::new();
+[31m-    let data = plan.histograms(&px.image().map_err(err)?, &mut ws).map_err(err)?;
+(B[m[31m-    Ok(Array2::from_shape_vec((rows, BINS), data).expect("shape").into_pyarray(py))
+(B[m[32m+    let data = plan
+(B[m[32m+        .histograms(&px.image().map_err(err)?, &mut ws)
+(B[m[32m+        .map_err(err)?;
+(B[m[32m+    Ok(Array2::from_shape_vec((rows, BINS), data)
+(B[m[32m+        .expect("shape")
+(B[m[32m+        .into_pyarray(py))
+(B[m }
+ 
+ /// Sampled coordinates: `(ray_lengths, coords)` with `coords` of shape `(N, 2)` holding
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:174:
+     }
+     let n = coords.len() / 2;
+     Ok((
+[31m-        numpy::ndarray::ArrayD::from_shape_vec(vec![lengths.len()], lengths).expect("shape").into_pyarray(py),
+(B[m[31m-        Array2::from_shape_vec((n, 2), coords).expect("shape").into_pyarray(py),
+(B[m[32m+        numpy::ndarray::ArrayD::from_shape_vec(vec![lengths.len()], lengths)
+(B[m[32m+            .expect("shape")
+(B[m[32m+            .into_pyarray(py),
+(B[m[32m+        Array2::from_shape_vec((n, 2), coords)
+(B[m[32m+            .expect("shape")
+(B[m[32m+            .into_pyarray(py),
+(B[m     ))
+ }
+ 
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:182:
+ fn shaped<'py>(py: Python<'py>, rep: Representation, v: Vec<f64>) -> Bound<'py, PyArrayDyn<f64>> {
+[31m-    let shape = if rep == Representation::D { vec![24, 32] } else { vec![v.len()] };
+(B[m[31m-    numpy::ndarray::ArrayD::from_shape_vec(shape, v).expect("shape").into_pyarray(py)
+(B[m[32m+    let shape = if rep == Representation::D {
+(B[m[32m+        vec![24, 32]
+(B[m[32m+    } else {
+(B[m[32m+        vec![v.len()]
+(B[m[32m+    };
+(B[m[32m+    numpy::ndarray::ArrayD::from_shape_vec(shape, v)
+(B[m[32m+        .expect("shape")
+(B[m[32m+        .into_pyarray(py)
+(B[m }
+ 
+ /// One representation computed directly from pixels (fused where possible).
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:188:
+ /// A: (56,), B: (98,), C: (768,), D: (24, 32).
+ #[pyfunction]
+ #[pyo3(signature = (rgb, kind="A", center=None, fused=true))]
+[31m-fn features<'py>(py: Python<'py>, rgb: &Bound<'py, PyAny>, kind: &str, center: Option<(f64, f64)>, fused: bool) -> PyResult<Bound<'py, PyArrayDyn<f64>>> {
+(B[m[32m+fn features<'py>(
+(B[m[32m+    py: Python<'py>,
+(B[m[32m+    rgb: &Bound<'py, PyAny>,
+(B[m[32m+    kind: &str,
+(B[m[32m+    center: Option<(f64, f64)>,
+(B[m[32m+    fused: bool,
+(B[m[32m+) -> PyResult<Bound<'py, PyArrayDyn<f64>>> {
+(B[m     let rep = representation(kind)?;
+     let px = image_from(rgb)?;
+     let params = params_for(px.width, px.height, center, 1)?;
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:210:
+ /// Several representations from one image in a single call: returns `{kind: array}`.
+ #[pyfunction]
+ #[pyo3(signature = (rgb, kinds, center=None))]
+[31m-fn features_multi<'py>(py: Python<'py>, rgb: &Bound<'py, PyAny>, kinds: Vec<String>, center: Option<(f64, f64)>) -> PyResult<Bound<'py, PyDict>> {
+(B[m[31m-    let reps = kinds.iter().map(|k| representation(k)).collect::<PyResult<Vec<_>>>()?;
+(B[m[32m+fn features_multi<'py>(
+(B[m[32m+    py: Python<'py>,
+(B[m[32m+    rgb: &Bound<'py, PyAny>,
+(B[m[32m+    kinds: Vec<String>,
+(B[m[32m+    center: Option<(f64, f64)>,
+(B[m[32m+) -> PyResult<Bound<'py, PyDict>> {
+(B[m[32m+    let reps = kinds
+(B[m[32m+        .iter()
+(B[m[32m+        .map(|k| representation(k))
+(B[m[32m+        .collect::<PyResult<Vec<_>>>()?;
+(B[m     let px = image_from(rgb)?;
+     let params = params_for(px.width, px.height, center, 1)?;
+     let img = px.image().map_err(err)?;
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:236:
+ /// A representation from an existing canonical matrix of shape `(n_rays, 256)`.
+ #[pyfunction]
+ #[pyo3(signature = (cdf, kind="A"))]
+[31m-fn features_from_matrix<'py>(py: Python<'py>, cdf: &Bound<'py, PyAny>, kind: &str) -> PyResult<Bound<'py, PyArrayDyn<f64>>> {
+(B[m[32m+fn features_from_matrix<'py>(
+(B[m[32m+    py: Python<'py>,
+(B[m[32m+    cdf: &Bound<'py, PyAny>,
+(B[m[32m+    kind: &str,
+(B[m[32m+) -> PyResult<Bound<'py, PyArrayDyn<f64>>> {
+(B[m     let rep = representation(kind)?;
+     let arr = as_array(cdf, "cdf")?;
+     if !arr.dtype().is_equiv_to(&numpy::dtype::<f64>(py)) {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:243:
+[31m-        return Err(PyTypeError::new_err(format!("cdf must have dtype float64, got {}", arr.dtype().str()?)));
+(B[m[32m+        return Err(PyTypeError::new_err(format!(
+(B[m[32m+            "cdf must have dtype float64, got {}",
+(B[m[32m+            arr.dtype().str()?
+(B[m[32m+        )));
+(B[m     }
+     let shape = arr.shape().to_vec();
+     if shape.len() != 2 || shape[1] != BINS {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:247:
+[31m-        return Err(PyValueError::new_err(format!("cdf must have shape (n_rays, 256), got {shape:?}")));
+(B[m[32m+        return Err(PyValueError::new_err(format!(
+(B[m[32m+            "cdf must have shape (n_rays, 256), got {shape:?}"
+(B[m[32m+        )));
+(B[m     }
+     let typed = arr.cast::<PyArray2<f64>>()?.readonly();
+     let owned: Vec<f64>;
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:255:
+         &owned
+     };
+     let mut out = vec![0.0; rep.dim()];
+[31m-    cdch_features::from_matrix(&MatrixView::new(shape[0], data).map_err(err)?, rep, &mut out).map_err(err)?;
+(B[m[32m+    cdch_features::from_matrix(
+(B[m[32m+        &MatrixView::new(shape[0], data).map_err(err)?,
+(B[m[32m+        rep,
+(B[m[32m+        &mut out,
+(B[m[32m+    )
+(B[m[32m+    .map_err(err)?;
+(B[m     Ok(shaped(py, rep, out))
+ }
+ 
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:264:
+     check_uint8(&arr, "images")?;
+     let shape = arr.shape().to_vec();
+     if shape.len() != 4 || shape[3] != 3 {
+[31m-        return Err(PyValueError::new_err(format!("images must have shape (n, height, width, 3), got {shape:?}")));
+(B[m[32m+        return Err(PyValueError::new_err(format!(
+(B[m[32m+            "images must have shape (n, height, width, 3), got {shape:?}"
+(B[m[32m+        )));
+(B[m     }
+     let typed = arr.cast::<PyArray4<u8>>()?.readonly();
+     let data = if typed.is_c_contiguous() {
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:279:
+ /// calls (building a pool costs far more than a typical batch item). `None`/`0` means
+ /// the global pool.
+ fn pool(threads: Option<usize>) -> PyResult<Option<Arc<rayon::ThreadPool>>> {
+[31m-    static POOLS: OnceLock<std::sync::Mutex<std::collections::HashMap<usize, Arc<rayon::ThreadPool>>>> = OnceLock::new();
+(B[m[32m+    static POOLS: OnceLock<
+(B[m[32m+        std::sync::Mutex<std::collections::HashMap<usize, Arc<rayon::ThreadPool>>>,
+(B[m[32m+    > = OnceLock::new();
+(B[m     let n = match threads {
+         None | Some(0) => return Ok(None),
+         Some(n) => n,
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:286:
+     };
+[31m-    let mut pools = POOLS.get_or_init(Default::default).lock().expect("pool cache poisoned");
+(B[m[32m+    let mut pools = POOLS
+(B[m[32m+        .get_or_init(Default::default)
+(B[m[32m+        .lock()
+(B[m[32m+        .expect("pool cache poisoned");
+(B[m     if let Some(p) = pools.get(&n) {
+         return Ok(Some(Arc::clone(p)));
+     }
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:291:
+     let p = Arc::new(
+[31m-        rayon::ThreadPoolBuilder::new().num_threads(n).build().map_err(|e| PyValueError::new_err(e.to_string()))?,
+(B[m[32m+        rayon::ThreadPoolBuilder::new()
+(B[m[32m+            .num_threads(n)
+(B[m[32m+            .build()
+(B[m[32m+            .map_err(|e| PyValueError::new_err(e.to_string()))?,
+(B[m     );
+     pools.insert(n, Arc::clone(&p));
+     Ok(Some(p))
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:317:
+ /// `threads=1` runs serially on the calling thread; `None` uses all cores (rayon).
+ #[pyfunction]
+ #[pyo3(signature = (images, kind="A", center=None, threads=None))]
+[31m-fn batch_features<'py>(py: Python<'py>, images: &Bound<'py, PyAny>, kind: &str, center: Option<(f64, f64)>, threads: Option<usize>) -> PyResult<Bound<'py, PyArray2<f64>>> {
+(B[m[32m+fn batch_features<'py>(
+(B[m[32m+    py: Python<'py>,
+(B[m[32m+    images: &Bound<'py, PyAny>,
+(B[m[32m+    kind: &str,
+(B[m[32m+    center: Option<(f64, f64)>,
+(B[m[32m+    threads: Option<usize>,
+(B[m[32m+) -> PyResult<Bound<'py, PyArray2<f64>>> {
+(B[m     let rep = representation(kind)?;
+     let (n, h, w, data) = stack_from(images)?;
+     let params = params_for(w, h, center, 1)?;
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:334:
+             Ok::<_, CdchError>(out)
+         })
+         .map_err(err)?;
+[31m-    Ok(Array2::from_shape_vec((n, dim), out).expect("shape").into_pyarray(py))
+(B[m[32m+    Ok(Array2::from_shape_vec((n, dim), out)
+(B[m[32m+        .expect("shape")
+(B[m[32m+        .into_pyarray(py))
+(B[m }
+ 
+ /// Batch canonical matrices: `(n, H, W, 3)` uint8 → `(n, n_rays, 256)` float64.
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:341:
+ #[pyfunction]
+ #[pyo3(signature = (images, center=None, angle_step=1, threads=None))]
+[31m-fn batch_cdch<'py>(py: Python<'py>, images: &Bound<'py, PyAny>, center: Option<(f64, f64)>, angle_step: u32, threads: Option<usize>) -> PyResult<Bound<'py, PyArray3<f64>>> {
+(B[m[32m+fn batch_cdch<'py>(
+(B[m[32m+    py: Python<'py>,
+(B[m[32m+    images: &Bound<'py, PyAny>,
+(B[m[32m+    center: Option<(f64, f64)>,
+(B[m[32m+    angle_step: u32,
+(B[m[32m+    threads: Option<usize>,
+(B[m[32m+) -> PyResult<Bound<'py, PyArray3<f64>>> {
+(B[m     let (n, h, w, data) = stack_from(images)?;
+     let params = params_for(w, h, center, angle_step)?;
+     let rows = params.n_rays();
+Diff in /Users/mykytasiryk/Development/science/experiments/cdch-rust-rewrite/ferris/crates/cdch-python/src/lib.rs:359:
+             Ok::<_, CdchError>(out)
+         })
+         .map_err(err)?;
+[31m-    Ok(Array3::from_shape_vec((n, rows, BINS), out).expect("shape").into_pyarray(py))
+(B[m[32m+    Ok(Array3::from_shape_vec((n, rows, BINS), out)
+(B[m[32m+        .expect("shape")
+(B[m[32m+        .into_pyarray(py))
+(B[m }
+ 
+ /// Build metadata (for benchmark provenance).

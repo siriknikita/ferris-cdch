@@ -131,7 +131,11 @@ mod tests {
             (-0.0, -0.0),
         ];
         for &(x, want) in cases {
-            assert!(same(round(x), want), "round({x:e}) = {:e}, want {want:e}", round(x));
+            assert!(
+                same(round(x), want),
+                "round({x:e}) = {:e}, want {want:e}",
+                round(x)
+            );
         }
         assert!(round(f64::NAN).is_nan());
         assert_eq!(round(f64::INFINITY), f64::INFINITY);
@@ -191,14 +195,21 @@ mod libm_comparison {
             let (c8, s8) = direction(a);
             let (cl, sl) = direction_libm(a);
             let radians = (a as f64 - 90.0) * (std::f64::consts::PI / 180.0);
-            assert_eq!(radians.to_bits(), super::radians(a).to_bits(), "radians differ at {a}");
+            assert_eq!(
+                radians.to_bits(),
+                super::radians(a).to_bits(),
+                "radians differ at {a}"
+            );
             if c8.to_bits() != cl.to_bits() || s8.to_bits() != sl.to_bits() {
                 diffs.push((a, c8, cl, s8, sl));
             }
         }
         println!("V8_VS_LIBM_DIRECTION_DIFFS {}", diffs.len());
         for d in &diffs {
-            println!("  angle {} cos v8={:e} libm={:e} sin v8={:e} libm={:e}", d.0, d.1, d.2, d.3, d.4);
+            println!(
+                "  angle {} cos v8={:e} libm={:e} sin v8={:e} libm={:e}",
+                d.0, d.1, d.2, d.3, d.4
+            );
         }
     }
 }

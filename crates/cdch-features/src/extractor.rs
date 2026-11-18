@@ -3,9 +3,15 @@
 use std::sync::Arc;
 
 use cdch_core::engine::CHECKPOINTS;
-use cdch_core::{CdchError, Engine, MatrixView, Params, Result, RgbImage, SamplingPlan, Workspace, BINS, RAYS_ARCHIVED};
+use cdch_core::{
+    CdchError, Engine, MatrixView, Params, Result, RgbImage, SamplingPlan, Workspace, BINS,
+    RAYS_ARCHIVED,
+};
 
-use crate::{compact_from_checkpoints, compact_prevalidated, from_matrix, rich, sector_from_checkpoints, Representation, A_DIM};
+use crate::{
+    compact_from_checkpoints, compact_prevalidated, from_matrix, rich, sector_from_checkpoints,
+    Representation, A_DIM,
+};
 
 /// Per-thread extractor. Holds reusable buffers and shares a plan cache.
 ///
@@ -54,7 +60,12 @@ impl FeatureExtractor {
     }
 
     /// Full canonical matrix into `out` (`n_rays * 256`).
-    pub fn matrix_into(&mut self, img: &RgbImage<'_>, params: &Params, out: &mut [f64]) -> Result<()> {
+    pub fn matrix_into(
+        &mut self,
+        img: &RgbImage<'_>,
+        params: &Params,
+        out: &mut [f64],
+    ) -> Result<()> {
         let plan = self.plan(img, params)?;
         plan.matrix_into(img, &mut self.ws, out)
     }
@@ -64,10 +75,15 @@ impl FeatureExtractor {
     /// geometry replaces the O(360 x 256) scan, exactly.
     fn require_valid_archived(plan: &SamplingPlan) -> Result<()> {
         if plan.n_rays() != RAYS_ARCHIVED {
-            return Err(CdchError::RayCount { expected: RAYS_ARCHIVED, actual: plan.n_rays() });
+            return Err(CdchError::RayCount {
+                expected: RAYS_ARCHIVED,
+                actual: plan.n_rays(),
+            });
         }
         if !plan.all_rays_nonempty() {
-            return Err(CdchError::InvalidMatrix("non-finite values (empty ray?)".into()));
+            return Err(CdchError::InvalidMatrix(
+                "non-finite values (empty ray?)".into(),
+            ));
         }
         Ok(())
     }
@@ -76,7 +92,10 @@ impl FeatureExtractor {
     fn checkpoints(&mut self, img: &RgbImage<'_>, params: &Params) -> Result<Arc<SamplingPlan>> {
         let plan = self.plan(img, params)?;
         if plan.n_rays() != RAYS_ARCHIVED {
-            return Err(CdchError::RayCount { expected: RAYS_ARCHIVED, actual: plan.n_rays() });
+            return Err(CdchError::RayCount {
+                expected: RAYS_ARCHIVED,
+                actual: plan.n_rays(),
+            });
         }
         self.cp.resize(plan.n_rays() * CHECKPOINTS, 0.0);
         plan.checkpoints_into(img, &mut self.ws, &mut self.cp)?;
@@ -84,9 +103,18 @@ impl FeatureExtractor {
     }
 
     /// One representation, fused where possible.
-    pub fn extract(&mut self, img: &RgbImage<'_>, params: &Params, rep: Representation, out: &mut [f64]) -> Result<()> {
+    pub fn extract(
+        &mut self,
+        img: &RgbImage<'_>,
+        params: &Params,
+        rep: Representation,
+        out: &mut [f64],
+    ) -> Result<()> {
         if out.len() != rep.dim() {
-            return Err(CdchError::BufferSize { expected: rep.dim(), actual: out.len() });
+            return Err(CdchError::BufferSize {
+                expected: rep.dim(),
+                actual: out.len(),
+            });
         }
         match rep {
             Representation::A => {
@@ -112,7 +140,13 @@ impl FeatureExtractor {
     }
 
     /// Unfused reference path: full matrix, then the representation from the matrix.
-    pub fn extract_via_matrix(&mut self, img: &RgbImage<'_>, params: &Params, rep: Representation, out: &mut [f64]) -> Result<()> {
+    pub fn extract_via_matrix(
+        &mut self,
+        img: &RgbImage<'_>,
+        params: &Params,
+        rep: Representation,
+        out: &mut [f64],
+    ) -> Result<()> {
         let plan = self.plan(img, params)?;
         self.matrix.resize(plan.n_rays() * BINS, 0.0);
         plan.matrix_into(img, &mut self.ws, &mut self.matrix)?;

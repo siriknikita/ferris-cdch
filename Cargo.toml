@@ -1,6 +1,8 @@
 [workspace]
 resolver = "2"
+exclude = ["examples/independent-consumer"]
 members = [
+    "crates/ferris-cdch",
     "crates/cdch-core",
     "crates/cdch-features",
     "crates/cdch-python",
@@ -8,6 +10,7 @@ members = [
     "crates/cdch-cli",
 ]
 default-members = [
+    "crates/ferris-cdch",
     "crates/cdch-core",
     "crates/cdch-features",
     "crates/cdch-bench",
@@ -15,7 +18,7 @@ default-members = [
 ]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 rust-version = "1.85"
 license = "MIT OR Apache-2.0"
@@ -24,6 +27,7 @@ publish = false
 [workspace.dependencies]
 cdch-core = { path = "crates/cdch-core" }
 cdch-features = { path = "crates/cdch-features" }
+ferris-cdch = { path = "crates/ferris-cdch" }
 rayon = "1.12"
 png = "0.18"
 serde_json = "1.0"

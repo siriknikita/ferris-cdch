@@ -71,7 +71,9 @@ fn round_with(m: Mutant, x: f64) -> f64 {
 fn luma_with(m: Mutant, r: u8, g: u8, b: u8) -> usize {
     let (r, g, b) = (r as f64, g as f64, b as f64);
     match m {
-        Mutant::LumaInteger => ((2125 * r as u32 + 7154 * g as u32 + 721 * b as u32 + 5000) / 10000) as usize,
+        Mutant::LumaInteger => {
+            ((2125 * r as u32 + 7154 * g as u32 + 721 * b as u32 + 5000) / 10000) as usize
+        }
         Mutant::LumaReassociated => js::round(r * R_COEF + (g * G_COEF + b * B_COEF)) as usize,
         Mutant::LumaRec601 => js::round(r * 0.299 + g * 0.587 + b * 0.114) as usize,
         _ => js::round(r * R_COEF + g * G_COEF + b * B_COEF) as usize,
@@ -132,7 +134,11 @@ pub fn cdch(img: &RgbImage<'_>, params: &Params, m: Mutant) -> Vec<f64> {
         let inv = 1.0 / total as f64;
         for &v in &hist {
             cum += v;
-            out.push(if m == Mutant::NormReciprocal { cum as f64 * inv } else { cum as f64 / total as f64 });
+            out.push(if m == Mutant::NormReciprocal {
+                cum as f64 * inv
+            } else {
+                cum as f64 / total as f64
+            });
         }
     }
     out
