@@ -28,8 +28,8 @@ deliberate, and provenance can be recorded?
 - *Git submodules / vendoring:* duplicate the source in the consumer.
 
 ## Consequences
-Upgrading is an explicit change of the tag plus a lockfile update. Fetching requires
-access to the private remote (CI needs a read token).
+Upgrading is an explicit change of the tag plus a lockfile update. The repository is public
+(since 2026-11-18, as `github.com/siriknikita/ferris-cdch`), so fetching needs no credentials.
 
 ## Risks and trade-offs
 Tags are mutable in Git; the lockfile's commit hash, which Cargo verifies, is the real pin.

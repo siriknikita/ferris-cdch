@@ -8,7 +8,7 @@ library and the creation of CDCH Research Studio. The baseline is commit `553ff8
 
 | Item | State at baseline |
 |---|---|
-| Repository | Git, branch `main` plus `phase-h-optimization`, `phase-i-benchmarks`, `phase-j-cli-mutants`, `phase-j-reports`; remote `origin` = `github.com/siriknikita/project-ferris-rust-cdch` (private); no tags; 13 commits |
+| Repository | Git, branch `main` plus `phase-h-optimization`, `phase-i-benchmarks`, `phase-j-cli-mutants`, `phase-j-reports`; remote `origin` = `github.com/siriknikita/project-ferris-rust-cdch` (private; renamed to `ferris-cdch` and made public after this work); no tags; 13 commits |
 | Workspace | `cdch-core`, `cdch-features`, `cdch-python`, `cdch-bench`, `cdch-cli`; version 0.1.0; `rust-version = 1.85`; MIT OR Apache-2.0 (licence texts were not in the repository) |
 | Canonical reference | `oracle/ip-1.js` (Muzyka, SHA-256 `110732b4…aab44d8`), archived `oracle/oracle.js`, `oracle/diff_worker.js` |
 | Canonical implementation | `cdch-core::reference` (literal port) and `cdch-core::{plan, engine}` (optimized), embedded V8 direction table |

@@ -7,7 +7,7 @@ Every code block below is taken from compiled examples, doctests or tests.
 
 ```toml
 [dependencies]
-ferris-cdch = { git = "https://github.com/siriknikita/project-ferris-rust-cdch.git", tag = "v0.2.0" }
+ferris-cdch = { git = "https://github.com/siriknikita/ferris-cdch.git", tag = "v0.2.0" }
 # Optional: the validated A/B/C/D feature extractors of the CDCH study.
 # ferris-cdch = { git = "…", tag = "v0.2.0", features = ["representations"] }
 ```

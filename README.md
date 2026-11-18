@@ -24,11 +24,11 @@ Ferris is not on crates.io. Depend on it through Git, pinned to a release tag:
 
 ```toml
 [dependencies]
-ferris-cdch = { git = "https://github.com/siriknikita/project-ferris-rust-cdch.git", tag = "v0.2.0" }
+ferris-cdch = { git = "https://github.com/siriknikita/ferris-cdch.git", tag = "v0.2.0" }
 ```
 
-(The repository is private, and the `v0.2.0` tag exists locally until it is pushed. See
-[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md#consuming-an-unpublished-tag) for local use.)
+`Cargo.lock` then records the exact commit of the tag. For working against an unreleased
+local tag, see [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md#consuming-an-unpublished-tag).
 
 ```rust
 use ferris_cdch::{Analyzer, CdchConfig, CenterSpec, OwnedRgbImage};

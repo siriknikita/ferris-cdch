@@ -55,8 +55,8 @@ because such changes are observable.
 
 ## Consuming an unpublished tag
 
-Consumers declare `git = "https://github.com/siriknikita/project-ferris-rust-cdch.git", tag = "vX.Y.Z"`.
-Until the tag is pushed, Cargo cannot fetch it. CDCH Research Studio solves this without
+Consumers declare `git = "https://github.com/siriknikita/ferris-cdch.git", tag = "vX.Y.Z"`.
+While a new tag exists only locally (before it is pushed), Cargo cannot fetch it. CDCH Research Studio solves this without
 changing its manifest: its `scripts/use-local-ferris.sh` writes an untracked
 `.cargo/config.toml` with a Cargo *source replacement* that reads the same tag from a
 local clone, and `scripts/update-ferris-lock.sh` pins the commit in `Cargo.lock`. Once

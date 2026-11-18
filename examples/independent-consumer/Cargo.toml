@@ -2,9 +2,9 @@
 # through a Git dependency on the public `ferris-cdch` crate, with no access to the
 # Ferris workspace. `[workspace]` makes this directory its own workspace root.
 #
-# The dependency below is the intended published form. Until the tag exists on the
-# remote, scripts/verify_independent_consumer.sh builds this project against a fresh
-# local clone instead (it rewrites the URL in a temporary copy).
+# The dependency below is the published form (`cargo run` works as is).
+# scripts/verify_independent_consumer.sh builds the same project against a fresh clone of
+# any revision (it rewrites the URL in a temporary copy), e.g. before tagging.
 [package]
 name = "ferris-independent-consumer"
 version = "0.1.0"
@@ -12,6 +12,6 @@ edition = "2021"
 publish = false
 
 [dependencies]
-ferris-cdch = { git = "https://github.com/siriknikita/project-ferris-rust-cdch.git", tag = "v0.2.0" }
+ferris-cdch = { git = "https://github.com/siriknikita/ferris-cdch.git", tag = "v0.2.0" }
 
 [workspace]
