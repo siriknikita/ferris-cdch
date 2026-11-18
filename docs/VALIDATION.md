@@ -59,7 +59,8 @@ angle-step classes). CI runs the synthetic suite.
 
 * Execution on Linux and Windows, and therefore cross-platform bitwise identity: CI is
   configured (`.github/workflows/ci.yml`, validated with `actionlint`) but has **not run**,
-  because the repository has not been pushed.
+  because GitHub Actions is blocked for the owner's account by a billing problem: the runs
+  triggered by publishing (2026-11-18) ended in `startup_failure` before any job started.
 * MSRV 1.85 for the crates other than `ferris-cdch` (only `ferris-cdch` was built with 1.85.0).
 * The direction table under Node 24 (see MATHEMATICAL_COMPATIBILITY.md §5).
 * No face images were available for any differential test.
@@ -69,4 +70,5 @@ angle-step classes). CI runs the synthetic suite.
 `.github/workflows/ci.yml` defines format, clippy, documentation, tests on Linux / macOS /
 Windows, MSRV, differential and mutation tests (synthetic fixtures, Node 22) on all three
 operating systems, the independent-consumer check, the Python-binding build and a RustSec
-audit. The syntax is validated with `actionlint`; the workflow has never run.
+audit. The syntax is validated with `actionlint`; the workflow has been triggered but has never
+executed (billing block, see §5).
