@@ -16,7 +16,7 @@ work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
 
 git clone --quiet "$repo" "$work/ferris"
-sha="$(git -C "$work/ferris" rev-parse "$rev")"
+sha="$(git -C "$work/ferris" rev-parse "$rev^{commit}")"
 echo "Ferris clone: $repo @ $sha"
 
 cp -R "$here/examples/independent-consumer" "$work/consumer"
