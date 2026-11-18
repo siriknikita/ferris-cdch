@@ -18,7 +18,7 @@ library and the creation of CDCH Research Studio. The baseline is commit `553ff8
 | Threading | `rayon` in the CLI, bindings and benchmarks; the core is single-threaded and `Sync` |
 | Platform-specific code | none |
 | Evidence | `reports/differential` (713 cases), `reports/classifier_compatibility`, `reports/perf`, five `RUST_*.md` reports, `study/` archive with `SHA256SUMS` |
-| HTML research interface | Not in the repository. The user supplied `../../cdch-research/CDCH_Workbench_Clean.html` (outside both repositories; Ukrainian interface; PyScript + Chart.js loaded from CDNs) |
+| HTML research interface | Not in the repository. The user supplied `../../../cdch-research/CDCH_Workbench_Clean.html` (outside both repositories; Ukrainian interface; PyScript + Chart.js loaded from CDNs) |
 
 ## Baseline checks (before any change)
 
